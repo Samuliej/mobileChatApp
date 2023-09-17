@@ -1,11 +1,14 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
 const User = require('./models/User')
 const Message = require('./models/Message')
+const Friendship = require('./models/Friendship')
+const { GraphQLError } = require( 'graphql' )
 
 require('dotenv').config()
 
@@ -24,12 +27,25 @@ mongoose.connect(MONGODB_URI)
 
 const typeDefs = `
 
+  enum FriendshipStatus {
+    PENDING
+    ACCEPTED
+    DECLINED
+  }
+
+  type Friendship {
+    userA: User!
+    userB: User!
+    status: FriendshipStatus!
+  }
+
   type User {
     username: String!
     name: String!
     phone: String
     city: String
     id: ID!
+    pendingFriendRequests: [Friendship]
     friends: [User]
   }
 
@@ -52,19 +68,12 @@ const typeDefs = `
     me: User
   }
 
-  type Friendship {
-    id: ID!
-    userA: User!
-    userB: User!
-    status: String!
-  }
-
-
   type Mutation {
     createUser(username: String!, password: String!, name: String!, phone: String, city: String): User
     sendFriendRequest(username: String!): Friendship
     acceptFriendRequest(friendshipId: ID!): Friendship
     declineFriendRequest(friendshipId: ID!): Friendship
+    login(username: String!, password: String!): Token
   }
 `
 
@@ -87,9 +96,49 @@ const resolvers = {
   },
 
   Mutation: {
-    sendFriendRequest: (root, args) => {
-      const { friendUsername } = args.request
+    sendFriendRequest: async (root, args, context) => {
+      const friendUsername = args.username
+      console.log('kamun käyttis')
+      console.log(friendUsername)
+      const currentUser = context.currentUser
+      const receiver = await User.findOne({username: friendUsername})
+      console.log(receiver)
 
+      if (!currentUser) {
+        throw new GraphQLError('Authentication required', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
+      }
+
+      console.log(currentUser)
+      console.log(friendUsername)
+
+      const newFriendship = new Friendship({
+        userA: currentUser,
+        userB: receiver,
+        status: 'PENDING'
+      })
+
+      try {
+        await newFriendship.save()
+
+        currentUser.pendingFriendRequests.push(newFriendship)
+        await currentUser.save()
+
+        receiver.pendingFriendRequests.push(newFriendship)
+        await receiver.save()
+
+      } catch (error) {
+        throw new GraphQLError('Something went wrong saving new friendship state', {
+          extensions: {
+            code: 'INTERNAL_SERVER_ERROR'
+          }
+        })
+      }
+
+      return newFriendship
     },
     createUser: async (_, { username, password, name, phone, city }) => {
       try {
@@ -97,7 +146,9 @@ const resolvers = {
 
         const newUser = new User({
           username, name, phone, city,
-          password: hashedPassword
+          password: hashedPassword,
+          pendingFriendRequests: [],
+          friends: []
         })
 
         const savedUser = await newUser.save()
@@ -112,6 +163,49 @@ const resolvers = {
             code: 'BAD_USER_INPUT',
             invalidArgs: args.username,
             error
+          }
+        })
+      }
+    },
+    login: async (root, args) => {
+      const { username, password } = args
+
+      try {
+        const user = await User.findOne({ username: username })
+        if (!user) {
+          throw new GraphQLError('User not found', {
+            extensions: {
+              code: 'BAD_USER_INPUT'
+            }
+          })
+        }
+
+        console.log('tässä')
+
+        const passwordMatch = await bcrypt.compare(password, user.password)
+
+        if (!passwordMatch) {
+          throw new GraphQLError('Wrong credentials', {
+            extensions: {
+              code: 'BAD_USER_INPUT'
+            }
+          })
+        }
+
+        const userForToken = {
+          username: user.username,
+          id: user._id
+        }
+
+        console.log(userForToken)
+
+        return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
+
+      } catch (error) {
+        throw new GraphQLError('Something went wrong signing in', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            error: error
           }
         })
       }
