@@ -2,12 +2,12 @@ const mongoose = require('mongoose')
 
 const friendshipSchema = new mongoose.Schema({
   userA: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    type: String,
+    required: true
   },
   userB: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    type: String,
+    required: true
   },
   status: {
     type: String,

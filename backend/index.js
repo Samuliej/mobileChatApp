@@ -34,9 +34,17 @@ const typeDefs = `
   }
 
   type Friendship {
-    userA: User!
-    userB: User!
+    userA: ID!
+    userB: ID!
     status: FriendshipStatus!
+    id: ID!
+  }
+
+  type Message {
+    sender: User!
+    receiver: User!
+    content: String!
+    timestamp: String!
   }
 
   type User {
@@ -46,19 +54,11 @@ const typeDefs = `
     city: String
     id: ID!
     pendingFriendRequests: [Friendship]
-    friends: [User]
+    friends: [ID]
   }
 
   type Token {
     value: String!
-  }
-
-  type Message {
-    sender: User!
-    receiver: User!
-    content: String!
-    timestamp: String!
-    id: ID!
   }
 
   type Query {
@@ -81,7 +81,7 @@ const resolvers = {
   Query: {
     UserCount: async () => User.collection.countDocuments,
     allUsers: async () => {
-      const users = await User.find({})
+      const users = await User.find({}).populate('pendingFriendRequests')
       return users
     },
     findUser: async (root, args) => {
@@ -98,11 +98,8 @@ const resolvers = {
   Mutation: {
     sendFriendRequest: async (root, args, context) => {
       const friendUsername = args.username
-      console.log('kamun käyttis')
-      console.log(friendUsername)
       const currentUser = context.currentUser
       const receiver = await User.findOne({username: friendUsername})
-      console.log(receiver)
 
       if (!currentUser) {
         throw new GraphQLError('Authentication required', {
@@ -112,22 +109,19 @@ const resolvers = {
         })
       }
 
-      console.log(currentUser)
-      console.log(friendUsername)
-
       const newFriendship = new Friendship({
-        userA: currentUser,
-        userB: receiver,
+        userA: currentUser._id,
+        userB: receiver._id,
         status: 'PENDING'
       })
 
       try {
         await newFriendship.save()
 
-        currentUser.pendingFriendRequests.push(newFriendship)
+        currentUser.pendingFriendRequests.push(newFriendship._id)
         await currentUser.save()
 
-        receiver.pendingFriendRequests.push(newFriendship)
+        receiver.pendingFriendRequests.push(newFriendship._id)
         await receiver.save()
 
       } catch (error) {
@@ -139,6 +133,38 @@ const resolvers = {
       }
 
       return newFriendship
+    },
+    acceptFriendRequest: async (root, args, context) => {
+      const friendship = await Friendship.findOne({ _id: args.friendshipId})
+      const currentUser = context.currentUser
+      const requestSender = await User.findOne({ _id: friendship.userA})
+
+      if (!currentUser) {
+        throw new GraphQLError('Authentication required', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
+      }
+
+      if (currentUser._id == friendship.userB) {
+        try {
+          friendship.status = 'ACCEPTED'
+          await friendship.save()
+          currentUser.friends.push(friendship.userA)
+          requestSender.friends.push(friendship.userB)
+          await currentUser.save()
+          await requestSender.save()
+        } catch (error) {
+          throw new GraphQLError('Error updating friendship status', {
+            extensions: {
+              code: 'INTERNAL_SERVER_ERROR'
+            }
+          })
+        }
+      }
+
+      return friendship
     },
     createUser: async (_, { username, password, name, phone, city }) => {
       try {
