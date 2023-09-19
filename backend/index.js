@@ -34,8 +34,8 @@ const typeDefs = `
   }
 
   type Friendship {
-    userA: ID!
-    userB: ID!
+    sender: ID!
+    receiver: ID!
     status: FriendshipStatus!
     id: ID!
   }
@@ -101,6 +101,9 @@ const resolvers = {
       const currentUser = context.currentUser
       const receiver = await User.findOne({username: friendUsername})
 
+      console.log(currentUser)
+      console.log(receiver)
+
       if (!currentUser) {
         throw new GraphQLError('Authentication required', {
           extensions: {
@@ -110,8 +113,8 @@ const resolvers = {
       }
 
       const newFriendship = new Friendship({
-        userA: currentUser._id,
-        userB: receiver._id,
+        sender: currentUser._id,
+        receiver: receiver._id,
         status: 'PENDING'
       })
 
@@ -137,7 +140,7 @@ const resolvers = {
     acceptFriendRequest: async (root, args, context) => {
       const friendship = await Friendship.findOne({ _id: args.friendshipId})
       const currentUser = context.currentUser
-      const requestSender = await User.findOne({ _id: friendship.userA})
+      const requestSender = await User.findOne({ _id: friendship.sender})
 
       if (!currentUser) {
         throw new GraphQLError('Authentication required', {
@@ -147,12 +150,12 @@ const resolvers = {
         })
       }
 
-      if (currentUser._id == friendship.userB) {
+      if (currentUser._id.toString() == friendship.receiver) {
         try {
           friendship.status = 'ACCEPTED'
           await friendship.save()
-          currentUser.friends.push(friendship.userA)
-          requestSender.friends.push(friendship.userB)
+          currentUser.friends.push(friendship.sender)
+          requestSender.friends.push(friendship.receiver)
           await currentUser.save()
           await requestSender.save()
         } catch (error) {
@@ -162,6 +165,45 @@ const resolvers = {
             }
           })
         }
+      } else {
+        throw new GraphQLError('Not authenticated to accept request', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
+      }
+
+      return friendship
+    },
+    declineFriendRequest: async (root, args, context) => {
+      const friendship = await Friendship.findOne({ _id: args.friendshipId})
+      const currentUser = context.currentUser
+
+      if (!currentUser) {
+        throw new GraphQLError('Authentication required', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
+      }
+
+      if (currentUser._id.toString() === friendship.receiver) {
+        try {
+          friendship.status = 'DECLINED'
+          await friendship.save()
+        } catch (error) {
+          throw new GraphQLError('Something went wrong declining the friendship', {
+            extensions: {
+              code: 'INTERNAL_SERVER_ERROR'
+            }
+          })
+        }
+      } else {
+        throw new GraphQLError('Not authenticated to decline request', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
       }
 
       return friendship
@@ -205,8 +247,6 @@ const resolvers = {
             }
           })
         }
-
-        console.log('tässä')
 
         const passwordMatch = await bcrypt.compare(password, user.password)
 

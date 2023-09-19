@@ -1,11 +1,11 @@
 const mongoose = require('mongoose')
 
 const friendshipSchema = new mongoose.Schema({
-  userA: {
+  sender: {
     type: String,
     required: true
   },
-  userB: {
+  receiver: {
     type: String,
     required: true
   },
