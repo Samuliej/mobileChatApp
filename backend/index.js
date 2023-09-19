@@ -41,8 +41,8 @@ const typeDefs = `
   }
 
   type Message {
-    sender: User!
-    receiver: User!
+    sender: ID!
+    receiver: ID!
     content: String!
     timestamp: String!
   }
@@ -70,10 +70,13 @@ const typeDefs = `
 
   type Mutation {
     createUser(username: String!, password: String!, name: String!, phone: String, city: String): User
+    login(username: String!, password: String!): Token
+
     sendFriendRequest(username: String!): Friendship
     acceptFriendRequest(friendshipId: ID!): Friendship
     declineFriendRequest(friendshipId: ID!): Friendship
-    login(username: String!, password: String!): Token
+
+    sendMessage(username: String!, content: String!): Message
   }
 `
 
@@ -100,9 +103,6 @@ const resolvers = {
       const friendUsername = args.username
       const currentUser = context.currentUser
       const receiver = await User.findOne({username: friendUsername})
-
-      console.log(currentUser)
-      console.log(receiver)
 
       if (!currentUser) {
         throw new GraphQLError('Authentication required', {
@@ -207,6 +207,54 @@ const resolvers = {
       }
 
       return friendship
+    },
+    sendMessage: async (root, args, context) => {
+      const currentUser = context.currentUser
+      if (!currentUser) {
+        throw new GraphQLError('Authentication required', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
+      }
+
+      const messageReceiver = await User.findOne({ username: args.username })
+      if (!messageReceiver) {
+        throw new GraphQLError('User not found', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
+      }
+
+      if (currentUser.friends.includes(messageReceiver._id)) {
+        const currentDate = new Date()
+        const timestampString = currentDate.toISOString()
+
+        const newMessage = new Message({
+          content: args.content,
+          sender: currentUser._id.toString(),
+          receiver: messageReceiver._id.toString(),
+          timestamp: timestampString
+        })
+
+        try {
+          await newMessage.save()
+          return newMessage
+        } catch (error) {
+          throw new GraphQLError(`Sending the message failed: ${error.message}`, {
+            extensions: {
+              code: 'INTERNAL_SERVER_ERROR'
+            }
+          })
+        }
+      } else {
+        throw new GraphQLError('Person is not currently on your friend list', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
+      }
     },
     createUser: async (_, { username, password, name, phone, city }) => {
       try {

@@ -2,13 +2,11 @@ const mongoose = require('mongoose')
 
 const schema = new mongoose.Schema({
   sender: {
-    type: mongoose.Types.ObjectId,
-    ref: 'User',
+    type: String,
     required: true,
   },
   receiver: {
-    type: mongoose.Types.ObjectId,
-    ref: 'User',
+    type: String,
     required: true
   },
   content: {
@@ -19,7 +17,7 @@ const schema = new mongoose.Schema({
   timestamp: {
     type: String,
     required: true
-  }
+  },
 })
 
 module.exports = mongoose.model('Message', schema)
