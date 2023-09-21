@@ -27,7 +27,8 @@ const schema = new mongoose.Schema({
     minlength: 3
   },
   pendingFriendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Friendship' }],
-  friends: [{ type: String }]
+  friends: [{ type: String }],
+  messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }]
 
 })
 

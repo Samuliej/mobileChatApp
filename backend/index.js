@@ -238,8 +238,13 @@ const resolvers = {
           timestamp: timestampString
         })
 
+        currentUser.messages.push(newMessage)
+        messageReceiver.messages.push(newMessage)
+
         try {
           await newMessage.save()
+          await currentUser.save()
+          await messageReceiver.save()
           return newMessage
         } catch (error) {
           throw new GraphQLError(`Sending the message failed: ${error.message}`, {
@@ -310,8 +315,6 @@ const resolvers = {
           username: user.username,
           id: user._id
         }
-
-        console.log(userForToken)
 
         return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
 
