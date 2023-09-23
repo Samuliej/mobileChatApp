@@ -3,6 +3,11 @@ import { View, StyleSheet, Pressable } from "react-native"
 import FormikTextInput from "./FormikTextInput"
 import theme from "../theme"
 import Text from "../Text"
+import * as yup from 'yup'
+import useSignIn from "../hooks/useSignIn"
+import { useNavigate } from "react-router-native"
+import { useEffect, useState } from "react"
+import ErrorBanner from "./ErrorBanner"
 
 const styles = StyleSheet.create({
   container: {
@@ -18,18 +23,23 @@ const initialValues = {
   password: ''
 }
 
-const SignInView = () => {
+const validationSchema = yup.object().shape({
+  username: yup
+    .string()
+    .required('Username is required'),
+  password: yup
+    .string()
+    .required('Password is required')
+})
 
-  const onSubmit = () => {
-    console.log('submittas')
-  }
+const SignInView = ({ onSubmit }) => {
 
   return (
     <View style={styles.container}>
       <Formik
         initialValues={initialValues}
         onSubmit={onSubmit}
-        //validationSchema={}
+        validationSchema={validationSchema}
       >
         {({ handleSubmit, isValid }) => (
           <>
@@ -48,4 +58,41 @@ const SignInView = () => {
   )
 }
 
-export default SignInView
+const SignIn = () => {
+  const [signIn] = useSignIn()
+  const navigate = useNavigate()
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (error) {
+      const timeout = setTimeout(() => {
+        setError(null)
+      }, 10000)
+
+      return () => clearTimeout(timeout)
+    }
+  })
+
+  const handleSignIn = async (values) => {
+    const { username, password } = values
+    console.log(values)
+    try {
+      const data = await signIn({ username, password })
+      console.log(data)
+      if (data) {
+        navigate('/')
+      }
+    } catch (error) {
+      setError(error.message)
+    }
+  }
+
+  return (
+    <>
+      {error && <ErrorBanner message={error} />}
+      <SignInView onSubmit={handleSignIn} />
+    </>
+  )
+}
+
+export default SignIn

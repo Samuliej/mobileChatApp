@@ -3,6 +3,7 @@ import NavBar from './NavBar'
 import { Route, Routes } from 'react-router-native'
 import SignInView from './SignIn'
 import Constants from 'expo-constants'
+import Feed from './Feed'
 
 const styles = StyleSheet.create({
   container: {
@@ -18,6 +19,7 @@ const Main = () => {
         <NavBar />
         <Routes>
           <Route path='/sign-in' element={<SignInView />} exact />
+          <Route path='/' element={<Feed />} exact />
         </Routes>
     </View>
   )
