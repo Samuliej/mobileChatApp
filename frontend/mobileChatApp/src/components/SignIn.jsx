@@ -75,10 +75,8 @@ const SignIn = () => {
 
   const handleSignIn = async (values) => {
     const { username, password } = values
-    console.log(values)
     try {
       const data = await signIn({ username, password })
-      console.log(data)
       if (data) {
         navigate('/')
       }

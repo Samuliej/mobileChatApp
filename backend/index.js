@@ -90,6 +90,9 @@ const resolvers = {
     findUser: async (root, args) => {
       const user = await User.findOne({ username: args.username })
       return user
+    },
+    me: (root, args, context) => {
+      return context.currentUser
     }
   },
   User: {
