@@ -15,7 +15,7 @@ const NavBar = () => {
   const apolloClient = useApolloClient()
   let user = null
   const navigate = useNavigate()
-  const data = useGetCurrentUser()
+  const data = useGetCurrentUser(false)
   user = data && data.user
 
   const handleSignOut = async () => {

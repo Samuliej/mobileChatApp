@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 const BottomNav = () => {
   let user = null
   const navigate = useNavigate()
-  const data = useGetCurrentUser()
+  const data = useGetCurrentUser(false)
   user = data && data.user
 
   return (
@@ -28,7 +28,10 @@ const BottomNav = () => {
       <ScrollView horizontal contentContainerStyle={styles.scrollViewContent}>
         <>
           {user &&(
-            <NavBarTab text='Contacts' onPress={() => navigate('/contacts')} />
+            <>
+              <NavBarTab text='Contacts' onPress={() => navigate('/contacts')} />
+              <NavBarTab text='Feed' onPress={() => navigate('/feed')} />
+            </>
           )}
           {!user && (
             <NavBarTab text='' onPress={() => console.log('placeholder')} />
