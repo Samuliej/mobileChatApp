@@ -8,6 +8,7 @@ mongoose.set('strictQuery', false)
 const User = require('./models/User')
 const Message = require('./models/Message')
 const Friendship = require('./models/Friendship')
+const Conversation = require('./models/Conversation')
 const { GraphQLError } = require( 'graphql' )
 
 require('dotenv').config()
@@ -47,6 +48,12 @@ const typeDefs = `
     timestamp: String!
   }
 
+  type Conversation {
+    id: ID!
+    participants: [ID]
+    messages: [Message]
+  }
+
   type User {
     username: String!
     name: String!
@@ -54,7 +61,7 @@ const typeDefs = `
     city: String
     id: ID!
     pendingFriendRequests: [Friendship]
-    friends: [ID]
+    friends: [User]
   }
 
   type Token {
@@ -64,7 +71,9 @@ const typeDefs = `
   type Query {
     UserCount: Int!
     allUsers: [User!]!
+    allConversations: [Conversation!]!
     findUser(username: String!): User
+    findConversationById(convoId: String!): Conversation
     me: User
   }
 
@@ -87,12 +96,39 @@ const resolvers = {
       const users = await User.find({}).populate('pendingFriendRequests')
       return users
     },
+    allConversations: async () => {
+      const convos = await Conversation.find({}).populate('messages')
+      return convos
+    },
+    findConversationById: async (root, args) => {
+      const convo = await Conversation.findById(args.convoId).populate('messages')
+      return convo
+    },
     findUser: async (root, args) => {
       const user = await User.findOne({ username: args.username })
       return user
     },
-    me: (root, args, context) => {
-      return context.currentUser
+    me: async (root, args, context) => {
+      const currentUser = context.currentUser
+
+      if (!currentUser) {
+        throw new GraphQLError('Authentication required', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
+      }
+
+      try {
+        const populatedCurrentUser = await User.findById(currentUser._id).populate('pendingFriendRequests')
+        return populatedCurrentUser
+      } catch (error) {
+        throw new GraphQLError('Error fetching user data', {
+          extensions: {
+            code: 'INTERNAL_SERVER_ERROR'
+          }
+        })
+      }
     }
   },
   User: {
@@ -107,6 +143,10 @@ const resolvers = {
       const currentUser = context.currentUser
       const receiver = await User.findOne({username: friendUsername})
 
+      console.log(currentUser)
+
+      console.log(receiver)
+
       if (!currentUser) {
         throw new GraphQLError('Authentication required', {
           extensions: {
@@ -114,6 +154,8 @@ const resolvers = {
           }
         })
       }
+
+      console.log('eikö mee perille')
 
       const newFriendship = new Friendship({
         sender: currentUser._id,
@@ -230,6 +272,19 @@ const resolvers = {
         })
       }
 
+      let conversation = await Conversation.findOne({
+        participants: {
+          $all: [currentUser._id, messageReceiver._id]
+        }
+      })
+
+      if (!conversation) {
+        conversation = new Conversation({
+          participants: [currentUser._id, messageReceiver._id],
+          messages: []
+        })
+      }
+
       if (currentUser.friends.includes(messageReceiver._id)) {
         const currentDate = new Date()
         const timestampString = currentDate.toISOString()
@@ -241,13 +296,16 @@ const resolvers = {
           timestamp: timestampString
         })
 
-        currentUser.messages.push(newMessage)
-        messageReceiver.messages.push(newMessage)
+        conversation.messages.push(newMessage._id)
+
+        //currentUser.messages.push(newMessage)
+        //messageReceiver.messages.push(newMessage)
 
         try {
           await newMessage.save()
-          await currentUser.save()
-          await messageReceiver.save()
+          //await currentUser.save()
+          //await messageReceiver.save()
+          await conversation.save()
           return newMessage
         } catch (error) {
           throw new GraphQLError(`Sending the message failed: ${error.message}`, {
