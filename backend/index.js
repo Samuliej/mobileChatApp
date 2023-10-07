@@ -316,7 +316,8 @@ const resolvers = {
 
         const userForToken = {
           username: user.username,
-          id: user._id
+          id: user._id,
+          exp: Math.floor(Date.now() / 1000) + (60 * 60) // JWT expires in 1 hour
         }
 
         return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }

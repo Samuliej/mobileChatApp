@@ -5,6 +5,7 @@ import { ApolloProvider } from '@apollo/client'
 import AuthStorage from './src/utils/authStorage'
 import createApolloClient from './src/utils/apolloClient'
 import AuthStorageContext from './src/context/AuthStorageContext'
+import { NavigationContainer } from '@react-navigation/native'
 
 const authStorage = new AuthStorage()
 const apolloClient = createApolloClient(authStorage)
@@ -12,6 +13,7 @@ const apolloClient = createApolloClient(authStorage)
 const App = () => {
   return (
     <>
+    <NavigationContainer>
       <NativeRouter>
         <ApolloProvider client={apolloClient}>
           <AuthStorageContext.Provider value={authStorage}>
@@ -19,6 +21,7 @@ const App = () => {
           </AuthStorageContext.Provider>
           </ApolloProvider>
       </NativeRouter>
+    </NavigationContainer>
       <StatusBar style='auto' />
     </>
   )

@@ -4,6 +4,8 @@ import { Route, Routes } from 'react-router-native'
 import SignInView from './SignIn'
 import Constants from 'expo-constants'
 import Feed from './Feed'
+import Contacts from './Contacts'
+import BottomNav from './BottomNav'
 
 const styles = StyleSheet.create({
   container: {
@@ -18,9 +20,11 @@ const Main = () => {
     <View style={styles.container}>
         <NavBar />
         <Routes>
+          <Route path='/contacts' element={<Contacts />} />
           <Route path='/sign-in' element={<SignInView />} exact />
           <Route path='/' element={<Feed />} exact />
         </Routes>
+        <BottomNav />
     </View>
   )
 }
