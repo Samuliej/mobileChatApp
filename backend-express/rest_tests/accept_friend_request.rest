@@ -1,0 +1,8 @@
+### Accept friend request
+POST http://localhost:3001/api/acceptFriendRequest
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyIiwiaWQiOiI2NTZmNTgzNTlkYzE4NzMxMjE4NzU3N2MiLCJleHAiOjE3MDE3OTk1ODcsImlhdCI6MTcwMTc5NTk4N30.cF6hV4I8Hi9XoBjV-GwyNP38WyCTRQ3NoUglPV_YuwI
+
+{
+  "friendshipId": "id_of_the_friendship"
+}

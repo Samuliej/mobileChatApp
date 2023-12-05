@@ -21,8 +21,8 @@ const Main = () => {
   // Check for user before loading /
   // Not signed in -> log in page
   let user = null
-  const data = useGetCurrentUser(false)
-  user = data && data.user
+  //const data = useGetCurrentUser(false)
+  //user = data && data.user
 
   return (
     <View style={styles.container}>

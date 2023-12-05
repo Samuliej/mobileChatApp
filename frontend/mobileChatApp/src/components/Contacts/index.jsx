@@ -1,15 +1,15 @@
 import Text from "../../Text"
 import { View } from "react-native"
-import useGetCurrentUser from "../../hooks/useGetCurrentUser"
+//import useGetCurrentUser from "../../hooks/useGetCurrentUser"
 
 
 const Contacts = () => {
 
-  let user = null
-  const data = useGetCurrentUser(true)
-  user = data && data.user
+  //let user = null
+  //const data = useGetCurrentUser(true)
+  //user = data && data.user
 
-  console.log(user)
+  //console.log(user)
   return (
     <View>
       <Text>Friends list</Text>

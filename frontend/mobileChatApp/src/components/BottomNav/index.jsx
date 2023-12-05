@@ -20,8 +20,8 @@ const styles = StyleSheet.create({
 const BottomNav = () => {
   let user = null
   const navigate = useNavigate()
-  const data = useGetCurrentUser(false)
-  user = data && data.user
+  //const data = useGetCurrentUser(false)
+  //user = data && data.user
 
   return (
     <View style={styles.container}>

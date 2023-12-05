@@ -1,0 +1,8 @@
+### Send friend request
+POST http://localhost:3001/api/sendFriendRequest
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyIiwiaWQiOiI2NTZmNTgzNTlkYzE4NzMxMjE4NzU3N2MiLCJleHAiOjE3MDE4MDE0NTgsImlhdCI6MTcwMTc5Nzg1OH0.Kwt423lKXeAuDeZKuK5M4vPXlRsyRo_OGLNgkIPAW5Y
+
+{
+  "username": "Aso"
+}
