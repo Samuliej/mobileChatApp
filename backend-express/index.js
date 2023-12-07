@@ -7,9 +7,13 @@ const getRoutes = require('./routes/get')
 const postRoutes = require('./routes/post')
 const putRoutes = require('./routes/put')
 
-require('dotenv').config()
+let MONGODB_URI
+if (process.env.NODE_ENV !== 'test') {
+  MONGODB_URI = config.MONGODB_URI
+} else {
+  MONGODB_URI = config.MONGODB_TEST_URI
+}
 
-const MONGODB_URI = config.MONGODB_URI
 
 console.log('connecting to', MONGODB_URI)
 
@@ -17,6 +21,7 @@ mongoose
   .connect(MONGODB_URI)
   .then(() => {
     console.log('Connected to MongoDB')
+    console.log(MONGODB_URI)
   })
   .catch((error) => {
     console.log('error connecting to MongoDB: ', error)
@@ -32,6 +37,10 @@ app.use(getRoutes)
 app.use(postRoutes)
 app.use(putRoutes)
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`)
-})
+if (config.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`)
+  })
+}
+
+module.exports = app

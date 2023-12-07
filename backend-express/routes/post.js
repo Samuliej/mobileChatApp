@@ -113,9 +113,10 @@ router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
 })
 
 // Accept friend request
-router.post('/api/acceptFriendRequest', async (req, res) => {
+router.post('/api/acceptFriendRequest', authMiddleware, async (req, res) => {
   const friendship = await Friendship.findOne({ _id: req.body.friendshipId })
   const currentUser = req.currentUser
+
   const requestSender = await User.findOne({ _id: friendship.sender })
 
   if (!currentUser) {
@@ -126,10 +127,15 @@ router.post('/api/acceptFriendRequest', async (req, res) => {
     try {
       friendship.status = 'ACCEPTED'
       await friendship.save()
+
       currentUser.friends.push(friendship.sender)
-      requestSender.friends.push(friendship.receiver)
+      currentUser.pendingFriendRequests = currentUser.pendingFriendRequests.filter(request => request.toString() !== friendship._id.toString())
       await currentUser.save()
+
+      requestSender.friends.push(friendship.receiver)
+      requestSender.pendingFriendRequests = requestSender.pendingFriendRequests.filter(request => request.toString() !== friendship._id.toString())
       await requestSender.save()
+
       res.status(200).json(friendship)
     } catch (error) {
       res.status(500).json({ error: 'Error updating friendship status' })
@@ -139,9 +145,11 @@ router.post('/api/acceptFriendRequest', async (req, res) => {
   }
 })
 
+
 // Send message
 router.post('/api/sendMessage', authMiddleware, async (req, res) => {
   const currentUser = req.currentUser
+  let user = await User.findOne({ username: currentUser.username })
   if (!currentUser) {
     return res.status(400).json({ error: 'Authentication required' })
   }
@@ -176,11 +184,18 @@ router.post('/api/sendMessage', authMiddleware, async (req, res) => {
     })
 
     conversation.messages.push(newMessage._id)
+    user.conversations.push(conversation._id)
+    messageReceiver.conversations.push(conversation._id)
 
     try {
       await newMessage.save()
       await conversation.save()
-      return res.status(201).json(newMessage)
+      await user.save()
+      await messageReceiver.save()
+      return res.status(201).json({
+        conversation: conversation,
+        message: newMessage
+      })
     } catch (error) {
       return res.status(500).json({ error: `Sending the message failed: ${error.message}` })
     }

@@ -31,7 +31,7 @@ router.get('/api/conversations', async (req, res) => {
 // Fetch user by username
 router.get('/api/users/:username', async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.params.username })
+    const user = await User.findOne({ username: req.params.username }).populate('friends', 'username')
     res.json(user)
   } catch (error) {
     res.status(500).json({ error: 'Error fetching user' })
