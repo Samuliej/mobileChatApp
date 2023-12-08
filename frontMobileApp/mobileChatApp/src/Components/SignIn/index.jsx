@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { View, StyleSheet, Pressable, Text, TextInput } from 'react-native'
 import * as yup from 'yup'
 import useSignIn from '../../hooks/useSignIn'
@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import ErrorBanner from '../Error/index.jsx'
 import { useNavigate } from 'react-router'
 import theme from '../../theme'
+import { UserContext } from '../../Context/UserContext'
 
 const styles = StyleSheet.create({
   container: {
@@ -24,13 +25,21 @@ const usernameSchema = yup.string().required('Username is required.')
 const passwordSchema = yup.string().required('Password is required')
 
 const SignIn = () => {
-  const { signIn, loading, error } = useSignIn()
+  const { updateUser } = useContext(UserContext)
+  const { signIn, error, setError } = useSignIn()
   const navigate = useNavigate()
-  const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setError('')
+    }, 5000)
+
+    return () => clearTimeout(timeout)
+  }, [error])
 
   const validateUsername = async () => {
     const isUsernameValid = await usernameSchema.isValid(username)
@@ -51,32 +60,29 @@ const SignIn = () => {
   }
 
   const handleSignIn = async () => {
-
-    try {
-      const data = await signIn(username, password)
-      if (data) {
-        await AsyncStorage.setItem('userToken', data.authorize.accessToken)
-        navigate('/')
-      }
-    } catch (error) {
-      setErrorMessage(error.message)
+    const data = await signIn(username, password)
+    if (data) {
+      await AsyncStorage.setItem('userToken', data)
+      await updateUser(data)
+      navigate('/')
     }
-    console.log('Sign in')
-    console.log(username)
-    console.log(password)
-  }
-
-  if (loading) {
-    return <Text>Loading...</Text>
-  }
-
-  if (error) {
-    return <Text>fdsjafjidsajifoadsjoafj</Text>
   }
 
   return (
     <>
-      {errorMessage && <ErrorBanner error={errorMessage} />}
+      {error && <ErrorBanner error={error} />}
+      <SignInView username={username} setUsername={setUsername} validateUsername={validateUsername}
+        password={password} setPassword={setPassword} validatePassword={validatePassword}
+        handleSignIn={handleSignIn} usernameError={usernameError} passwordError={passwordError}/>
+    </>
+  )
+
+}
+
+const SignInView = ({ username, setUsername, validateUsername, password,
+  setPassword, validatePassword, handleSignIn, usernameError, passwordError }) => {
+  return (
+    <>
       <View style={styles.container}>
         <TextInput style={styles.inputBox}
           value={username}

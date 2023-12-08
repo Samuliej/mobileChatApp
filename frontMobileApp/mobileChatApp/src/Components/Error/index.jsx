@@ -11,9 +11,15 @@ const ErrorBanner = ({ error }) => {
 
 const styles = StyleSheet.create({
   errorBanner: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     backgroundColor: 'red',
     padding: 10,
-    marginBottom: 10,
+    zIndex: 1,
+    width: '100%',
+    borderRadius: 15
   },
   errorText: {
     color: 'white',

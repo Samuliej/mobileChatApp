@@ -15,12 +15,12 @@ const useSignIn = () => {
       return res.data.token
     } catch (err) {
       setLoading(false)
-      setError(err.response ? err.response.data.error : 'Something went wrong signing in')
+      setError('Incorrect username or password')
       return null
     }
   }
 
-  return { signIn, loading, error }
+  return { signIn, loading, error, setError }
 }
 
 export default useSignIn
