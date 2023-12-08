@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const config = require('./utils/config')
 const mongoose = require('mongoose')
+const cors = require('cors')
 
 const getRoutes = require('./routes/get')
 const postRoutes = require('./routes/post')
@@ -33,6 +34,7 @@ const port = config.PORT || 3000
 app.use(bodyParser.json())
 
 // initialize the routes
+app.use(cors())
 app.use(getRoutes)
 app.use(postRoutes)
 app.use(putRoutes)

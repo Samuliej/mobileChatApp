@@ -63,6 +63,8 @@ router.post('/api/login', async (req, res) => {
     const token = jwt.sign(userForToken, process.env.JWT_SECRET)
     res.json({ token })
   } catch (error) {
+    //console.error(error)
+    console.error(req.body)
     res.status(500).json({ error: 'Something went wrong signing in' })
   }
 })
