@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { View, StyleSheet, Pressable, Text, TextInput, Dimensions } from 'react-native'
+import React, { useState, useEffect, useContext, useRef } from 'react'
+import { View, StyleSheet, Pressable, Text, TextInput, Dimensions, Image, Animated } from 'react-native'
 import * as yup from 'yup'
 import useSignIn from '../../hooks/useSignIn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -7,7 +7,9 @@ import ErrorBanner from '../Error/index.jsx'
 import theme from '../../theme'
 import { UserContext } from '../../Context/UserContext'
 import { useNavigation } from '@react-navigation/native'
+import CustomButton from './CustomButton.jsx'
 const height = Dimensions.get('window').height
+const icon = require('../../../assets/icons8-chat-100.png')
 
 
 
@@ -104,7 +106,13 @@ const SignInView = ({ username, setUsername, validateUsername, password,
 
   return (
     <>
-      <View style={[styles.container, { marginTop: height/5 }]}>
+      <View style={[styles.container, { marginTop: height/7 }]}>
+        <View style={{ alignItems: 'center' }}>
+          <Image
+            source={icon} // Replace with your image path
+            style={{ width: 120, height: 120 }} // Adjust the size as needed
+          />
+        </View>
         <TextInput style={styles.inputBox}
           value={username}
           onChangeText={setUsername}
@@ -112,7 +120,7 @@ const SignInView = ({ username, setUsername, validateUsername, password,
           placeholder='Username'
         />
         {usernameError ? <Text style={{ color: 'red' }}>{usernameError}</Text> : null}
-        <TextInput style={styles.inputBox}
+        <TextInput style={[styles.inputBox, { marginBottom: 10 }]}
           value={password}
           onChangeText={setPassword}
           onBlur={validatePassword}
@@ -120,16 +128,10 @@ const SignInView = ({ username, setUsername, validateUsername, password,
           secureTextEntry={true}
         />
         {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
-        <Pressable style={styles.button} onPress={handleSignIn}>
-          <Text testID='signInButton' style={styles.buttonText}>Sign in</Text>
-        </Pressable>
-        <Text style={{ marginTop: 30, textAlign: 'center' }}>Don't have an account?</Text>
-        <Pressable style={styles.button}
-          onPress={() => navigation.navigate('SignUp')}
-
-        >
-          <Text testID='signUpButton' style={styles.buttonText}>Sign up</Text>
-        </Pressable>
+        <CustomButton onPress={handleSignIn} title='Sign in' />
+        <Text style={{ marginBottom: 10, marginTop: 30, textAlign: 'center' }}>Don't have an account?</Text>
+        <CustomButton title='Register' style={{ backgroundColor: 'black' }}
+          onPress={() => navigation.navigate('SignUp')} />
       </View>
     </>
   )

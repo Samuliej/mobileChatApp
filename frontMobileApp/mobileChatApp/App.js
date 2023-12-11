@@ -100,7 +100,7 @@ const CustomDrawerContent = (props) => {
             await AsyncStorage.removeItem('userToken')
             // Update the user context
             await updateUser()
-            navigation.navigate('Home')
+            navigation.navigate('SignIn')
           }
         },
       ],
