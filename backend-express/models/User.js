@@ -11,6 +11,10 @@ const schema = new mongoose.Schema({
     required: true,
     minlength: 5
   },
+  profilePicture: {
+    type: String,
+    required: false
+  },
   name: {
     type: String,
     required: true,

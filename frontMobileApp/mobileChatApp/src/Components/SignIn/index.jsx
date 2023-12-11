@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { View, StyleSheet, Pressable, Text, TextInput } from 'react-native'
+import { View, StyleSheet, Pressable, Text, TextInput, Dimensions } from 'react-native'
 import * as yup from 'yup'
 import useSignIn from '../../hooks/useSignIn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ErrorBanner from '../Error/index.jsx'
 import theme from '../../theme'
 import { UserContext } from '../../Context/UserContext'
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native'
+const height = Dimensions.get('window').height
 
 
 
@@ -99,9 +100,11 @@ const SignIn = () => {
 
 const SignInView = ({ username, setUsername, validateUsername, password,
   setPassword, validatePassword, handleSignIn, usernameError, passwordError }) => {
+  const navigation = useNavigation()
+
   return (
     <>
-      <View style={styles.container}>
+      <View style={[styles.container, { marginTop: height/5 }]}>
         <TextInput style={styles.inputBox}
           value={username}
           onChangeText={setUsername}
@@ -119,6 +122,13 @@ const SignInView = ({ username, setUsername, validateUsername, password,
         {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
         <Pressable style={styles.button} onPress={handleSignIn}>
           <Text testID='signInButton' style={styles.buttonText}>Sign in</Text>
+        </Pressable>
+        <Text style={{ marginTop: 30, textAlign: 'center' }}>Don't have an account?</Text>
+        <Pressable style={styles.button}
+          onPress={() => navigation.navigate('SignUp')}
+
+        >
+          <Text testID='signUpButton' style={styles.buttonText}>Sign up</Text>
         </Pressable>
       </View>
     </>

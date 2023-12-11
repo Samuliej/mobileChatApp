@@ -38,6 +38,24 @@ router.get('/api/users/:username', async (req, res) => {
   }
 })
 
+// Fetch users by username query pagination added;
+// TODO: filter yourself from the results
+router.get('/api/users/search/:query', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1
+    const limit = 5 // results / page
+    const skip = (page - 1) * limit
+    const users = await User.find({ username: new RegExp(req.params.query, 'i') })
+      .populate('friends', 'username')
+      .skip(skip)
+      .limit(limit)
+
+    res.json(users)
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching users' })
+  }
+})
+
 
 // Fetch conversation by ID
 router.get('/api/conversations/:convoId', async (req, res) => {

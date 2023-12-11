@@ -10,6 +10,9 @@ const Friendship = require('../models/Friendship')
 const Conversation = require('../models/Conversation')
 const Message = require('../models/Message')
 
+const cloudinary = require('../cloudinary')
+// Use cloudinary.uploader.upload() to upload images
+
 
 // Create a user
 router.post('/api/users', async (req, res) => {

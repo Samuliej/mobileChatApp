@@ -1,6 +1,7 @@
 import * as React from 'react'
 import SignIn from './src/Components/SignIn/index.jsx'
-import { View, Text, Image, Pressable, StyleSheet, Alert } from 'react-native'
+import SignUp from './src/Components/SignUp/index.jsx'
+import { Image, Pressable, StyleSheet, Alert } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import {
   createDrawerNavigator,
@@ -17,12 +18,21 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import theme from './src/theme.js'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import SearchForUser from './src/Components/SearchForUser/index.jsx'
+import { createStackNavigator } from '@react-navigation/stack'
 const testImage = require('./assets/icon.png')
 
 
 
 
+const AuthStack = createStackNavigator()
 
+const AuthFlow = () => (
+  <AuthStack.Navigator initialRouteName="SignIn">
+    <AuthStack.Screen name="SignIn" component={SignIn} />
+    <AuthStack.Screen name="SignUp" component={SignUp} />
+  </AuthStack.Navigator>
+)
 
 
 function CustomHeader({ user }) {
@@ -47,6 +57,8 @@ function MyTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        activeTintColor: theme.platformStyle.color,
+        inactiveTintColor: 'gray',
         tabBarIcon: ({ focused, color, size }) => {
           let iconName
 
@@ -60,22 +72,10 @@ function MyTabs() {
           return <Ionicons name={iconName} size={size} color={color} />
         },
       })}
-      tabBarOptions={{
-        activeTintColor: theme.platformStyle.color,
-        inactiveTintColor: 'gray',
-      }}
     >
       <Tab.Screen name="Conversations" component={Conversations} />
       <Tab.Screen name="Feed" component={FeedScreen} />
     </Tab.Navigator>
-  )
-}
-
-function Notifications() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Notifications Screen</Text>
-    </View>
   )
 }
 
@@ -90,6 +90,10 @@ const CustomDrawerContent = (props) => {
       'Are you sure you want to sign out?',
       [
         {
+          text: 'No',
+          onPress: () => console.log('No Pressed'), style: 'cancel'
+        },
+        {
           text: 'Yes',
           onPress: async () => {
             // Clear the token from the storage
@@ -98,10 +102,6 @@ const CustomDrawerContent = (props) => {
             await updateUser()
             navigation.navigate('Home')
           }
-        },
-        {
-          text: 'No',
-          onPress: () => console.log('No Pressed'), style: 'cancel'
         },
       ],
       {cancelable: false},
@@ -113,11 +113,17 @@ const CustomDrawerContent = (props) => {
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
       {user &&(
-        <DrawerItem
-          label="Sign Out"
-          onPress={handleSignOut}
-          labelStyle={{ color: 'red' }}
-        />
+        <>
+          <DrawerItem
+            label="Search for a user"
+            onPress={() => navigation.navigate('SearchForUser')}
+          />
+          <DrawerItem
+            label="Sign Out"
+            onPress={handleSignOut}
+            labelStyle={{ color: 'red' }}
+          />
+        </>
       )}
     </DrawerContentScrollView>
   )
@@ -146,6 +152,7 @@ function MyDrawer() {
         }}
       />
       {!user && <Drawer.Screen name="Sign In" component={SignIn} />}
+      <Drawer.Screen name="Search For a User" component={SearchForUser} />
     </Drawer.Navigator>
   )
 }
@@ -160,7 +167,7 @@ const App = () => {
   return (
     <UserContext.Provider value={{ user, updateUser }}>
       <NavigationContainer>
-        <MyDrawer />
+        {user ? <MyDrawer /> : <AuthFlow />}
       </NavigationContainer>
     </UserContext.Provider>
   )
