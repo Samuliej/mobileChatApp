@@ -1,6 +1,11 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
+/**
+ *
+ * Simple component to display an error message.
+ *
+ */
 const ErrorBanner = ({ error }) => {
   return (
     <View style={styles.errorBanner}>

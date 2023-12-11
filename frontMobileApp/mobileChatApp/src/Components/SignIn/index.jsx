@@ -4,9 +4,11 @@ import * as yup from 'yup'
 import useSignIn from '../../hooks/useSignIn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ErrorBanner from '../Error/index.jsx'
-import { useNavigate } from 'react-router'
 import theme from '../../theme'
 import { UserContext } from '../../Context/UserContext'
+import { useNavigation } from '@react-navigation/native';
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -24,10 +26,26 @@ const styles = StyleSheet.create({
 const usernameSchema = yup.string().required('Username is required.')
 const passwordSchema = yup.string().required('Password is required')
 
+
+/**
+ * This is the Sign In component of the application.
+ *
+ * It uses several hooks and contexts:
+ * - `useSignIn` hook: This custom hook provides the functionality to sign in the user.
+ * - `AsyncStorage`: Used to store the user token persistently.
+ * - `UserContext`: This context provides the current user state and a function to update it.
+ * - `useNavigate`: This hook from 'react-router' is used to programmatically navigate the user.
+ *
+ * The component contains a form with two fields: username and password. Both fields have validation schemas using `yup`.
+ *
+ * When the user submits the form, the `handleSignIn` function is called. This function calls the `signIn` function from the `useSignIn` hook with the username and password. If the sign in is successful, it stores the user token in `AsyncStorage`, updates the user context, and navigates the user to the main page.
+ *
+ * The component also includes an `ErrorBanner` component to display any error that might occur while signing in.
+ */
 const SignIn = () => {
   const { updateUser } = useContext(UserContext)
   const { signIn, error, setError } = useSignIn()
-  const navigate = useNavigate()
+  const navigation = useNavigation()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [usernameError, setUsernameError] = useState('')
@@ -64,7 +82,7 @@ const SignIn = () => {
     if (data) {
       await AsyncStorage.setItem('userToken', data)
       await updateUser(data)
-      navigate('/')
+      navigation.navigate('Feed')
     }
   }
 

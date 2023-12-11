@@ -1,10 +1,10 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
-export default function FeedScreen({ navigation }) {
+export default function Conversations({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.paragraph}>This is a Feed Screen</Text>
+      <Text style={styles.paragraph}>This is the Conversations Screen</Text>
     </View>
   )
 }
