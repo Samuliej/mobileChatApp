@@ -1,9 +1,7 @@
 import React, { useState } from 'react'
 import { Pressable, Text, TextInput, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
 import CustomButton from '../SignIn/CustomButton'
-import * as ImagePicker from 'react-native-image-picker'
-import theme from '../../theme'
-import { View } from 'react-native-web'
+import { launchImageLibrary } from 'react-native-image-picker'
 
 
 
@@ -23,9 +21,9 @@ const SignUp = () => {
       noData: true,
     }
 
-    ImagePicker.launchImageLibrary(options, response => {
-      if (response.uri) {
-        setImage(response.uri)
+    launchImageLibrary(options, response => {
+      if (response.assets && response.assets[0].uri) {
+        setImage(response.assets[0].uri)
       }
     })
   }

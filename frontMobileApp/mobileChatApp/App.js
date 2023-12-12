@@ -31,6 +31,8 @@ const AuthFlow = () => (
   <AuthStack.Navigator initialRouteName="SignIn">
     <AuthStack.Screen name="SignIn" component={SignIn} />
     <AuthStack.Screen name="SignUp" component={SignUp} />
+    {/* Add this line below to get rid of error that no "Home screen" */}
+    <AuthStack.Screen name="Home" component={FeedScreen} />
   </AuthStack.Navigator>
 )
 

@@ -85,7 +85,7 @@ const SignIn = () => {
     if (data) {
       await AsyncStorage.setItem('userToken', data)
       await updateUser(data)
-      navigation.navigate('Feed')
+      navigation.navigate('Home')
     }
   }
 
