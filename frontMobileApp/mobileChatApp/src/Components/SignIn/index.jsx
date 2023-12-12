@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext, useRef } from 'react'
-import { View, StyleSheet, Pressable, Text, TextInput, Dimensions, Image, Animated } from 'react-native'
+import React, { useState, useEffect, useContext } from 'react'
+import { View, StyleSheet, Text, TextInput, Dimensions, Image, } from 'react-native'
 import * as yup from 'yup'
 import useSignIn from '../../hooks/useSignIn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -11,7 +11,14 @@ import CustomButton from './CustomButton.jsx'
 const height = Dimensions.get('window').height
 const icon = require('../../../assets/icons8-chat-100.png')
 
-
+const validationSchema = yup.object().shape({
+  username: yup.string()
+    .min(3, 'Username must be at least 3 characters')
+    .required('Username is required'),
+  password: yup.string()
+    .min(5, 'Password must be at least 5 characters')
+    .required('Password is required'),
+})
 
 const styles = StyleSheet.create({
   container: {
@@ -25,10 +32,6 @@ const styles = StyleSheet.create({
   },
   inputBox: theme.inputBox,
 })
-
-const usernameSchema = yup.string().required('Username is required.')
-const passwordSchema = yup.string().required('Password is required')
-
 
 /**
  * This is the Sign In component of the application.
@@ -62,21 +65,13 @@ const SignIn = () => {
     return () => clearTimeout(timeout)
   }, [error])
 
-  const validateUsername = async () => {
-    const isUsernameValid = await usernameSchema.isValid(username)
-    if (!isUsernameValid) {
-      setUsernameError('Username is required')
-    } else {
-      setUsernameError('')
-    }
-  }
 
-  const validatePassword = async () => {
-    const isPasswordValid = await passwordSchema.isValid(password)
-    if (!isPasswordValid) {
-      setPasswordError('Password is required')
-    } else {
-      setPasswordError('')
+
+  const validateField = (field, value) => {
+    try {
+      yup.reach(validationSchema, field).validateSync(value)
+    } catch (error) {
+      return error.message
     }
   }
 
@@ -92,16 +87,17 @@ const SignIn = () => {
   return (
     <>
       {error && <ErrorBanner error={error} />}
-      <SignInView username={username} setUsername={setUsername} validateUsername={validateUsername}
-        password={password} setPassword={setPassword} validatePassword={validatePassword}
-        handleSignIn={handleSignIn} usernameError={usernameError} passwordError={passwordError}/>
+      <SignInView username={username} setUsername={setUsername} setUsernameError={setUsernameError}
+        password={password} setPassword={setPassword} setPasswordError={setPasswordError}
+        handleSignIn={handleSignIn} usernameError={usernameError} passwordError={passwordError}
+        validateField={validateField} />
     </>
   )
 
 }
 
-const SignInView = ({ username, setUsername, validateUsername, password,
-  setPassword, validatePassword, handleSignIn, usernameError, passwordError }) => {
+const SignInView = ({ username, setUsername, password, setUsernameError, setPasswordError,
+  setPassword, handleSignIn, usernameError, passwordError, validateField }) => {
   const navigation = useNavigation()
 
   return (
@@ -116,19 +112,39 @@ const SignInView = ({ username, setUsername, validateUsername, password,
         <TextInput style={styles.inputBox}
           value={username}
           onChangeText={setUsername}
-          onBlur={validateUsername}
+          onBlur={() => {
+            const errorMessage = validateField('username', username)
+            if (errorMessage) {
+              setUsernameError(errorMessage)
+              setTimeout(() => {
+                setUsernameError('')
+              }, 3500)
+            } else {
+              setUsernameError('')
+            }
+          }}
           placeholder='Username'
         />
         {usernameError ? <Text style={{ color: 'red' }}>{usernameError}</Text> : null}
-        <TextInput style={[styles.inputBox, { marginBottom: 10 }]}
+        <TextInput style={styles.inputBox}
           value={password}
           onChangeText={setPassword}
-          onBlur={validatePassword}
+          onBlur={() => {
+            const errorMessage = validateField('password', username)
+            if (errorMessage) {
+              setPasswordError(errorMessage)
+              setTimeout(() => {
+                setPasswordError('')
+              }, 3500)
+            } else {
+              setPasswordError('')
+            }
+          }}
           placeholder='Password'
           secureTextEntry={true}
         />
         {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
-        <CustomButton onPress={handleSignIn} title='Sign in' />
+        <CustomButton style={{ marginTop: 10 }} onPress={handleSignIn} title='Sign in' />
         <Text style={{ marginBottom: 10, marginTop: 30, textAlign: 'center' }}>Don't have an account?</Text>
         <CustomButton title='Register' style={{ backgroundColor: 'black' }}
           onPress={() => navigation.navigate('SignUp')} />

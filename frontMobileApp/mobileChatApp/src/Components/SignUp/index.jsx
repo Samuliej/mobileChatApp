@@ -1,9 +1,24 @@
 import React, { useState } from 'react'
-import { View, Pressable, Text, TextInput, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
+import { Dimensions, View, Pressable, Text, TextInput, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
 import CustomButton from '../SignIn/CustomButton'
 import * as ImagePicker from 'expo-image-picker'
+import * as yup from 'yup'
 
+const width = Dimensions.get('window').width
 
+const validationSchema = yup.object().shape({
+  username: yup
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .required('Username is required'),
+  password: yup
+    .string()
+    .min(5, 'Password must be at least 5 characters')
+    .required('Password is required'),
+  name: yup.string()
+    .min(3, 'Name must be at least 3 characters')
+    .required('Name is required'),
+})
 
 const SignUp =  () => {
   const [username, setUsername] = useState('')
@@ -12,7 +27,11 @@ const SignUp =  () => {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [city, setCity] = useState('')
-  const [profilePicture, setProfilePicture] = useState('')
+  const [profilePictureUrl, setProfilePictureUrl] = useState('')
+  const [usernameError, setUsernameError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [nameError, setNameError] = useState('')
+  const [passwordsMatch, setPasswordsMatch] = useState(null)
 
   const [image, setImage] = useState(null)
 
@@ -28,6 +47,21 @@ const SignUp =  () => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri)
+      setProfilePictureUrl(result.assets[0].uri)
+    }
+  }
+
+  const validateField = (field, values) => {
+    try {
+      yup.reach(validationSchema, field).validateSync(values[field])
+    } catch (error) {
+      return error.message
+    }
+  }
+
+  const validateConfirmPassword = (password, confirmPassword) => {
+    if (password !== confirmPassword) {
+      return "Passwords don't match."
     }
   }
 
@@ -61,33 +95,76 @@ const SignUp =  () => {
             style={styles.input}
             value={username}
             onChangeText={setUsername}
+            onBlur={() => {
+              const errorMessage = validateField('username', { username })
+              if (errorMessage) {
+                setUsernameError(errorMessage)
+                setTimeout(() => {
+                  setUsernameError('')
+                }, 3500)
+              }
+            }}
             placeholder='Username'
           />
-          <Text>Password:</Text>
+          {usernameError ? <Text style={{ color: 'red' }}>{usernameError}</Text> : null}
+          <Text style={{ marginTop: 16 }}>Password:</Text>
           <TextInput
             style={styles.input}
             value={password}
             onChangeText={setPassword}
+            onBlur={() => {
+              const errorMessage = validateField('password', { password })
+              if (errorMessage) {
+                setPasswordError(errorMessage)
+                setTimeout(() => {
+                  setPasswordError('')
+                }, 3500)
+              }
+            }}
             secureTextEntry
             placeholder='Password'
           />
-          <Text>Confirm Password:</Text>
+          {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
+          <Text style={{ marginTop: 16 }}>Confirm Password:</Text>
           <TextInput
             style={styles.input}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            onBlur={() => {
+              const errorMessage = validateConfirmPassword(password, confirmPassword)
+              if (errorMessage) {
+                setPasswordsMatch(false)
+              } else {
+                setPasswordsMatch(true)
+              }
+            }}
             secureTextEntry
             placeholder='Confirm Password'
           />
+          {passwordsMatch !== null && !passwordsMatch ? <Text style={{ color: 'red' }}>{'Passwords must match'}</Text> : null}
+          {passwordsMatch ? <Text style={{ color: 'green' }}>{'Passwords match!'}</Text> : null}
+          <Text style={{ marginBottom: 10 }} />
           <Text style={styles.title}>Additional information</Text>
           <Text>Name:</Text>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
+            onBlur={() => {
+              const errorMessage = validateField('name', name)
+              if (errorMessage) {
+                setNameError(errorMessage)
+                setTimeout(() => {
+                  setNameError('')
+                }, 3500)
+              } else {
+                setNameError('')
+              }
+            }}
             placeholder='Name'
           />
-          <Text>Phone:</Text>
+          {nameError? <Text style={{ color: 'red' }}>{nameError}</Text> : null}
+          <Text style={{ marginTop: 16 }}>Phone:</Text>
           <TextInput
             style={styles.input}
             value={phone}
@@ -95,14 +172,14 @@ const SignUp =  () => {
             placeholder='Phone'
             keyboardType='phone-pad'
           />
-          <Text>City:</Text>
+          <Text style={{ marginTop: 16 }}>City:</Text>
           <TextInput
             style={styles.input}
             value={city}
             onChangeText={setCity}
             placeholder='City'
           />
-          <CustomButton onPress={handleSignUp} title='Register' />
+          <CustomButton style={{ marginTop: 10 }} onPress={handleSignUp} title='Register' />
         </View>
       </KeyboardAvoidingView>
     </ScrollView>
@@ -122,7 +199,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 16,
     paddingLeft: 8,
   },
   imagePicker: {
@@ -133,7 +209,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
-    marginTop: 50
+    marginTop: 20,
+    marginLeft: width/3,
   },
   image: {
     width: 100,
@@ -142,6 +219,10 @@ const styles = StyleSheet.create({
   },
   imagePickerText: {
     fontSize: 50,
+    color: '#008000',
+    position: 'absolute',
+    right: 5,
+    bottom: -10,
   },
 })
 
