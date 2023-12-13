@@ -8,6 +8,7 @@ import theme from '../../theme'
 import { UserContext } from '../../Context/UserContext'
 import { useNavigation } from '@react-navigation/native'
 import CustomButton from './CustomButton.jsx'
+import useGetCurrentUser from '../../hooks/useGetCurrentUser'
 const height = Dimensions.get('window').height
 const icon = require('../../../assets/icons8-chat-100.png')
 
@@ -50,6 +51,7 @@ const styles = StyleSheet.create({
  */
 const SignIn = () => {
   const { updateUser } = useContext(UserContext)
+  const { user, fetchUser } = useGetCurrentUser()
   const { signIn, error, setError } = useSignIn()
   const navigation = useNavigation()
   const [username, setUsername] = useState('')
@@ -79,7 +81,8 @@ const SignIn = () => {
     const data = await signIn(username, password)
     if (data) {
       await AsyncStorage.setItem('userToken', data)
-      await updateUser(data)
+      await fetchUser(data)
+      await updateUser(user)
       navigation.navigate('Home')
     }
   }

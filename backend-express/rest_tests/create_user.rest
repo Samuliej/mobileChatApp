@@ -2,9 +2,10 @@ POST http://localhost:3001/api/users
 Content-Type: application/json
 
 {
-  "username": "Samppa",
-  "name": "Samuli",
+  "username": "Aso",
+  "name": "aso",
   "password": "salis",
-  "phone": "1234567890",
+  "phone": "1234567980",
+  "profilePicture": "www.url.com",
   "city": "Jyväskylä"
 }

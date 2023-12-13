@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Dimensions, View, Pressable, Text, TextInput, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
 import CustomButton from '../SignIn/CustomButton'
+import useSignUp from '../../hooks/useSignUp'
 import * as ImagePicker from 'expo-image-picker'
 import * as yup from 'yup'
 
@@ -21,13 +22,15 @@ const validationSchema = yup.object().shape({
 })
 
 const SignUp =  () => {
+  const { signUp, error } = useSignUp()
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [city, setCity] = useState('')
-  const [profilePictureUrl, setProfilePictureUrl] = useState('')
+  const [profilePicture, setProfilePicture] = useState({})
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [nameError, setNameError] = useState('')
@@ -46,8 +49,16 @@ const SignUp =  () => {
     console.log(result)
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri)
-      setProfilePictureUrl(result.assets[0].uri)
+      setImage(result.uri)
+      let localUri = result.uri
+      let filename = localUri.split('/').pop()
+
+      // Infer the type of the image
+      let match = /\.(\w+)$/.exec(filename)
+      let type = match ? `image/${match[1]}` : `image`
+      setProfilePicture({ uri: localUri, name: filename, type })
+
+      // Send this formData to your backend
     }
   }
 
@@ -65,14 +76,18 @@ const SignUp =  () => {
     }
   }
 
-  const handleSignUp = () => {
-    if (password !== confirmPassword) {
-      alert("Passwords don't match.")
-      return
+  const handleSignUp = async () => {
+    if (passwordsMatch && !usernameError && !passwordError && !nameError) {
+      // Call the signUp function from the useSignUp hook
+      const user = await signUp(username, password, name, profilePicture, phone, city)
+      if (user) {
+        console.log('User created:', user)
+        // Navigate to the next screen or do something with the user data
+      } else {
+        console.log('Sign up failed')
+        // Handle sign up failure
+      }
     }
-
-    // Sign up logic here
-    console.log('Sign Up')
   }
 
   return (

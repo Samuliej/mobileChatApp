@@ -20,7 +20,9 @@ import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import SearchForUser from './src/Components/SearchForUser/index.jsx'
 import { createStackNavigator } from '@react-navigation/stack'
-const testImage = require('./assets/icon.png')
+import defaultProfilePicture from './assets/soldier.png'
+// Default use profile picture property of Pixel Perfect:
+// href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 
 
 
@@ -39,11 +41,13 @@ const AuthFlow = () => (
 
 function CustomHeader({ user }) {
   const navigation = useNavigation()
+  //console.log(user)
+  //console.log(user.profilePicture)
 
   return (
     <Pressable onPress={() => navigation.toggleDrawer()}>
       <Image
-        source={testImage}
+        source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
         style={{ width: 40, height: 40, borderRadius: 20 }}
       />
     </Pressable>
@@ -135,19 +139,20 @@ const Drawer = createDrawerNavigator()
 
 function MyDrawer() {
   const { user, updateUser } = useContext(UserContext)
+  console.log('MyDrawer', user)
 
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen
-        name="Home"
+        name={user ? user.username : 'Home'}
         component={MyTabs}
         options={{
           headerLeft: () => <CustomHeader user={user} />,
           drawerIcon: ({ focused, size }) => (
             <Image
-              source={testImage}
+              source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
               style={{ width: size, height: size, borderRadius: size / 2 }}
             />
           ),

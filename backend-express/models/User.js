@@ -23,12 +23,10 @@ const schema = new mongoose.Schema({
   phone: {
     type: String,
     required: false,
-    minlength: 5
   },
   city: {
     type: String,
     required: false,
-    minlength: 3
   },
   pendingFriendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Friendship' }],
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

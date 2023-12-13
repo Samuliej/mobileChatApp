@@ -1,4 +1,3 @@
-// In useGetCurrentUser.js
 import { useState, useEffect } from 'react'
 import api from '../api'
 import AsyncStorage from '@react-native-async-storage/async-storage'

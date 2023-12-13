@@ -10,18 +10,26 @@ const Friendship = require('../models/Friendship')
 const Conversation = require('../models/Conversation')
 const Message = require('../models/Message')
 
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
+
 const cloudinary = require('../cloudinary')
 // Use cloudinary.uploader.upload() to upload images
 
 
 // Create a user
-router.post('/api/users', async (req, res) => {
+router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
+  //console.log(req.body)
+  //console.log(req.file)
+  //console.log(req)
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
+    const result = await cloudinary.uploader.upload(req.file.path)
 
     const newUser = new User({
       username: req.body.username,
       name: req.body.name,
+      profilePicture: result.secure_url, // Save the URL of the uploaded image
       phone: req.body.phone,
       city: req.body.city,
       password: hashedPassword,
@@ -36,10 +44,10 @@ router.post('/api/users', async (req, res) => {
 
     res.status(201).json(userWithoutPassword)
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: 'Something went wrong creating the user' })
   }
 })
-
 // User login
 router.post('/api/login', async (req, res) => {
   try {
