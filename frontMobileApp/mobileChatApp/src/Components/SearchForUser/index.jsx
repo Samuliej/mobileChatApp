@@ -4,10 +4,12 @@ import { useSearchUser } from '../../hooks/useSearchUser'
 import theme from '../../theme.js'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
+// TODO: Fix the listing, multiple of the same user is showing up
+// and the list is showing all the users when entering arbitrary characters
 const SearchForUser = () => {
   const [searchInput, setSearchInput] = useState('')
   const [page, setPage] = useState(1)
-  const { loading, searchResults, error } = useSearchUser(searchInput)
+  const { searchResults } = useSearchUser(searchInput)
 
   const loadMoreResults = () => {
     setPage(page + 1)
