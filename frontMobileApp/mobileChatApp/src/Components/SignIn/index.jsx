@@ -50,8 +50,7 @@ const styles = StyleSheet.create({
  * The component also includes an `ErrorBanner` component to display any error that might occur while signing in.
  */
 const SignIn = () => {
-  const { updateUser } = useContext(UserContext)
-  const { user, fetchUser } = useGetCurrentUser()
+  const { user, updateUser } = useContext(UserContext)
   const { signIn, error, setError } = useSignIn()
   const navigation = useNavigation()
   const [username, setUsername] = useState('')
@@ -77,13 +76,20 @@ const SignIn = () => {
     }
   }
 
+  useEffect(() => {
+    if (user) {
+      navigation.navigate('Main', { screen: 'Home' })
+    }
+  },[user])
+
   const handleSignIn = async () => {
     const data = await signIn(username, password)
+    console.log('data', data)
     if (data) {
       await AsyncStorage.setItem('userToken', data)
-      await fetchUser(data)
-      await updateUser(user)
-      navigation.navigate('Home')
+      await updateUser(data)
+      setUsername('')
+      setPassword('')
     }
   }
 

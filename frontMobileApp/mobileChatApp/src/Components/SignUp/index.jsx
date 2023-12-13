@@ -57,8 +57,6 @@ const SignUp =  () => {
       let match = /\.(\w+)$/.exec(filename)
       let type = match ? `image/${match[1]}` : `image`
       setProfilePicture({ uri: localUri, name: filename, type })
-
-      // Send this formData to your backend
     }
   }
 

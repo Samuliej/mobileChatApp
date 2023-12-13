@@ -29,8 +29,10 @@ const useGetCurrentUser = () => {
       })
       setUser(response.data)
       setLoading(false)
+      return user
     } catch (e) {
       setError(e)
+      setUser(null)
       setLoading(false)
     }
   }

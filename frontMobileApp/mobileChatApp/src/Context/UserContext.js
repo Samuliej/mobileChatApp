@@ -1,51 +1,50 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from '../api'
-import useGetCurrentUser from '../hooks/useGetCurrentUser'
 
 export const UserContext = createContext()
 
 export const UserProvider = ({ children }) => {
-  const [token, setToken] = useState(null)
-  const { user, fetchUser, setUser } = useGetCurrentUser()
+  const [user, setUser] = useState(null)
 
-  const signIn = async (username, password) => {
-    const res = await api.post('/api/login', { username, password })
-    setToken(res.data.token)
-    // Fetch the user data after signing in
-    await fetchUser(res.data.token)
+  const fetchUser = async (token) => {
+    // Fetch the user data using the token
+    // This is just a placeholder, replace it with your actual fetch logic
+    const response = await api.get('/api/me', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    console.log(response.data)
+    const data = response.data
+    return data
   }
-
-  const updateUser = async () => {
-    // Fetch the updated user data
-    await fetchUser(token)
-  }
-
-  return (
-    <UserContext.Provider value={{ token, user, signIn, updateUser }}>
-      {children}
-    </UserContext.Provider>
-  )
-}
-
-/*import { createContext } from 'react'
-import useGetCurrentUser from '../hooks/useGetCurrentUser'
-
-export const UserContext = createContext()
-
-export const UserProvider = ({ children }) => {
-  const { user, fetchUser, setUser } = useGetCurrentUser()
 
   const updateUser = async (token) => {
+    console.log('updateUser called')
     if (token) {
-      await fetchUser(token)
+      const fetchedUser = await fetchUser(token)
+      console.log('updateUser', fetchedUser)
+      setUser(fetchedUser)
     } else {
       setUser(null)
     }
   }
+
+  useEffect(() => {
+    const initializeUser = async () => {
+      const token = await AsyncStorage.getItem('userToken')
+      if (token) {
+        await updateUser(token)
+      }
+    }
+
+    initializeUser()
+  }, [])
 
   return (
     <UserContext.Provider value={{ user, updateUser }}>
       {children}
     </UserContext.Provider>
   )
-}*/
+}

@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { useEffect } from 'react'
 import SignIn from './src/Components/SignIn/index.jsx'
 import SignUp from './src/Components/SignUp/index.jsx'
 import { Image, Pressable, StyleSheet, Alert } from 'react-native'
-import { NavigationContainer } from '@react-navigation/native'
+import { NavigationContainer, CommonActions } from '@react-navigation/native'
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -21,6 +22,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import SearchForUser from './src/Components/SearchForUser/index.jsx'
 import { createStackNavigator } from '@react-navigation/stack'
 import defaultProfilePicture from './assets/soldier.png'
+import useGetCurrentUser from './src/hooks/useGetCurrentUser.js'
+import { UserProvider } from './src/Context/UserContext.js'
 // Default use profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 
@@ -28,21 +31,28 @@ import defaultProfilePicture from './assets/soldier.png'
 
 
 const AuthStack = createStackNavigator()
+const RootStack = createStackNavigator()
+const Drawer = createDrawerNavigator()
+const Tab = createBottomTabNavigator()
 
 const AuthFlow = () => (
   <AuthStack.Navigator initialRouteName="SignIn">
     <AuthStack.Screen name="SignIn" component={SignIn} />
     <AuthStack.Screen name="SignUp" component={SignUp} />
     {/* Add this line below to get rid of error that no "Home screen" */}
-    <AuthStack.Screen name="Home" component={FeedScreen} />
   </AuthStack.Navigator>
+)
+
+const RootNavigator = () => (
+  <RootStack.Navigator headerMode="none">
+    <RootStack.Screen name="Auth" component={AuthFlow} />
+    <RootStack.Screen name="Main" component={MyDrawer} />
+  </RootStack.Navigator>
 )
 
 
 function CustomHeader({ user }) {
   const navigation = useNavigation()
-  //console.log(user)
-  //console.log(user.profilePicture)
 
   return (
     <Pressable onPress={() => navigation.toggleDrawer()}>
@@ -53,10 +63,6 @@ function CustomHeader({ user }) {
     </Pressable>
   )
 }
-
-
-
-const Tab = createBottomTabNavigator()
 
 function MyTabs() {
   return (
@@ -89,6 +95,10 @@ const CustomDrawerContent = (props) => {
   const { user, updateUser } = useContext(UserContext)
   const navigation = useNavigation()
 
+  useEffect(() => {
+    if (!user) navigation.navigate('Auth', { screen: 'SignIn' })
+  })
+
 
   const handleSignOut = async () => {
     Alert.alert(
@@ -105,8 +115,7 @@ const CustomDrawerContent = (props) => {
             // Clear the token from the storage
             await AsyncStorage.removeItem('userToken')
             // Update the user context
-            await updateUser()
-            navigation.navigate('SignIn')
+            await updateUser(null)
           }
         },
       ],
@@ -135,18 +144,15 @@ const CustomDrawerContent = (props) => {
   )
 }
 
-const Drawer = createDrawerNavigator()
-
-function MyDrawer() {
-  const { user, updateUser } = useContext(UserContext)
-  console.log('MyDrawer', user)
+const MyDrawer = () => {
+  const { user } = useContext(UserContext)
 
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen
-        name={user ? user.username : 'Home'}
+        name='Home'
         component={MyTabs}
         options={{
           headerLeft: () => <CustomHeader user={user} />,
@@ -158,25 +164,27 @@ function MyDrawer() {
           ),
         }}
       />
-      {!user && <Drawer.Screen name="Sign In" component={SignIn} />}
       <Drawer.Screen name="Search For a User" component={SearchForUser} />
     </Drawer.Navigator>
   )
 }
 
 const App = () => {
-  const [user, setUser] = React.useState(null)
+  useEffect(() => {
+    const clearStorage = async () => {
+      await AsyncStorage.clear()
+    }
 
-  const updateUser = (newUser) => {
-    setUser(newUser)
-  }
+    clearStorage()
+  }, [])
+
 
   return (
-    <UserContext.Provider value={{ user, updateUser }}>
+    <UserProvider>
       <NavigationContainer>
-        {user ? <MyDrawer /> : <AuthFlow />}
+        <RootNavigator />
       </NavigationContainer>
-    </UserContext.Provider>
+    </UserProvider>
   )
 }
 
