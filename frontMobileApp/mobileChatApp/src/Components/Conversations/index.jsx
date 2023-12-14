@@ -14,7 +14,10 @@ const Conversations = ({ navigation }) => {
           //navigation.navigate('NewConversation') // replace with your screen
         }}
       >
-        <Ionicons name="add" size={24} color="white" />
+        <View style={styles.iconContainer}>
+          <Ionicons name="chatbubbles-outline" size={30} color="white" />
+          <Ionicons name="add" size={24} color="white" style={styles.plusIcon} />
+        </View>
       </Pressable>
     </View>
   )
@@ -32,15 +35,25 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    width: 56,
-    height: 56,
+    width: 64,
+    height: 64,
     alignItems: 'center',
     justifyContent: 'center',
     right: 20,
     bottom: 20,
     backgroundColor: '#03A9F4',
-    borderRadius: 30,
+    borderRadius: 35,
     elevation: 8
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  plusIcon: {
+    position: 'absolute',
+    left: 20,
+    top: 15
   },
 })
 

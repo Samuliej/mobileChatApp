@@ -160,6 +160,8 @@ const MyDrawer = () => {
 }
 
 const App = () => {
+
+
   useEffect(() => {
     const clearStorage = async () => {
       await AsyncStorage.clear()

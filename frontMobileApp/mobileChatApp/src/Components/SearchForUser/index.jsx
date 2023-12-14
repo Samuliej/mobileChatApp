@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { View, TextInput, Text, FlatList, StyleSheet, Image } from 'react-native'
 import { useSearchUser } from '../../hooks/useSearchUser'
 import theme from '../../theme.js'
@@ -36,7 +36,7 @@ const SearchForUser = () => {
                 source={item.profilePicture ? { uri: item.profilePicture } : defaultProfilePicture}
                 style={styles.listingProfilePicture} // Add a style for the image
               />
-              <Text style={styles.listItemText}> ({item.username})</Text>
+              <Text style={styles.listItemText}> {item.username}</Text>
               <Icon.Button
                 name="user-plus"
                 backgroundColor="transparent"
