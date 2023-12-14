@@ -54,7 +54,8 @@ router.get('/api/users/search/:query', async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = 5 // results / page
     const skip = (page - 1) * limit
-    const users = await User.find({ username: new RegExp(req.params.query, 'i') })
+    // Changed the regex to match usernames starting with the query
+    const users = await User.find({ username: new RegExp('^' + req.params.query, 'i') })
       .populate('friends', 'username')
       .skip(skip)
       .limit(limit)

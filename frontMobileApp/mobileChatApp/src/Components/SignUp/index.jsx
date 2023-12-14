@@ -106,9 +106,11 @@ const SignUp =  () => {
   const handleSignUp = async () => {
     if ((passwordsMatch && !usernameError && !passwordError && !nameError)
         && (username && password && name && confirmPassword)) {
-      // Call the signUp function from the useSignUp hook
+
+      // Sign up the new user
       const user = await signUp(username, password, name, profilePicture, phone, city)
       if (user) {
+        // If user created, sign in
         const data = await signIn(username, password)
         if (data) {
           await AsyncStorage.setItem('userToken', data)

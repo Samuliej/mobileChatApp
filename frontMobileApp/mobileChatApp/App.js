@@ -16,9 +16,9 @@ import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import SearchForUser from './src/Components/SearchForUser/index.jsx'
 import { createStackNavigator } from '@react-navigation/stack'
-import defaultProfilePicture from './assets/soldier.png'
 import { UserProvider } from './src/Context/UserContext.js'
-// Default use profile picture property of Pixel Perfect:
+import defaultProfilePicture from './assets/soldier.png'
+// Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 
 

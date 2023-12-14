@@ -9,6 +9,11 @@ export const useSearchUser = (query, page) => {
   const { user } = useContext(UserContext)
   let currentUser = user
 
+  // Reset the search results when the query changes
+  useEffect(() => {
+    setSearchResults([])
+  }, [query])
+
   useEffect(() => {
     if (query.length > 0) {
       setLoading(true)
