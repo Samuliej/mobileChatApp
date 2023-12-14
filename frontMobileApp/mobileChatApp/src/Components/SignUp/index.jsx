@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Dimensions, View, Pressable, Text, TextInput, Image, StyleSheet, ActivityIndicator } from 'react-native'
 import CustomButton from '../SignIn/CustomButton'
 import useSignUp from '../../hooks/useSignUp'
@@ -35,6 +35,7 @@ const SignUp =  () => {
   const { signIn, error: signInError } = useSignIn()
   const { updateUser } = useContext(UserContext)
   const { isLoading, isTaken, check } = useIsUsernameTaken()
+  const [ signingUp, setSigningUp ] = useState(false)
 
   const [errorMessage, setErrorMessage] = useState('')
   const navigation = useNavigation()
@@ -53,7 +54,7 @@ const SignUp =  () => {
 
   const [image, setImage] = useState(null)
 
-  useState(() => {
+  useEffect(() => {
     if (signUpError) {
       setErrorMessage(signUpError)
       setTimeout(() => {
@@ -66,6 +67,18 @@ const SignUp =  () => {
       }, 5000)
     }
   }, [signUpError, signInError])
+
+  useEffect(() => {
+    if (loading) {
+      setSigningUp(true)
+    }
+
+    const timeout = setTimeout(() => {
+      setSigningUp(false)
+    }, 5000)
+
+    clearTimeout(timeout)
+  }, [loading])
 
   const selectImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -128,13 +141,14 @@ const SignUp =  () => {
     }
   }
 
+  // TODO: maybe create component for displaying text input and errors
   return (
     <KeyboardAwareScrollView
       resetScrollToCoords={{ x: 0, y: 0 }}
       contentContainerStyle={styles.container}
       scrollEnabled={true}
     >
-      {loading ? (
+      {signingUp ? (
         <>
           <View style={[styles.container, { marginTop: height / 3, justifyContent: 'center', alignItems: 'center', } ]}>
             <ActivityIndicator size="large" color="#0000ff" />
