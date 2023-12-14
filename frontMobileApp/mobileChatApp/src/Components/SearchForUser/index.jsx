@@ -1,11 +1,9 @@
 import React, { useState } from 'react'
-import { View, TextInput, Text, FlatList, StyleSheet, } from 'react-native'
+import { View, TextInput, Text, FlatList, StyleSheet, Image } from 'react-native'
 import { useSearchUser } from '../../hooks/useSearchUser'
 import theme from '../../theme.js'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
-// TODO: Fix the listing, multiple of the same user is showing up
-// and the list is showing all the users when entering arbitrary characters
 const SearchForUser = () => {
   const [searchInput, setSearchInput] = useState('')
   const [page, setPage] = useState(1)
@@ -31,7 +29,8 @@ const SearchForUser = () => {
           keyExtractor={item => item._id.toString()}
           renderItem={({ item }) => (
             <View style={styles.listItem}>
-              <Text style={styles.listItemText}>{item.name} ({item.username})</Text>
+              <Image />
+              <Text style={styles.listItemText}> ({item.username})</Text>
               <Icon.Button
                 name="user-plus"
                 backgroundColor="transparent"

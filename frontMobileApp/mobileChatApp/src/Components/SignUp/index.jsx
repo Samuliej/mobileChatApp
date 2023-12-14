@@ -1,11 +1,20 @@
-import React, { useState } from 'react'
-import { Dimensions, View, Pressable, Text, TextInput, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
+import React, { useState, useContext } from 'react'
+import { Dimensions, View, Pressable, Text, TextInput, Image, StyleSheet, ActivityIndicator } from 'react-native'
 import CustomButton from '../SignIn/CustomButton'
 import useSignUp from '../../hooks/useSignUp'
 import * as ImagePicker from 'expo-image-picker'
 import * as yup from 'yup'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { useNavigation } from '@react-navigation/native'
+import ErrorBanner from '../Error/index.jsx'
+import useSignIn from '../../hooks/useSignIn'
+import { UserContext } from '../../Context/UserContext'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import useIsUsernameTaken from '../../hooks/useIsUsernameTaken'
+
 
 const width = Dimensions.get('window').width
+const height = Dimensions.get('window').height
 
 const validationSchema = yup.object().shape({
   username: yup
@@ -22,7 +31,13 @@ const validationSchema = yup.object().shape({
 })
 
 const SignUp =  () => {
-  const { signUp, error } = useSignUp()
+  const { signUp, error: signUpError, loading } = useSignUp()
+  const { signIn, error: signInError } = useSignIn()
+  const { updateUser } = useContext(UserContext)
+  const { isLoading, isTaken, check } = useIsUsernameTaken()
+
+  const [errorMessage, setErrorMessage] = useState('')
+  const navigation = useNavigation()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -30,13 +45,27 @@ const SignUp =  () => {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [city, setCity] = useState('')
-  const [profilePicture, setProfilePicture] = useState({})
+  const [profilePicture, setProfilePicture] = useState(null)
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [nameError, setNameError] = useState('')
   const [passwordsMatch, setPasswordsMatch] = useState(null)
 
   const [image, setImage] = useState(null)
+
+  useState(() => {
+    if (signUpError) {
+      setErrorMessage(signUpError)
+      setTimeout(() => {
+        setErrorMessage('')
+      }, 5000)
+    } else if (signInError) {
+      setErrorMessage(signInError)
+      setTimeout(() => {
+        setErrorMessage('')
+      }, 5000)
+    }
+  }, [signUpError, signInError])
 
   const selectImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -75,26 +104,44 @@ const SignUp =  () => {
   }
 
   const handleSignUp = async () => {
-    if (passwordsMatch && !usernameError && !passwordError && !nameError) {
+    if ((passwordsMatch && !usernameError && !passwordError && !nameError)
+        && (username && password && name && confirmPassword)) {
       // Call the signUp function from the useSignUp hook
       const user = await signUp(username, password, name, profilePicture, phone, city)
       if (user) {
-        console.log('User created:', user)
-        // Navigate to the next screen or do something with the user data
+        const data = await signIn(username, password)
+        if (data) {
+          await AsyncStorage.setItem('userToken', data)
+          await updateUser(data)
+          navigation.navigate('Main', { screen: 'Home' })
+        }
       } else {
         console.log('Sign up failed')
-        // Handle sign up failure
       }
+    }  else {
+      setErrorMessage('Some of the required fields are missing or invalid.')
+      setTimeout(() => {
+        setErrorMessage('')
+      }, 5000)
     }
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
+    <KeyboardAwareScrollView
+      resetScrollToCoords={{ x: 0, y: 0 }}
+      contentContainerStyle={styles.container}
+      scrollEnabled={true}
+    >
+      {loading ? (
+        <>
+          <View style={[styles.container, { marginTop: height / 3, justifyContent: 'center', alignItems: 'center', } ]}>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Flying to the Hive...</Text>
+          </View>
+        </>
+      ) : (
         <View>
+          {errorMessage && <ErrorBanner error={errorMessage} />}
           <Pressable style={styles.imagePicker} onPress={selectImage}>
             {image ? (
               <Image source={{ uri: image }} style={styles.image} />
@@ -103,12 +150,13 @@ const SignUp =  () => {
             )}
           </Pressable>
           <Text style={styles.title}>Choose your username</Text>
-          <Text>Username:</Text>
+          <Text style={{ marginBottom: 24 }}>Starred(*) fields are required</Text>
+          <Text>Username:*</Text>
           <TextInput
             style={styles.input}
             value={username}
             onChangeText={setUsername}
-            onBlur={() => {
+            onBlur={async () => {
               const errorMessage = validateField('username', { username })
               if (errorMessage) {
                 setUsernameError(errorMessage)
@@ -116,11 +164,14 @@ const SignUp =  () => {
                   setUsernameError('')
                 }, 3500)
               }
+              await check(username)
             }}
-            placeholder='Username'
+            placeholder='Username (min. 3 characters)'
           />
+          {isTaken ? <Text style={{ color: 'red' }}>Username is taken</Text> : null}
+          {!isTaken && !isLoading ? <Text style={{ color: 'green' }}>Username is available</Text> : null}
           {usernameError ? <Text style={{ color: 'red' }}>{usernameError}</Text> : null}
-          <Text style={{ marginTop: 16 }}>Password:</Text>
+          <Text style={{ marginTop: 16 }}>Password:*</Text>
           <TextInput
             style={styles.input}
             value={password}
@@ -135,10 +186,10 @@ const SignUp =  () => {
               }
             }}
             secureTextEntry
-            placeholder='Password'
+            placeholder='Password (min. 5 characters)'
           />
           {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
-          <Text style={{ marginTop: 16 }}>Confirm Password:</Text>
+          <Text style={{ marginTop: 16 }}>Confirm Password:*</Text>
           <TextInput
             style={styles.input}
             value={confirmPassword}
@@ -158,13 +209,13 @@ const SignUp =  () => {
           {passwordsMatch ? <Text style={{ color: 'green' }}>{'Passwords match!'}</Text> : null}
           <Text style={{ marginBottom: 10 }} />
           <Text style={styles.title}>Additional information</Text>
-          <Text>Name:</Text>
+          <Text>Name:*</Text>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
             onBlur={() => {
-              const errorMessage = validateField('name', name)
+              const errorMessage = validateField('name', { name })
               if (errorMessage) {
                 setNameError(errorMessage)
                 setTimeout(() => {
@@ -174,7 +225,7 @@ const SignUp =  () => {
                 setNameError('')
               }
             }}
-            placeholder='Name'
+            placeholder='Name (min. 3 characters)'
           />
           {nameError? <Text style={{ color: 'red' }}>{nameError}</Text> : null}
           <Text style={{ marginTop: 16 }}>Phone:</Text>
@@ -192,10 +243,10 @@ const SignUp =  () => {
             onChangeText={setCity}
             placeholder='City'
           />
-          <CustomButton style={{ marginTop: 10 }} onPress={handleSignUp} title='Register' />
+          <CustomButton style={{ marginTop: 10, marginBottom: 20 }} onPress={handleSignUp} title='Register' />
         </View>
-      </KeyboardAvoidingView>
-    </ScrollView>
+      )}
+    </KeyboardAwareScrollView>
   )
 }
 
@@ -206,7 +257,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    marginBottom: 24,
   },
   input: {
     height: 40,

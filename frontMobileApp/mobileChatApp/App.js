@@ -2,14 +2,9 @@ import * as React from 'react'
 import { useEffect } from 'react'
 import SignIn from './src/Components/SignIn/index.jsx'
 import SignUp from './src/Components/SignUp/index.jsx'
-import { Image, Pressable, StyleSheet, Alert } from 'react-native'
-import { NavigationContainer, CommonActions } from '@react-navigation/native'
-import {
-  createDrawerNavigator,
-  DrawerContentScrollView,
-  DrawerItemList,
-  DrawerItem,
-} from '@react-navigation/drawer'
+import { Image, Pressable, Alert } from 'react-native'
+import { NavigationContainer } from '@react-navigation/native'
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer'
 import { UserContext } from './src/Context/UserContext.js'
 import { useContext } from 'react'
 import FeedScreen from './src/Components/Feed/index.jsx'
@@ -22,7 +17,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import SearchForUser from './src/Components/SearchForUser/index.jsx'
 import { createStackNavigator } from '@react-navigation/stack'
 import defaultProfilePicture from './assets/soldier.png'
-import useGetCurrentUser from './src/hooks/useGetCurrentUser.js'
 import { UserProvider } from './src/Context/UserContext.js'
 // Default use profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
@@ -36,8 +30,8 @@ const Drawer = createDrawerNavigator()
 const Tab = createBottomTabNavigator()
 
 const AuthFlow = () => (
-  <AuthStack.Navigator initialRouteName="SignIn">
-    <AuthStack.Screen name="SignIn" component={SignIn} />
+  <AuthStack.Navigator initialRouteName="NexusHive">
+    <AuthStack.Screen name="NexusHive" component={SignIn} />
     <AuthStack.Screen name="SignUp" component={SignUp} />
     {/* Add this line below to get rid of error that no "Home screen" */}
   </AuthStack.Navigator>
@@ -96,7 +90,7 @@ const CustomDrawerContent = (props) => {
   const navigation = useNavigation()
 
   useEffect(() => {
-    if (!user) navigation.navigate('Auth', { screen: 'SignIn' })
+    if (!user) navigation.navigate('Auth', { screen: 'NexusHive' })
   })
 
 
@@ -129,10 +123,6 @@ const CustomDrawerContent = (props) => {
       <DrawerItemList {...props} />
       {user &&(
         <>
-          <DrawerItem
-            label="Search for a user"
-            onPress={() => navigation.navigate('SearchForUser')}
-          />
           <DrawerItem
             label="Sign Out"
             onPress={handleSignOut}
@@ -187,14 +177,5 @@ const App = () => {
     </UserProvider>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-})
 
 export default App

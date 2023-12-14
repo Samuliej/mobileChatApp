@@ -123,6 +123,16 @@ describe('test for api endpoint GET', () => {
     expect(response.body.username).toBe('user1')
   })
 
+  test('returns true if username is taken', async () => {
+    const response = await api.get('/api/username/user1')
+    expect(response.body.isTaken).toBe(true)
+  })
+
+  test('returns false if username is not taken', async () => {
+    const response = await api.get('/api/username/nonexistentuser')
+    expect(response.body.isTaken).toBe(false)
+  })
+
 
   test('fetching conversation by ID returns correct conversation', async () => {
     const response = await api.get(`/api/conversations/${conversation._id}`)

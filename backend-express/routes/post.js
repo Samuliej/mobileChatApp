@@ -19,17 +19,18 @@ const cloudinary = require('../cloudinary')
 
 // Create a user
 router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
-  //console.log(req.body)
-  //console.log(req.file)
-  //console.log(req)
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
-    const result = await cloudinary.uploader.upload(req.file.path)
+    let result = null
+    if (req.file) {
+      result = await cloudinary.uploader.upload(req.file.path)
+    }
+
 
     const newUser = new User({
       username: req.body.username,
       name: req.body.name,
-      profilePicture: result.secure_url, // Save the URL of the uploaded image
+      profilePicture: result ? result.secure_url : null,
       phone: req.body.phone,
       city: req.body.city,
       password: hashedPassword,
@@ -41,6 +42,9 @@ router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
 
     const userWithoutPassword = savedUser.toObject()
     delete userWithoutPassword.password
+
+
+    console.log(userWithoutPassword)
 
     res.status(201).json(userWithoutPassword)
   } catch (error) {

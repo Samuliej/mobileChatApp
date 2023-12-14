@@ -14,11 +14,13 @@ const useSignUp = () => {
       formData.append('username', username)
       formData.append('password', password)
       formData.append('name', name)
-      formData.append('profilePicture', {
-        uri: profilePicture.uri,
-        type: profilePicture.type,
-        name: profilePicture.name,
-      })
+      if (profilePicture) {
+        formData.append('profilePicture', {
+          uri: profilePicture.uri,
+          type: profilePicture.type,
+          name: profilePicture.name,
+        })
+      }
       formData.append('phone', phone)
       formData.append('city', city)
 
@@ -29,6 +31,7 @@ const useSignUp = () => {
       })
 
       setLoading(false)
+      console.log(res.data)
       return res.data
     } catch (err) {
       setLoading(false)

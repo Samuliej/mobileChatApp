@@ -8,9 +8,10 @@ import theme from '../../theme'
 import { UserContext } from '../../Context/UserContext'
 import { useNavigation } from '@react-navigation/native'
 import CustomButton from './CustomButton.jsx'
-import useGetCurrentUser from '../../hooks/useGetCurrentUser'
 const height = Dimensions.get('window').height
-const icon = require('../../../assets/icons8-chat-100.png')
+// Sign in icon from:
+// <a href="https://www.flaticon.com/free-icons/honeycomb" title="honeycomb icons">Honeycomb icons created by PIXARTIST - Flaticon</a>
+const icon = require('../../../assets/honeycomb.png')
 
 const validationSchema = yup.object().shape({
   username: yup.string()
@@ -88,8 +89,10 @@ const SignIn = () => {
     if (data) {
       await AsyncStorage.setItem('userToken', data)
       await updateUser(data)
-      setUsername('')
-      setPassword('')
+      setTimeout(() => {
+        setUsername('')
+        setPassword('')
+      }, 2000)
     }
   }
 
@@ -114,8 +117,8 @@ const SignInView = ({ username, setUsername, password, setUsernameError, setPass
       <View style={[styles.container, { marginTop: height/7 }]}>
         <View style={{ alignItems: 'center' }}>
           <Image
-            source={icon} // Replace with your image path
-            style={{ width: 120, height: 120 }} // Adjust the size as needed
+            source={icon}
+            style={{ width: 90, height: 90 }}
           />
         </View>
         <TextInput style={styles.inputBox}

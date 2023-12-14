@@ -38,8 +38,17 @@ router.get('/api/users/:username', async (req, res) => {
   }
 })
 
+// Check if a username is taken
+router.get('/api/username/:username', async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username })
+    res.json({ isTaken: !!user })
+  } catch (error) {
+    res.status(500).json({ error: 'Error checking username' })
+  }
+})
+
 // Fetch users by username query pagination added;
-// TODO: filter yourself from the results
 router.get('/api/users/search/:query', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1
