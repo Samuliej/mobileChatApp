@@ -91,6 +91,9 @@ router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
     const currentUser = req.currentUser
     const receiver = await User.findOne({ username: friendUsername })
 
+    console.log(currentUser)
+    console.log(receiver)
+
     if (!currentUser) {
       return res.status(401).json({ error: 'Authentication required' })
     }

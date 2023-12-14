@@ -6,9 +6,18 @@ const AuthStack = createStackNavigator()
 
 const AuthFlow = () => (
   <AuthStack.Navigator initialRouteName="NexusHive">
-    <AuthStack.Screen name="NexusHive" component={SignIn} />
-    <AuthStack.Screen name="SignUp" component={SignUp} />
-    {/* Add this line below to get rid of error that no "Home screen" */}
+    <AuthStack.Screen
+      name="NexusHive"
+      component={SignIn}
+      options={{ title: 'Welcome to NexusHive' }}
+    />
+    <AuthStack.Screen
+      name="SignUp"
+      component={SignUp}
+      options={{
+        title: 'Create your account'
+      }}
+    />
   </AuthStack.Navigator>
 )
 

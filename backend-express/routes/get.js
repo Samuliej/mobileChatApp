@@ -85,9 +85,6 @@ router.get('/api/me', authMiddleware, async (req, res) => {
 
   const userWithoutPassword = req.currentUser.toObject()
   delete userWithoutPassword.password
-  console.log(userWithoutPassword)
-  console.log('tänne pääsee')
-
   res.json(userWithoutPassword)
 })
 

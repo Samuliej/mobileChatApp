@@ -4,6 +4,7 @@ import { useSearchUser } from '../../hooks/useSearchUser'
 import theme from '../../theme.js'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import defaultProfilePicture from '../../../assets/soldier.png'
+import useSendFriendRequest from '../../hooks/useSendFriendRequest'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 
@@ -11,9 +12,16 @@ const SearchForUser = () => {
   const [searchInput, setSearchInput] = useState('')
   const [page, setPage] = useState(1)
   const { searchResults } = useSearchUser(searchInput)
+  const { sendFriendRequest } = useSendFriendRequest()
 
   const loadMoreResults = () => {
     setPage(page + 1)
+  }
+
+  const handleSendFriendRequest = async (username) => {
+    console.log('sending friend request to', username)
+    const res = await sendFriendRequest(username)
+    console.log(res)
   }
 
   return (
@@ -41,7 +49,7 @@ const SearchForUser = () => {
                 name="user-plus"
                 backgroundColor="transparent"
                 color="blue"
-                onPress={() => {/* Handle friend request */}}
+                onPress={() => handleSendFriendRequest(item.username)}
               />
             </View>
           )}

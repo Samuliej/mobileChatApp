@@ -102,6 +102,11 @@ const SignUp =  () => {
     }
   }
 
+  const deleteImage = () => {
+    setImage(null)
+    setProfilePicture(null)
+  }
+
   const validateField = (field, values) => {
     try {
       yup.reach(validationSchema, field).validateSync(values[field])
@@ -160,7 +165,12 @@ const SignUp =  () => {
           {errorMessage && <ErrorBanner error={errorMessage} />}
           <Pressable style={styles.imagePicker} onPress={selectImage}>
             {image ? (
-              <Image source={{ uri: image }} style={styles.image} />
+              <>
+                <Image source={{ uri: image }} style={styles.image} />
+                <Pressable style={styles.deleteButton} onPress={deleteImage}>
+                  <Text style={styles.deleteButtonText}>X</Text>
+                </Pressable>
+              </>
             ) : (
               <Text style={styles.imagePickerText}>+</Text>
             )}
@@ -302,6 +312,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 5,
     bottom: -10,
+  },
+  deleteButton: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    backgroundColor: 'red',
+    borderRadius: 50,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })
 

@@ -19,7 +19,7 @@ const CustomHeader = ({ user }) => {
     <Pressable onPress={() => navigation.toggleDrawer()}>
       <Image
         source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
-        style={{ width: 40, height: 40, borderRadius: 20 }}
+        style={{ width: 40, height: 40, borderRadius: 20, paddingLeft: 5 }}
       />
     </Pressable>
   )
@@ -85,6 +85,14 @@ const MyDrawer = () => {
         name='Home'
         component={MyTabs}
         options={{
+          headerTitle: user && user.username ? user.username : 'Home',
+          headerStyle: {
+            backgroundColor: '#007BFF',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
           headerLeft: () => <CustomHeader user={user} />,
           drawerIcon: ({ focused, size }) => (
             <Image
