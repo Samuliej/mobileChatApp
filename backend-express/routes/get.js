@@ -9,7 +9,7 @@ const authMiddleware = require('../middlewares/authMiddlewares')
 // Fetch all users
 router.get('/api/users', async (req, res) => {
   try {
-    const users = await User.find({})
+    const users = await User.find({}).select('-password')
     res.json(users)
   } catch (error) {
     res.status(500).json({ error: 'Error fetching users' })
@@ -31,7 +31,9 @@ router.get('/api/conversations', async (req, res) => {
 // Fetch user by username
 router.get('/api/users/:username', async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.params.username }).populate('friends', 'username')
+    const user = await User.findOne({ username: req.params.username })
+      .select('-password')
+      .populate('friends', 'username')
     res.json(user)
   } catch (error) {
     res.status(500).json({ error: 'Error fetching user' })
@@ -41,7 +43,7 @@ router.get('/api/users/:username', async (req, res) => {
 // Fetch user by id
 router.get('/api/users/id/:userId', async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId)
+    const user = await User.findById(req.params.userId).select('-password')
       .populate('friends', 'username')
       .populate('profilePicture', 'url')
     res.json(user)
@@ -60,14 +62,14 @@ router.get('/api/username/:username', async (req, res) => {
   }
 })
 
-// Fetch users by username query pagination added;
+// Fetch users by username query pagination added
 router.get('/api/users/search/:query', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1
     const limit = 5 // results / page
     const skip = (page - 1) * limit
     // Changed the regex to match usernames starting with the query
-    const users = await User.find({ username: new RegExp('^' + req.params.query, 'i') })
+    const users = await User.find({ username: new RegExp('^' + req.params.query, 'i') }).select('-password')
       .populate('friends', 'username')
       .populate('pendingFriendRequests')
       .skip(skip)
@@ -97,11 +99,9 @@ router.get('/api/me', authMiddleware, async (req, res) => {
   }
 
   // Populate the pendingFriendships field
-  const user = await User.findById(req.currentUser._id).populate('pendingFriendRequests')
+  const user = await User.findById(req.currentUser._id).select('-password').populate('pendingFriendRequests')
 
-  const userWithoutPassword = user.toObject()
-  delete userWithoutPassword.password
-  res.json(userWithoutPassword)
+  res.json(user)
 })
 
 // Fetch friend requests;

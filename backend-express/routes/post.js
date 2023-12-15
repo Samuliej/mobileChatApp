@@ -126,39 +126,6 @@ router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
   }
 })
 
-// Accept friend request
-router.post('/api/acceptFriendRequest', authMiddleware, async (req, res) => {
-  const friendship = await Friendship.findOne({ _id: req.body.friendshipId })
-  const currentUser = req.currentUser
-
-  const requestSender = await User.findOne({ _id: friendship.sender })
-
-  if (!currentUser) {
-    return res.status(401).json({ error: 'Authentication required' })
-  }
-
-  if (currentUser._id.toString() === friendship.receiver.toString()) {
-    try {
-      friendship.status = 'ACCEPTED'
-      await friendship.save()
-
-      currentUser.friends.push(friendship.sender)
-      currentUser.pendingFriendRequests = currentUser.pendingFriendRequests.filter(request => request.toString() !== friendship._id.toString())
-      await currentUser.save()
-
-      requestSender.friends.push(friendship.receiver)
-      requestSender.pendingFriendRequests = requestSender.pendingFriendRequests.filter(request => request.toString() !== friendship._id.toString())
-      await requestSender.save()
-
-      res.status(200).json(friendship)
-    } catch (error) {
-      res.status(500).json({ error: 'Error updating friendship status' })
-    }
-  } else {
-    res.status(403).json({ error: 'Not authenticated to accept request' })
-  }
-})
-
 
 // Send message
 router.post('/api/sendMessage', authMiddleware, async (req, res) => {
