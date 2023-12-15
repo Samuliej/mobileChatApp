@@ -38,6 +38,18 @@ router.get('/api/users/:username', async (req, res) => {
   }
 })
 
+// Fetch user by id
+router.get('/api/users/id/:userId', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId)
+      .populate('friends', 'username')
+      .populate('profilePicture', 'url')
+    res.json(user)
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching user' })
+  }
+})
+
 // Check if a username is taken
 router.get('/api/username/:username', async (req, res) => {
   try {

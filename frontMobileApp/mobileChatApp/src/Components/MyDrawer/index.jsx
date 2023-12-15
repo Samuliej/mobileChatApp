@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer'
 import { UserContext } from '../../Context/UserContext.js'
 import { useNavigation } from '@react-navigation/native'
@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import defaultProfilePicture from '../../../assets/soldier.png'
 import MyTabs from '../MyTabs/index.jsx'
 import SearchForUser from '../SearchForUser/index.jsx'
+import FriendRequests from '../FriendRequests/index.jsx'
 
 const Drawer = createDrawerNavigator()
 
@@ -73,6 +74,8 @@ const CustomDrawerContent = (props) => {
 
 const MyDrawer = () => {
   const { user } = useContext(UserContext)
+  let count = 0
+  if (user) count = user.pendingFriendRequests.filter(request => request.receiver === user._id).length
 
   return (
     <Drawer.Navigator
@@ -91,7 +94,7 @@ const MyDrawer = () => {
             fontWeight: 'bold',
           },
           headerLeft: () => <CustomHeader user={user} />,
-          drawerIcon: ({ focused, size }) => (
+          drawerIcon: ({ size }) => (
             <Image
               source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
               style={{ width: size, height: size, borderRadius: size / 2 }}
@@ -99,7 +102,8 @@ const MyDrawer = () => {
           ),
         }}
       />
-      <Drawer.Screen name="Search For a User" component={SearchForUser} />
+      <Drawer.Screen name="Search for a User" component={SearchForUser} />
+      <Drawer.Screen name={count ? `Friend requests +(${count})` : "Friend requests"} component={FriendRequests} />
     </Drawer.Navigator>
   )
 }
