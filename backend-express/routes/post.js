@@ -43,12 +43,9 @@ router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
     const userWithoutPassword = savedUser.toObject()
     delete userWithoutPassword.password
 
-
-    console.log(userWithoutPassword)
-
     res.status(201).json(userWithoutPassword)
   } catch (error) {
-    console.log(error)
+    console.error(error)
     res.status(500).json({ error: 'Something went wrong creating the user' })
   }
 })
@@ -90,9 +87,6 @@ router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
     const friendUsername = req.body.username
     const currentUser = req.currentUser
     const receiver = await User.findOne({ username: friendUsername })
-
-    console.log(currentUser)
-    console.log(receiver)
 
     if (!currentUser) {
       return res.status(401).json({ error: 'Authentication required' })

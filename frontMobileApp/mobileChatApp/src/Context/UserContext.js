@@ -24,7 +24,6 @@ export const UserProvider = ({ children }) => {
     console.log('updateUser called')
     if (token) {
       const fetchedUser = await fetchUser(token)
-      console.log('updateUser', fetchedUser)
       setUser(fetchedUser)
     } else {
       setUser(null)

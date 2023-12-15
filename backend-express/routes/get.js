@@ -57,6 +57,7 @@ router.get('/api/users/search/:query', async (req, res) => {
     // Changed the regex to match usernames starting with the query
     const users = await User.find({ username: new RegExp('^' + req.params.query, 'i') })
       .populate('friends', 'username')
+      .populate('pendingFriendRequests')
       .skip(skip)
       .limit(limit)
 
@@ -83,7 +84,10 @@ router.get('/api/me', authMiddleware, async (req, res) => {
     return res.status(401).json({ error: 'Authentication required' })
   }
 
-  const userWithoutPassword = req.currentUser.toObject()
+  // Populate the pendingFriendships field
+  const user = await User.findById(req.currentUser._id).populate('pendingFriendRequests')
+
+  const userWithoutPassword = user.toObject()
   delete userWithoutPassword.password
   res.json(userWithoutPassword)
 })

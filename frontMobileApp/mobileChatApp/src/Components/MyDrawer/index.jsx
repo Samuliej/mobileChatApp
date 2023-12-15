@@ -29,11 +29,6 @@ const CustomDrawerContent = (props) => {
   const { user, updateUser } = useContext(UserContext)
   const navigation = useNavigation()
 
-  useEffect(() => {
-    if (!user) navigation.navigate('Auth', { screen: 'NexusHive' })
-  })
-
-
   const handleSignOut = async () => {
     Alert.alert(
       'Confirmation',
@@ -50,6 +45,8 @@ const CustomDrawerContent = (props) => {
             await AsyncStorage.removeItem('userToken')
             // Update the user context
             await updateUser(null)
+
+            navigation.navigate('Auth', { screen: 'NexusHive' })
           }
         },
       ],
