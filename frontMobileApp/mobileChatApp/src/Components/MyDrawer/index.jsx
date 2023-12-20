@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer'
 import { UserContext } from '../../Context/UserContext.js'
 import { useNavigation } from '@react-navigation/native'
@@ -10,6 +10,7 @@ import defaultProfilePicture from '../../../assets/soldier.png'
 import MyTabs from '../MyTabs/index.jsx'
 import SearchForUser from '../SearchForUser/index.jsx'
 import FriendRequests from '../FriendRequests/index.jsx'
+import Friends from '../Friends/index.jsx'
 
 const Drawer = createDrawerNavigator()
 
@@ -26,8 +27,8 @@ const CustomHeader = ({ user }) => {
   )
 }
 
-const CustomDrawerContent = (props) => {
-  const { user, updateUser } = useContext(UserContext)
+const CustomDrawerContent = ({ setCurrentScreen, ...props }) => {
+  const { user, isSignedIn, updateUser } = useContext(UserContext)
   const navigation = useNavigation()
 
   const handleSignOut = async () => {
@@ -46,7 +47,7 @@ const CustomDrawerContent = (props) => {
             await AsyncStorage.removeItem('userToken')
             // Update the user context
             await updateUser(null)
-
+            setCurrentScreen('NexusHive')
             navigation.navigate('Auth', { screen: 'NexusHive' })
           }
         },
@@ -59,14 +60,12 @@ const CustomDrawerContent = (props) => {
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
-      {user &&(
-        <>
-          <DrawerItem
-            label="Sign Out"
-            onPress={handleSignOut}
-            labelStyle={{ color: 'red' }}
-          />
-        </>
+      {isSignedIn && (
+        <DrawerItem
+          label="Sign Out"
+          onPress={handleSignOut}
+          labelStyle={{ color: 'red' }}
+        />
       )}
     </DrawerContentScrollView>
   )
@@ -74,18 +73,20 @@ const CustomDrawerContent = (props) => {
 
 const MyDrawer = () => {
   const { user } = useContext(UserContext)
+  const [currentScreen, setCurrentScreen] = useState('Home')
+
   let count = 0
   if (user) count = user.pendingFriendRequests.filter(request => request.receiver === user._id).length
 
   return (
     <Drawer.Navigator
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      drawerContent={(props) => <CustomDrawerContent {...props} setCurrentScreen={setCurrentScreen} />}
     >
       <Drawer.Screen
         name='Home'
         component={MyTabs}
         options={{
-          headerTitle: user && user.username ? user.username : 'Home',
+          headerTitle: currentScreen,
           headerStyle: {
             backgroundColor: '#007BFF',
           },
@@ -104,6 +105,7 @@ const MyDrawer = () => {
       />
       <Drawer.Screen name="Search for a User" component={SearchForUser} />
       <Drawer.Screen name={count ? `Friend requests +(${count})` : "Friend requests"} component={FriendRequests} />
+      <Drawer.Screen name="Friends" component={Friends} />
     </Drawer.Navigator>
   )
 }

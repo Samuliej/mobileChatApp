@@ -6,10 +6,10 @@ export const UserContext = createContext()
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null)
+  const [isSignedIn, setIsSignedIn] = useState(false)
 
   const fetchUser = async (token) => {
     // Fetch the user data using the token
-    // This is just a placeholder, replace it with your actual fetch logic
     const response = await api.get('/api/me', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -25,9 +25,18 @@ export const UserProvider = ({ children }) => {
     if (token) {
       const fetchedUser = await fetchUser(token)
       setUser(fetchedUser)
+      setIsSignedIn(true)
     } else {
       setUser(null)
+      setIsSignedIn(false)
     }
+  }
+
+  const updateUserPendingRequests = (newRequests) => {
+    setUser({
+      ...user,
+      pendingFriendRequests: newRequests,
+    })
   }
 
   useEffect(() => {
@@ -42,7 +51,7 @@ export const UserProvider = ({ children }) => {
   }, [])
 
   return (
-    <UserContext.Provider value={{ user, updateUser }}>
+    <UserContext.Provider value={{ user, isSignedIn, updateUser, updateUserPendingRequests }}>
       {children}
     </UserContext.Provider>
   )

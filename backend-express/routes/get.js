@@ -43,6 +43,7 @@ router.get('/api/users/:username', async (req, res) => {
 // Fetch user by id
 router.get('/api/users/id/:userId', async (req, res) => {
   try {
+    console.log(req.params.userId)
     const user = await User.findById(req.params.userId).select('-password')
       .populate('friends', 'username')
       .populate('profilePicture', 'url')
@@ -99,7 +100,9 @@ router.get('/api/me', authMiddleware, async (req, res) => {
   }
 
   // Populate the pendingFriendships field
-  const user = await User.findById(req.currentUser._id).select('-password').populate('pendingFriendRequests')
+  const user = await User.findById(req.currentUser._id)
+    .select('-password')
+    .populate('pendingFriendRequests')
 
   res.json(user)
 })

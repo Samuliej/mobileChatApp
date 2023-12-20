@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native'
+import { View, Text, Image, Pressable, StyleSheet, Alert } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
@@ -9,7 +9,7 @@ const emptyIcon = require('../../../assets/fist-bump.png')
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
 const FriendRequests = () => {
-  const { user } = useContext(UserContext)
+  const { user, updateUserPendingRequests } = useContext(UserContext)
   const [requests, setRequests] = useState([])
   const [notification, setNotification] = useState('')
   const navigation = useNavigation()
@@ -19,16 +19,22 @@ const FriendRequests = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       if (user) {
+        // Fetch the requests that are not declined
         const fetchedRequests = await Promise.all(pendingRequests.map(async (request) => {
-          const response = await api.get(`/api/users/id/${request.sender}`)
-          const senderUser = await response.data
-          return {
-            ...request,
-            userObj: senderUser,
+          if (request.status !== 'DECLINED') {
+            const response = await api.get(`/api/users/id/${request.sender}`)
+            const senderUser = await response.data
+            return {
+              ...request,
+              userObj: senderUser,
+            }
           }
         }))
 
-        setRequests(fetchedRequests)
+        // Filter out undefined values (requests that were declined)
+        const validRequests = fetchedRequests.filter(request => request !== undefined)
+
+        setRequests(validRequests)
       }
     }
 
@@ -46,21 +52,53 @@ const FriendRequests = () => {
   const handleAccept = async (username, friendshipId) => {
     try {
       const userToken = await AsyncStorage.getItem('userToken')
-      const response = await api.put('/api/acceptFriendRequest', { friendshipId }, {
+      await api.put('/api/acceptFriendRequest', { friendshipId }, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         }
       })
       setNotification(`Accepted friend request from ${username}`)
       // Update the requests state to remove the accepted request
-      setRequests(requests.filter(request => request._id !== friendshipId))
+      const newRequests = requests.filter(request => request._id !== friendshipId)
+      setRequests(newRequests)
+      updateUserPendingRequests(newRequests)
     } catch (error) {
       console.error(`Error accepting friend request from ${username}: `, error)
     }
   }
 
-  const handleDecline = (username) => {
-    console.log(`Declined friend request from ${username}`)
+  const handleDecline = (username, friendshipId) => {
+    Alert.alert(
+      "Decline Friend Request",
+      `Are you sure you want to decline the friend request from ${username}?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+              const userToken = await AsyncStorage.getItem('userToken')
+              await api.put(`/api/declineFriendRequest/${friendshipId}`, {}, {
+                headers: {
+                  Authorization: `Bearer ${userToken}`,
+                }
+              })
+              setNotification(`Declined friend request from ${username}`)
+              // Update the requests state to remove the declined request
+              const newRequests = requests.filter(request => request._id !== friendshipId)
+              setRequests(newRequests)
+              updateUserPendingRequests(newRequests)
+              navigation.navigate('Friend requests')
+            } catch (error) {
+              console.error(`Error declining friend request from ${username}: `, error)
+            }
+          }
+        }
+      ]
+    )
   }
 
   return (
@@ -98,7 +136,7 @@ const FriendRequests = () => {
                       styles.declineButton,
                       { opacity: pressed ? 0.5 : 1 }
                     ]}
-                    onPress={() => handleDecline(request.userObj.username)}>
+                    onPress={() => handleDecline(request.userObj.username, request._id)}>
                     <Text style={styles.navigateButtonText}>X</Text>
                   </Pressable>
                 </View>

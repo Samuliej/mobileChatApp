@@ -26,6 +26,9 @@ router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
       result = await cloudinary.uploader.upload(req.file.path)
     }
 
+    console.log(req.body)
+    console.log('Registering')
+
 
     const newUser = new User({
       username: req.body.username,
@@ -52,6 +55,9 @@ router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
 // User login
 router.post('/api/login', async (req, res) => {
   try {
+
+    console.log(req.body)
+    console.log('Logging in')
     const user = await User.findOne({ username: req.body.username })
 
     if (!user) {

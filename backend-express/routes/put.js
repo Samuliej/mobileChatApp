@@ -7,6 +7,7 @@ const authMiddleware = require('../middlewares/authMiddlewares')
 
 // Decline friend request
 router.put('/api/declineFriendRequest/:friendshipId', authMiddleware, async (req, res) => {
+  console.log('Declining friend request')
   const friendship = await Friendship.findOne({ _id: req.params.friendshipId })
   const currentUser = req.currentUser
 
