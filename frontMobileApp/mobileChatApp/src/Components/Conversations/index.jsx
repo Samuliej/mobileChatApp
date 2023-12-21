@@ -5,6 +5,9 @@ import { UserContext } from '../../Context/UserContext.js'
 import api from '../../api.js'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
+// TODO: Sort the conversations by last message time
+// TODO: Smoother transition when navigating to Chat screen
+
 const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const [conversations, setConversations] = useState([])

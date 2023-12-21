@@ -6,6 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
+// TODO: If a conversation exists between the two users, don't create a new one
+// but just navigate to the existing one
+
 const NewConversation = () => {
   const { user, updateUser } = useContext(UserContext)
   const [friends, setFriends] = useState([])

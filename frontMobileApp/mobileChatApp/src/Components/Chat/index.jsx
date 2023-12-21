@@ -12,6 +12,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 const defaultBackgroundPicture = require('../../../assets/rm222-mind-14.jpg')
 
+// TODO: Smoother transition when navigating to Chat screen
+// Implement a loading screen, maybe need custom hooks
+
 const CustomNavBar = ({ navigation, friend }) => {
   return (
     <View style={styles.navBar}>
