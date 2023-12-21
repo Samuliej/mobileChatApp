@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { View, Text, Image, Pressable, StyleSheet, Alert } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
+import { NotificationContext } from '../../Context/NotificationContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -9,9 +10,9 @@ const emptyIcon = require('../../../assets/fist-bump.png')
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
 const FriendRequests = () => {
-  const { user, updateUserPendingRequests } = useContext(UserContext)
+  const { user, updateUserPendingRequests, updateUser } = useContext(UserContext)
+  const { notification, setNotification } = useContext(NotificationContext)
   const [requests, setRequests] = useState([])
-  const [notification, setNotification] = useState('')
   const navigation = useNavigation()
   let pendingRequests = []
   if (user) pendingRequests = user.pendingFriendRequests.filter(request => request.receiver === user._id)
@@ -19,22 +20,17 @@ const FriendRequests = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       if (user) {
-        // Fetch the requests that are not declined
+        // Fetch all requests
         const fetchedRequests = await Promise.all(pendingRequests.map(async (request) => {
-          if (request.status !== 'DECLINED') {
-            const response = await api.get(`/api/users/id/${request.sender}`)
-            const senderUser = await response.data
-            return {
-              ...request,
-              userObj: senderUser,
-            }
+          const response = await api.get(`/api/users/id/${request.sender}`)
+          const senderUser = await response.data
+          return {
+            ...request,
+            userObj: senderUser,
           }
         }))
 
-        // Filter out undefined values (requests that were declined)
-        const validRequests = fetchedRequests.filter(request => request !== undefined)
-
-        setRequests(validRequests)
+        setRequests(fetchedRequests)
       }
     }
 
@@ -57,11 +53,15 @@ const FriendRequests = () => {
           Authorization: `Bearer ${userToken}`,
         }
       })
-      setNotification(`Accepted friend request from ${username}`)
       // Update the requests state to remove the accepted request
       const newRequests = requests.filter(request => request._id !== friendshipId)
       setRequests(newRequests)
       updateUserPendingRequests(newRequests)
+      updateUser(userToken)
+      // I have to include this because for some reason updating the user
+      // object redirects to the home page
+      navigation.navigate('Friend requests')
+      setNotification(`Accepted friend request from ${username}`)
     } catch (error) {
       console.error(`Error accepting friend request from ${username}: `, error)
     }
@@ -86,12 +86,15 @@ const FriendRequests = () => {
                   Authorization: `Bearer ${userToken}`,
                 }
               })
-              setNotification(`Declined friend request from ${username}`)
               // Update the requests state to remove the declined request
               const newRequests = requests.filter(request => request._id !== friendshipId)
               setRequests(newRequests)
               updateUserPendingRequests(newRequests)
+              updateUser(userToken)
+              // I have to include this because for some reason updating the user
+              // object redirects to the home page
               navigation.navigate('Friend requests')
+              setNotification(`Declined friend request from ${username}`)
             } catch (error) {
               console.error(`Error declining friend request from ${username}: `, error)
             }

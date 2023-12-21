@@ -52,13 +52,13 @@ router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
     res.status(500).json({ error: 'Something went wrong creating the user' })
   }
 })
+
 // User login
 router.post('/api/login', async (req, res) => {
   try {
-
-    console.log(req.body)
-    console.log('Logging in')
     const user = await User.findOne({ username: req.body.username })
+      .populate('pendingFriendRequests')
+      .populate('friends')
 
     if (!user) {
       res.status(401).json({ error: 'User not found' })
@@ -98,34 +98,40 @@ router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' })
     }
 
-    const existingFriendship = await Friendship.findOne({
-      // Performs a logical OR operation on an array of two or
-      // more expressions and selects the documents that satisfy at least one of the expressions.
+    let existingFriendship = await Friendship.findOne({
       $or: [
         { sender: currentUser._id, receiver: receiver._id },
         { sender: receiver._id, receiver: currentUser._id }
       ]
     })
 
-    if (existingFriendship) {
+    console.log(existingFriendship)
+
+    if (existingFriendship && existingFriendship.status === 'PENDING') {
       return res.status(400).json({ error: 'Friend request already sent' })
     }
 
-    const newFriendship = new Friendship({
-      sender: currentUser._id,
-      receiver: receiver._id,
-      status: 'PENDING',
-    })
+    if (existingFriendship && existingFriendship.status === 'DECLINED') {
+      existingFriendship.status = 'PENDING'
+      await existingFriendship.save()
+      res.status(200).json(existingFriendship)
+    } else {
+      const newFriendship = new Friendship({
+        sender: currentUser._id,
+        receiver: receiver._id,
+        status: 'PENDING',
+      })
 
-    await newFriendship.save()
+      await newFriendship.save()
 
-    currentUser.pendingFriendRequests.push(newFriendship._id)
-    await currentUser.save()
+      currentUser.pendingFriendRequests.push(newFriendship._id)
+      await currentUser.save()
 
-    receiver.pendingFriendRequests.push(newFriendship._id)
-    await receiver.save()
+      receiver.pendingFriendRequests.push(newFriendship._id)
+      await receiver.save()
 
-    res.status(201).json(newFriendship)
+      res.status(201).json(newFriendship)
+    }
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Something went wrong saving new friendship state' })

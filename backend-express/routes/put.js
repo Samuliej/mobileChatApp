@@ -17,9 +17,14 @@ router.put('/api/declineFriendRequest/:friendshipId', authMiddleware, async (req
 
   if (currentUser._id.toString() === friendship.receiver.toString()) {
     try {
-      friendship.status = 'DECLINED'
-      await friendship.save()
-      res.status(200).json(friendship)
+      // Remove the friendship from the pendingFriendRequests array of the currentUser
+      currentUser.pendingFriendRequests = currentUser.pendingFriendRequests.filter(request => request._id.toString() !== friendship._id.toString())
+      await currentUser.save()
+
+      // Delete the friendship
+      await Friendship.deleteOne({ _id: req.params.friendshipId })
+
+      res.status(200).json({ message: 'Friend request declined' })
     } catch (error) {
       res.status(500).json({ error: 'Something went wrong declining the friendship' })
     }

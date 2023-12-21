@@ -64,19 +64,24 @@ const SearchForUser = () => {
                 <View style={styles.listItem}>
                   <Image
                     source={item.profilePicture ? { uri: item.profilePicture } : defaultProfilePicture}
-                    style={styles.listingProfilePicture} // Add a style for the image
+                    style={styles.listingProfilePicture}
                   />
                   <Text style={styles.listItemText}> {item.username}</Text>
                   <Icon.Button
                     name="user-plus"
                     backgroundColor="transparent"
-                    color={sentRequests.includes(item.username)
-                      || item.pendingFriendRequests.some(request => request.sender === userId
-                      || request.receiver === userId) ? 'gray' : 'blue'}
+                    color={user && user.friends.includes(item._id) ? 'green' :
+                      (sentRequests.includes(item.username) ||
+                    item.pendingFriendRequests.some(request =>
+                      (request.sender === userId || request.receiver === userId) && request.status !== 'DECLINED'
+                    )) ? 'gray' : 'blue'}
                     onPress={() => handleSendFriendRequest(item.username)}
-                    disabled={sentRequests.includes(item.username)
-                      || item.pendingFriendRequests.some(request => request.sender === userId
-                      || request.receiver === userId)}
+                    // Disable the request, if the user is already a friend or if the request has already been sent
+                    disabled={user && user.friends.includes(item.username) ||
+                      sentRequests.includes(item.username) ||
+                      item.pendingFriendRequests.some(request =>
+                        (request.sender === userId || request.receiver === userId) && request.status !== 'DECLINED'
+                      )}
                   />
                 </View>
               )

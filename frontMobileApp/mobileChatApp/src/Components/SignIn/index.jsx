@@ -67,8 +67,6 @@ const SignIn = () => {
     return () => clearTimeout(timeout)
   }, [error])
 
-
-
   const validateField = (field, value) => {
     try {
       yup.reach(validationSchema, field).validateSync(value)
