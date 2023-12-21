@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItem,  } from '@react-navigation/drawer'
 import { UserContext } from '../../Context/UserContext.js'
 import { useNavigation } from '@react-navigation/native'
 import { Image, Pressable, Alert, View, Text } from 'react-native'
@@ -11,6 +11,8 @@ import MyTabs from '../MyTabs/index.jsx'
 import SearchForUser from '../SearchForUser/index.jsx'
 import Friends from '../Friends/index.jsx'
 import FriendRequests from '../FriendRequests/index.jsx'
+import NewConversation from '../NewConversation/index.jsx'
+import Chat from '../Chat/index.jsx'
 
 const Drawer = createDrawerNavigator()
 
@@ -44,6 +46,7 @@ const CustomDrawerItem = ({ label, badgeCount, ...props }) => (
   />
 )
 
+
 const MyDrawer = () => {
   const { user, updateUser } = useContext(UserContext)
   const pendingRequestsCount = user ? user.pendingFriendRequests.filter(request => request.status === 'PENDING').length : 0
@@ -64,8 +67,11 @@ const MyDrawer = () => {
             // Clear the token from the storage
             await AsyncStorage.removeItem('userToken')
             // Update the user context
-            await updateUser(null)
-            navigation.navigate('Auth', { screen: 'NexusHive' })
+            updateUser(null)
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Auth', params: { screen: 'NexusHive' } }],
+            })
           }
         },
       ],
@@ -134,8 +140,17 @@ const MyDrawer = () => {
       <Drawer.Screen name="Search for a User" component={SearchForUser} />
       <Drawer.Screen name="Friends" component={Friends} />
       <Drawer.Screen name="Friend requests" component={FriendRequests} />
+      <Drawer.Screen name="New conversation" component={NewConversation} />
+      <Drawer.Screen
+        name="Chat"
+        component={Chat}
+        options={{
+          headerShown: false,
+        }}
+      />
     </Drawer.Navigator>
   )
 }
+
 
 export default MyDrawer

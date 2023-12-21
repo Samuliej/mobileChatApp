@@ -87,6 +87,14 @@ router.get('/api/users/search/:query', async (req, res) => {
 router.get('/api/conversations/:convoId', async (req, res) => {
   try {
     const convo = await Conversation.findById(req.params.convoId)
+      .populate('participants')
+      .populate({
+        path: 'messages',
+        populate: {
+          path: 'sender receiver',
+          model: 'User'
+        }
+      })
     res.json(convo)
   } catch (error) {
     res.status(500).json({ error: 'Error fetching conversation' })
@@ -103,6 +111,7 @@ router.get('/api/me', authMiddleware, async (req, res) => {
   const user = await User.findById(req.currentUser._id)
     .select('-password')
     .populate('pendingFriendRequests')
+    .populate('conversations')
 
   res.json(user)
 })

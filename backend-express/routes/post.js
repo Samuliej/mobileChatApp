@@ -138,53 +138,90 @@ router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
   }
 })
 
-
-// Send message
-router.post('/api/sendMessage', authMiddleware, async (req, res) => {
+// Start a new conversation
+router.post('/api/startConversation', authMiddleware, async (req, res) => {
+  console.log('Starting conversation')
   const currentUser = req.currentUser
   let user = await User.findOne({ username: currentUser.username })
   if (!currentUser) {
     return res.status(400).json({ error: 'Authentication required' })
   }
 
-  const messageReceiver = await User.findOne({ username: req.body.username })
-  if (!messageReceiver) {
+  const friend = await User.findOne({ username: req.body.username })
+  if (!friend) {
     return res.status(400).json({ error: 'User not found' })
   }
 
+  console.log(friend)
+
   let conversation = await Conversation.findOne({
     participants: {
-      $all: [currentUser._id, messageReceiver._id]
+      $all: [currentUser._id, friend._id]
     }
   })
 
   if (!conversation) {
     conversation = new Conversation({
-      participants: [currentUser._id, messageReceiver._id],
+      participants: [currentUser._id, friend._id],
       messages: []
     })
   }
 
-  if (currentUser.friends.includes(messageReceiver._id)) {
+  if (currentUser.friends.includes(friend._id)) {
+    user.conversations.push(conversation._id)
+    friend.conversations.push(conversation._id)
+
+    try {
+      await conversation.save()
+      await user.save()
+      await friend.save()
+      return res.status(201).json({
+        conversation: conversation
+      })
+    } catch (error) {
+      return res.status(500).json({ error: `Starting the conversation failed: ${error.message}` })
+    }
+  } else {
+    return res.status(400).json({ error: 'Person is not currently on your friend list' })
+  }
+})
+
+
+// Send message
+router.post('/api/sendMessage', authMiddleware, async (req, res) => {
+  console.log('sending message')
+  const currentUser = req.currentUser
+  console.log(currentUser)
+  if (!currentUser) {
+    return res.status(400).json({ error: 'Authentication required' })
+  }
+
+  console.log('Authentication successful')
+
+  const conversation = await Conversation.findById(req.body.conversationId)
+
+  if (!conversation) {
+    return res.status(400).json({ error: 'Conversation not found' })
+  }
+
+  console.log('Conversation found')
+
+  if (conversation.participants.includes(currentUser._id)) {
     const currentDate = new Date()
     const timestampString = currentDate.toISOString()
 
     const newMessage = new Message({
       content: req.body.content,
       sender: currentUser._id.toString(),
-      receiver: messageReceiver._id.toString(),
+      receiver: conversation.participants.find(participant => participant.toString() !== currentUser._id.toString()),
       timestamp: timestampString
     })
 
     conversation.messages.push(newMessage._id)
-    user.conversations.push(conversation._id)
-    messageReceiver.conversations.push(conversation._id)
 
     try {
       await newMessage.save()
       await conversation.save()
-      await user.save()
-      await messageReceiver.save()
       return res.status(201).json({
         conversation: conversation,
         message: newMessage
@@ -193,8 +230,7 @@ router.post('/api/sendMessage', authMiddleware, async (req, res) => {
       return res.status(500).json({ error: `Sending the message failed: ${error.message}` })
     }
   } else {
-    return res.status(400).json({ error: 'Person is not currently on your friend list' })
+    return res.status(400).json({ error: 'You are not a participant in this conversation' })
   }
 })
-
 module.exports = router

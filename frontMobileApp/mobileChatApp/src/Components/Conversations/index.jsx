@@ -1,18 +1,53 @@
-import React from 'react'
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import React, { useState, useEffect, useContext } from 'react'
+import { View, Text, StyleSheet, Pressable, FlatList, Image } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { UserContext } from '../../Context/UserContext.js'
+import api from '../../api.js'
+const defaultProfilePicture = require('../../../assets/soldier.png')
 
 const Conversations = ({ navigation }) => {
+  const { user } = useContext(UserContext)
+  const [conversations, setConversations] = useState([])
+
+  useEffect(() => {
+    if (user && user.conversations) {
+      const fetchFriendData = async () => {
+        const updatedConversations = await Promise.all(user.conversations.map(async (conversation) => {
+          const friendId = conversation.participants.find(id => id !== user._id)
+          if (friendId) {
+            const response = await api.get(`/api/users/id/${friendId}`)
+            const friend = await response.data
+
+            return { ...conversation, friend }
+          }
+        }))
+
+        setConversations(updatedConversations)
+      }
+
+      fetchFriendData()
+    } else {
+      setConversations([]) // Clear the conversations when user is null
+    }
+  }, [user])
+
   return (
     <View style={styles.container}>
-      <Text style={styles.paragraph}>This is the Conversations Screen</Text>
+      {conversations.length > 0 && (
+        <FlatList
+          data={conversations}
+          keyExtractor={item => item && item._id ? item._id : ''}
+          renderItem={({ item }) => item && (
+            <Pressable style={styles.conversationItem} onPress={() => item._id && navigation.navigate('Chat', { conversationId: item._id })}>
+              <Image source={item.friend && item.friend.profilePicture ? { uri: item.friend.profilePicture } : defaultProfilePicture} style={styles.profilePicture} />
+              <Text style={styles.conversationText}>{item.friend && item.friend.username}</Text>
+            </Pressable>
+          )}
+        />
+      )}
       <Pressable
         style={styles.fab}
-        onPress={() => {
-          // Handle the press event
-          console.log('New conversation button pressed')
-          //navigation.navigate('NewConversation') // replace with your screen
-        }}
+        onPress={() => navigation.navigate('New conversation')}
       >
         <View style={styles.iconContainer}>
           <Ionicons name="chatbubbles-outline" size={30} color="white" />
@@ -26,8 +61,6 @@ const Conversations = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   paragraph: {
     fontSize: 16,
@@ -54,6 +87,29 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 20,
     top: 15
+  },
+  conversationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  profilePicture: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 20,
+  },
+  conversationText: {
+    flex: 1,
+    fontSize: 18,
   },
 })
 
