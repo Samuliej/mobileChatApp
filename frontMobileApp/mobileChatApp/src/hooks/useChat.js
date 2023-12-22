@@ -40,6 +40,8 @@ const useChat = (user, conversationId, initialFriend) => {
 
     // Response is { convo, msg } so we can get the updated conversation
     const updatedConversation =  response.data.conversation
+    const newMsg = response.data.message
+    console.log('newMsg', newMsg)
     setConversation(updatedConversation)
 
     setNewMessage('')

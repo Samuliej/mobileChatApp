@@ -15,13 +15,11 @@ export const UserProvider = ({ children }) => {
         'Authorization': `Bearer ${token}`
       }
     })
-    console.log(response.data)
     const data = response.data
     return data
   }
 
   const updateUser = async (token) => {
-    console.log('updateUser called')
     if (token) {
       const fetchedUser = await fetchUser(token)
       setUser(fetchedUser)

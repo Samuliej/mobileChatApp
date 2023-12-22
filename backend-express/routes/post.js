@@ -222,14 +222,23 @@ router.post('/api/sendMessage', authMiddleware, async (req, res) => {
     try {
       await newMessage.save()
       await conversation.save()
-      await conversation.populate({
-        path: 'messages',
-        populate: {
-          path: 'sender receiver',
-          model: 'User',
-          select: '-password'
+      await conversation.populate([
+        {
+          path: 'messages',
+          populate: {
+            path: 'sender receiver',
+            model: 'User',
+            select: '-password'
+          }
+        },
+        {
+          path: 'lastRead',
+          populate: {
+            path: 'user message',
+            model: 'User Message'
+          }
         }
-      })
+      ])
 
       return res.status(201).json({
         conversation: conversation,
@@ -241,6 +250,71 @@ router.post('/api/sendMessage', authMiddleware, async (req, res) => {
     }
   } else {
     console.log('Not a participant')
+    return res.status(400).json({ error: 'You are not a participant in this conversation' })
+  }
+})
+
+
+// Mark message as read
+router.post('/api/markAsRead', authMiddleware, async (req, res) => {
+  const currentUser = req.currentUser
+  const messageId = req.body.messageId
+  const conversationId = req.body.conversationId
+
+  if (!currentUser) {
+    return res.status(400).json({ error: 'Authentication required' })
+  }
+
+  const conversation = await Conversation.findById(conversationId)
+
+  if (!conversation) {
+    return res.status(400).json({ error: 'Conversation not found' })
+  }
+
+  if (conversation.participants.includes(currentUser._id)) {
+    conversation.lastRead.set(currentUser._id.toString(), messageId)
+
+    try {
+      await conversation.save()
+      return res.status(200).json({
+        conversation: conversation
+      })
+    } catch (error) {
+      return res.status(500).json({ error: `Marking the message as read failed: ${error.message}` })
+    }
+  } else {
+    return res.status(400).json({ error: 'You are not a participant in this conversation' })
+  }
+})
+
+
+// Update lastRead
+router.post('/api/updateLastRead', authMiddleware, async (req, res) => {
+  const currentUser = req.currentUser
+  const { conversationId, messageId } = req.body
+
+  if (!currentUser) {
+    return res.status(400).json({ error: 'Authentication required' })
+  }
+
+  const conversation = await Conversation.findById(conversationId)
+
+  if (!conversation) {
+    return res.status(400).json({ error: 'Conversation not found' })
+  }
+
+  if (conversation.participants.includes(currentUser._id)) {
+    conversation.lastRead.set(currentUser._id.toString(), messageId)
+
+    try {
+      await conversation.save()
+      return res.status(200).json({
+        conversation: conversation
+      })
+    } catch (error) {
+      return res.status(500).json({ error: `Updating lastRead failed: ${error.message}` })
+    }
+  } else {
     return res.status(400).json({ error: 'You are not a participant in this conversation' })
   }
 })
