@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { View, Text, StyleSheet, Pressable, FlatList, Image } from 'react-native'
+import React, { useContext } from 'react'
+import { View, Text, StyleSheet, Pressable, FlatList, Image, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { UserContext } from '../../Context/UserContext.js'
-import api from '../../api.js'
+import useConversations from '../../hooks/useConversations.js'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
 // TODO: Sort the conversations by last message time
@@ -10,29 +10,16 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
 const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)
-  const [conversations, setConversations] = useState([])
+  const { conversations, loading } = useConversations(user)
 
-  useEffect(() => {
-    if (user && user.conversations) {
-      const fetchFriendData = async () => {
-        const updatedConversations = await Promise.all(user.conversations.map(async (conversation) => {
-          const friendId = conversation.participants.find(id => id !== user._id)
-          if (friendId) {
-            const response = await api.get(`/api/users/id/${friendId}`)
-            const friend = await response.data
-
-            return { ...conversation, friend }
-          }
-        }))
-
-        setConversations(updatedConversations)
-      }
-
-      fetchFriendData()
-    } else {
-      setConversations([]) // Clear the conversations when user is null
-    }
-  }, [user])
+  if (loading) {
+    // Display a loading screen when loading
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
