@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useContext } from 'react'
 import {
   View, Text, TextInput,
   Pressable, StyleSheet, FlatList,
-  Image, ImageBackground, StatusBar
+  Image, ImageBackground, StatusBar,
+  ActivityIndicator
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { UserContext } from '../../Context/UserContext.js'
-import api from '../../api.js'
 import Icon from 'react-native-vector-icons/Ionicons'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import useChat from '../../hooks/useChat.js'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 const defaultBackgroundPicture = require('../../../assets/rm222-mind-14.jpg')
 
@@ -31,31 +31,22 @@ const CustomNavBar = ({ navigation, friend }) => {
 const Chat = ({ route }) => {
   const { user } = useContext(UserContext)
   const navigation = useNavigation()
-  // When the Chat is created
   const { conversationId, friend: initialFriend } = route.params
-  // When re-entering Chat
-  const [friend, setFriend] = useState(initialFriend)
-  const [conversation, setConversation] = useState(null)
-  const [newMessage, setNewMessage] = useState('')
-  const [inputHeight, setInputHeight] = useState(0)
 
-  useEffect(() => {
-    const fetchConversation = async () => {
-      const response = await api.get(`/api/conversations/${conversationId}`)
-      const fetchedConversation = await response.data
+  const {
+    friend, conversation, newMessage,
+    setNewMessage, inputHeight, setInputHeight,
+    loading, sendMessage
+  } = useChat(user, conversationId, initialFriend)
 
-      // Check that user is not null before trying to access its properties
-      if (user) {
-        // Find the friend in the participants list
-        const friend = fetchedConversation.participants.find(participant => participant._id !== user._id)
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
 
-        setFriend(friend)
-      }
-      setConversation(fetchedConversation)
-    }
-
-    fetchConversation()
-  }, [conversationId, user])
 
   return (
     <ImageBackground source={defaultBackgroundPicture} style={styles.container}>
@@ -102,24 +93,7 @@ const Chat = ({ route }) => {
               setInputHeight(event.nativeEvent.contentSize.height)
             }}
           />
-          <Pressable style={styles.sendButton} onPress={async () => {
-            // send the new message
-            const userToken = await AsyncStorage.getItem('userToken')
-            const response = await api.post('/api/sendMessage', { content: newMessage, conversationId }, {
-              headers: {
-                Authorization: `Bearer ${userToken}`
-              }
-            })
-
-            // fetch the conversation again to get the latest messages
-            const conversationResponse = await api.get(`/api/conversations/${conversationId}`)
-            const updatedConversation = await conversationResponse.data
-
-            // update the conversation state
-            setConversation(updatedConversation)
-
-            setNewMessage('')
-          }}>
+          <Pressable style={styles.sendButton} onPress={sendMessage}>
             <Icon name="send" size={24} color="lightgreen" />
           </Pressable>
         </View>
