@@ -5,11 +5,11 @@ import SignUp from '../SignUp/index.jsx'
 const AuthStack = createStackNavigator()
 
 const AuthFlow = () => (
-  <AuthStack.Navigator initialRouteName="NexusHive">
+  <AuthStack.Navigator initialRouteName="The Hive">
     <AuthStack.Screen
-      name="NexusHive"
+      name="The Hive"
       component={SignIn}
-      options={{ title: 'Welcome to NexusHive' }}
+      options={{ title: 'Welcome to The Hive' }}
     />
     <AuthStack.Screen
       name="SignUp"

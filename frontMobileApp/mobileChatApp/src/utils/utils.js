@@ -8,3 +8,6 @@ export const getToken = async () => {
     console.error(e)
   }
 }
+
+// Truncate a string to n characters
+export const truncate = (input, chars) => input.length > chars ? `${input.substring(0, chars)}...` : input

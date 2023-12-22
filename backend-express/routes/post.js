@@ -222,14 +222,25 @@ router.post('/api/sendMessage', authMiddleware, async (req, res) => {
     try {
       await newMessage.save()
       await conversation.save()
+      await conversation.populate({
+        path: 'messages',
+        populate: {
+          path: 'sender receiver',
+          model: 'User',
+          select: '-password'
+        }
+      })
+
       return res.status(201).json({
         conversation: conversation,
         message: newMessage
       })
     } catch (error) {
+      console.error(error)
       return res.status(500).json({ error: `Sending the message failed: ${error.message}` })
     }
   } else {
+    console.log('Not a participant')
     return res.status(400).json({ error: 'You are not a participant in this conversation' })
   }
 })

@@ -3,6 +3,7 @@ const router = express.Router()
 const User = require('../models/User')
 const Conversation = require('../models/Conversation')
 const Friendship = require('../models/Friendship')
+const Message = require('../models/Message')
 
 const authMiddleware = require('../middlewares/authMiddlewares')
 
@@ -100,6 +101,26 @@ router.get('/api/conversations/:convoId', async (req, res) => {
     res.status(500).json({ error: 'Error fetching conversation' })
   }
 })
+
+
+// Fetch messages in a conversation
+router.get('/api/conversations/:convoId/messages', async (req, res) => {
+  try {
+    const convo = await Conversation.findById(req.params.convoId)
+      .populate({
+        path: 'messages',
+        populate: {
+          path: 'sender receiver',
+          model: 'User',
+          select: '-password'
+        }
+      })
+    res.json(convo.messages)
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching messages' })
+  }
+})
+
 
 // Fetch current user
 router.get('/api/me', authMiddleware, async (req, res) => {

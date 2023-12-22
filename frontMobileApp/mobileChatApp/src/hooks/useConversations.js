@@ -15,7 +15,12 @@ const useConversations = (user) => {
             const response = await api.get(`/api/users/id/${friendId}`)
             const friend = await response.data
 
-            return { ...conversation, friend }
+            // Fetch the messages for the conversation
+            const messagesResponse = await api.get(`/api/conversations/${conversation._id}/messages`)
+            const messages = await messagesResponse.data
+            const lastMessage = messages[messages.length - 1]
+
+            return { ...conversation, friend, lastMessage }
           }
         }))
 

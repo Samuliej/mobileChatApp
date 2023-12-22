@@ -1,8 +1,8 @@
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem,  } from '@react-navigation/drawer'
 import { UserContext } from '../../Context/UserContext.js'
 import { useNavigation } from '@react-navigation/native'
-import { Image, Pressable, Alert, View, Text } from 'react-native'
+import { Image, Pressable, Alert, View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
@@ -34,7 +34,7 @@ const CustomDrawerItem = ({ label, badgeCount, ...props }) => (
   <DrawerItem
     label={() => (
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Text>{label}</Text>
+        <Text style={{ color: '#696969', fontWeight: '500' }}>{label}</Text>
         {badgeCount > 0 && (
           <View style={{ backgroundColor: 'red', borderRadius: 10, width: 20, height: 20, justifyContent: 'center', alignItems: 'center', marginLeft: 5 }}>
             <Text style={{ color: 'white' }}>{badgeCount}</Text>
@@ -51,6 +51,7 @@ const MyDrawer = () => {
   const { user, updateUser } = useContext(UserContext)
   const pendingRequestsCount = user ? user.pendingFriendRequests.filter(request => request.status === 'PENDING').length : 0
   const navigation = useNavigation()
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   const handleSignOut = async () => {
     Alert.alert(
@@ -64,19 +65,29 @@ const MyDrawer = () => {
         {
           text: 'Yes',
           onPress: async () => {
+            setIsSigningOut(true)
             // Clear the token from the storage
             await AsyncStorage.removeItem('userToken')
             // Update the user context
             updateUser(null)
             navigation.reset({
               index: 0,
-              routes: [{ name: 'Auth', params: { screen: 'NexusHive' } }],
+              routes: [{ name: 'Auth', params: { screen: 'The Hive' } }],
             })
+            // No need to set isSigningOut to false because the state will be reset
           }
         },
       ],
       {cancelable: false},
       //clicking outside of alert will not cancel
+    )
+  }
+
+  if (isSigningOut) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
     )
   }
 
@@ -151,6 +162,14 @@ const MyDrawer = () => {
     </Drawer.Navigator>
   )
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+})
 
 
 export default MyDrawer

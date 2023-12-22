@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, Pressable, FlatList, Image, ActivityIndicator }
 import { Ionicons } from '@expo/vector-icons'
 import { UserContext } from '../../Context/UserContext.js'
 import useConversations from '../../hooks/useConversations.js'
+import { truncate } from '../../utils/utils.js'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
 // TODO: Sort the conversations by last message time
-// TODO: Smoother transition when navigating to Chat screen
 
 const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)
@@ -30,7 +30,10 @@ const Conversations = ({ navigation }) => {
           renderItem={({ item }) => item && (
             <Pressable style={styles.conversationItem} onPress={() => item._id && navigation.navigate('Chat', { conversationId: item._id })}>
               <Image source={item.friend && item.friend.profilePicture ? { uri: item.friend.profilePicture } : defaultProfilePicture} style={styles.profilePicture} />
-              <Text style={styles.conversationText}>{item.friend && item.friend.username}</Text>
+              <View style={styles.textContainer}>
+                <Text style={styles.conversationText}>{item.friend && item.friend.username}</Text>
+                {item.lastMessage && <Text style={styles.latestMessage}>{truncate(item.lastMessage.content, 25)}</Text>}
+              </View>
             </Pressable>
           )}
         />
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
-    marginBottom: 20,
+    marginBottom: 10,
     backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
