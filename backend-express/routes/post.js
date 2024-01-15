@@ -186,7 +186,7 @@ router.post('/api/startConversation', authMiddleware, async (req, res) => {
   }
 })
 
-
+/*
 // Send message
 router.post('/api/sendMessage', authMiddleware, async (req, res) => {
   console.log('sending message')
@@ -254,6 +254,7 @@ router.post('/api/sendMessage', authMiddleware, async (req, res) => {
   }
 })
 
+*/
 
 // Mark message as read
 router.post('/api/markAsRead', authMiddleware, async (req, res) => {

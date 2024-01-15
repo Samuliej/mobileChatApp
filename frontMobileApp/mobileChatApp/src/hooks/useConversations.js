@@ -7,7 +7,8 @@ const useConversations = (user) => {
 
   useEffect(() => {
     setLoading(true)
-    if (user && user.conversations) {
+    // if (user && user.conversations) {
+    if (user?.conversations) {
       const fetchFriendData = async () => {
         const updatedConversations = await Promise.all(user.conversations.map(async (conversation) => {
           const friendId = conversation.participants.find(id => id !== user._id)

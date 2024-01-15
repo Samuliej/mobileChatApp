@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import api from '../api.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -8,6 +8,7 @@ const useChat = (user, conversationId, initialFriend) => {
   const [newMessage, setNewMessage] = useState('')
   const [inputHeight, setInputHeight] = useState(0)
   const [loading, setLoading] = useState(false)
+  const ws = useRef(null)
 
   useEffect(() => {
     setLoading(true)
@@ -15,11 +16,8 @@ const useChat = (user, conversationId, initialFriend) => {
       const response = await api.get(`/api/conversations/${conversationId}`)
       const fetchedConversation = await response.data
 
-      // Check that user is not null before trying to access its properties
       if (user) {
-        // Find the friend in the participants list
         const friend = fetchedConversation.participants.find(participant => participant._id !== user._id)
-
         setFriend(friend)
       }
       setConversation(fetchedConversation)
@@ -27,23 +25,51 @@ const useChat = (user, conversationId, initialFriend) => {
     }
 
     fetchConversation()
+
+    ws.current = new WebSocket(`ws://192.168.1.104:3003`)
+
+    ws.current.onopen = () => {
+      console.log('connected to websocket')
+    }
+
+    ws.current.onmessage = (e) => {
+      const messageData = JSON.parse(e.data)
+      if (messageData.conversation._id === conversationId) {
+        setConversation(messageData.conversation)
+      }
+    }
+
+    ws.current.onerror = (error) => {
+      console.log('WebSocket error: ', error)
+    }
+
+    ws.current.onclose = () => {
+      console.log('disconnected from websocket')
+    }
+
+    return () => {
+      ws.current.close()
+    }
   }, [conversationId, user])
 
   const sendMessage = async () => {
-    // send the new message
-    const userToken = await AsyncStorage.getItem('userToken')
-    const response = await api.post('/api/sendMessage', { content: newMessage, conversationId }, {
-      headers: {
-        Authorization: `Bearer ${userToken}`
-      }
-    })
-
-    // Response is { convo, msg } so we can get the updated conversation
-    const updatedConversation =  response.data.conversation
-    const newMsg = response.data.message
-    console.log('newMsg', newMsg)
-    setConversation(updatedConversation)
-
+    if (ws.current.readyState === WebSocket.OPEN) {
+      console.log('ws open, trying to send message')
+      const token = await AsyncStorage.getItem('userToken') // get the token from storage
+      fetch('http://192.168.1.104:3003/api/sendMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // include the token in the Authorization header
+        },
+        body: JSON.stringify({ content: newMessage, conversationId })
+      })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch((error) => {
+          console.error('Error:', error)
+        })
+    }
     setNewMessage('')
   }
 

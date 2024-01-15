@@ -16,7 +16,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "cross-env NODE_ENV=test jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lintfix": "eslint . --fix"
   },
   "author": "Samuli Toppi",
   "license": "ISC",

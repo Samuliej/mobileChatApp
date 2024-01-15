@@ -1,9 +1,9 @@
 import axios from 'axios'
 
-const kemi = 'http://192.168.0.107'
+const url = 'http://192.168.1.104'
 
 const api = axios.create({
-  baseURL: kemi + ':3001'
+  baseURL: url + ':3001'
 })
 
 export default api
