@@ -1,9 +1,23 @@
-import axios from 'axios'
+// wsApi.js
+export const createWebSocketConnection = (url, onMessage) => {
+  const ws = new WebSocket(url)
 
-const url = 'http://192.168.1.104'
+  ws.onopen = () => {
+    console.log('connected to websocket')
+  }
 
-const wsApi = axios.create({
-  baseURL: url + ':3003'
-})
+  ws.onmessage = (e) => {
+    const messageData = JSON.parse(e.data)
+    onMessage(messageData)
+  }
 
-export default wsApi
+  ws.onerror = (error) => {
+    console.log('WebSocket error: ', error)
+  }
+
+  ws.onclose = () => {
+    console.log('disconnected from websocket')
+  }
+
+  return ws
+}

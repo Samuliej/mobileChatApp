@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import api from '../api.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { createWebSocketConnection } from '../wsApi.js'
+
 
 const useChat = (user, conversationId, initialFriend) => {
   const [friend, setFriend] = useState(initialFriend)
@@ -26,26 +28,11 @@ const useChat = (user, conversationId, initialFriend) => {
 
     fetchConversation()
 
-    ws.current = new WebSocket(`ws://192.168.1.104:3003`)
-
-    ws.current.onopen = () => {
-      console.log('connected to websocket')
-    }
-
-    ws.current.onmessage = (e) => {
-      const messageData = JSON.parse(e.data)
+    ws.current = createWebSocketConnection('ws://192.168.1.104:3003', (messageData) => {
       if (messageData.conversation._id === conversationId) {
         setConversation(messageData.conversation)
       }
-    }
-
-    ws.current.onerror = (error) => {
-      console.log('WebSocket error: ', error)
-    }
-
-    ws.current.onclose = () => {
-      console.log('disconnected from websocket')
-    }
+    })
 
     return () => {
       ws.current.close()
@@ -55,7 +42,7 @@ const useChat = (user, conversationId, initialFriend) => {
   const sendMessage = async () => {
     if (ws.current.readyState === WebSocket.OPEN) {
       console.log('ws open, trying to send message')
-      const token = await AsyncStorage.getItem('userToken') // get the token from storage
+      const token = await AsyncStorage.getItem('userToken')
       fetch('http://192.168.1.104:3003/api/sendMessage', {
         method: 'POST',
         headers: {

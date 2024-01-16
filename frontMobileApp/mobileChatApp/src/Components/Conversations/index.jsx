@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { View, Text, StyleSheet, Pressable, FlatList, Image, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { UserContext } from '../../Context/UserContext.js'
@@ -21,11 +21,18 @@ const Conversations = ({ navigation }) => {
     )
   }
 
+  const sortedConversations = [...conversations].sort((a, b) => {
+    const aDate = new Date(a.lastMessage.timestamp)
+    const bDate = new Date(b.lastMessage.timestamp)
+    return bDate - aDate
+  })
+
+
   return (
     <View style={styles.container}>
       {conversations.length > 0 && (
         <FlatList
-          data={conversations}
+          data={sortedConversations}
           keyExtractor={item => item && item._id ? item._id : ''}
           renderItem={({ item }) => item && (
             <Pressable style={styles.conversationItem} onPress={() => item._id && navigation.navigate('Chat', { conversationId: item._id })}>
