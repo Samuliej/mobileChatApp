@@ -9,14 +9,20 @@ import { useNavigation } from '@react-navigation/native'
 import { UserContext } from '../../Context/UserContext.js'
 import Icon from 'react-native-vector-icons/Ionicons'
 import useChat from '../../hooks/useChat.js'
+import uuid from 'react-native-uuid'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 const defaultBackgroundPicture = require('../../../assets/rm222-mind-14.jpg')
 
 
 const CustomNavBar = ({ navigation, friend }) => {
+  const handleBackButton = () => {
+    navigation.goBack()
+  }
+
+
   return (
     <View style={styles.navBar}>
-      <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+      <Pressable onPress={handleBackButton} style={styles.backButton}>
         <Text style={{ fontSize: 30 }}>←</Text>
       </Pressable>
       <Image source={friend && friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profilePicture} />
@@ -24,6 +30,33 @@ const CustomNavBar = ({ navigation, friend }) => {
     </View>
   )
 }
+
+const MessageItem = ({ item, user }) => {
+  if (!item._id) {
+    // Item doesn't have an ID, generate a temporary one
+    item._id = Math.random().toString(36).substr(2, 9)
+  }
+
+  const date = new Date(item.timestamp)
+  const formattedDate = date.toLocaleString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+
+
+  return (
+    <View style={user && item.sender._id === user._id ? styles.myMessageContainer : styles.messageContainer}>
+      <View key={item._id} style={[styles.messageItem, user && item.sender._id === user._id ? styles.myMessage : styles.friendMessage]}>
+        <Text>{item.content}</Text>
+      </View>
+      <Text style={styles.timestamp}>{formattedDate} {item.status}</Text>
+    </View>
+  )
+}
+
 
 
 const Chat = ({ route }) => {
@@ -37,6 +70,7 @@ const Chat = ({ route }) => {
     loading, sendMessage
   } = useChat(user, conversationId, initialFriend)
 
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -45,10 +79,9 @@ const Chat = ({ route }) => {
     )
   }
 
-
   return (
     <ImageBackground source={defaultBackgroundPicture} style={styles.container}>
-      <CustomNavBar navigation={navigation} friend={friend} />
+      <CustomNavBar navigation={navigation} friend={friend}/>
       <View style={styles.content}>
         <View style={styles.header}>
         </View>
@@ -56,32 +89,19 @@ const Chat = ({ route }) => {
           ref={flatListRef}
           key={conversationId}
           data={conversation.messages}
-          keyExtractor={item => item ? item._id : ''}
-          // Scroll down when opening an conversation
-          onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: false })}
-          renderItem={({ item }) => {
-            if (item.sender) {
-              const date = new Date(item.timestamp)
-              const formattedDate = date.toLocaleString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-              })
-              return (
-                <View style={user && item.sender._id === user._id ? styles.myMessageContainer : styles.messageContainer}>
-                  <View key={item._id} style={[styles.messageItem, user && item.sender._id === user._id ? styles.myMessage : styles.friendMessage]}>
-                    <Text>{item.content}</Text>
-                  </View>
-                  <Text style={styles.timestamp}>{formattedDate}</Text>
-                </View>
-              )
-            } else {
-              // Handle the case where item.sender is null
-              return null
+          keyExtractor={item => item && item._id ? item._id : uuid.v4()}
+          /*
+          onScroll={({nativeEvent}) => {
+            if (nativeEvent.contentOffset.y === 0) {
+              // User has scrolled to the top, load more messages
+              console.log('load more messages')
+
             }
           }}
+          */
+          // Scroll down when opening an conversation
+          onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: false })}
+          renderItem={({ item }) => <MessageItem item={item} user={user} />}
         />}
         <View style={styles.inputContainer}>
           <TextInput

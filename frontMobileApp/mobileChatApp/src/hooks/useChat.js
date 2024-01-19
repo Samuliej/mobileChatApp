@@ -13,49 +13,74 @@ const useChat = (user, conversationId, initialFriend) => {
   const ws = useRef(null)
 
   useEffect(() => {
-    setLoading(true)
-    const fetchConversation = async () => {
-      const response = await api.get(`/api/conversations/${conversationId}`)
-      const fetchedConversation = await response.data
-
-      if (user) {
-        const friend = fetchedConversation.participants.find(participant => participant._id !== user._id)
-        setFriend(friend)
-      }
-      setConversation(fetchedConversation)
-      setLoading(false)
-    }
-
-    fetchConversation()
-
-    ws.current = createWebSocketConnection('ws://192.168.1.104:3003', (messageData) => {
-      if (messageData.conversation._id === conversationId) {
-        setConversation(messageData.conversation)
-      }
-    })
-
+    ws.current = createWebSocketConnection('ws://192.168.1.104:3003')
     return () => {
       ws.current.close()
     }
+  }, [])
+
+  useEffect(() => {
+    setLoading(true)
+    fetchConversation() // Fetch the first page of messages when the component mounts
   }, [conversationId, user])
+
+  useEffect(() => {
+    if (ws.current) {
+      ws.current.onmessage = (message) => {
+        const messageData = JSON.parse(message.data)
+        if (messageData.conversationId === conversationId) {
+          console.log(user._id)
+          console.log(messageData)
+          // another user sent a message to the conversation
+          if (messageData.message.sender !== user._id) {
+            const newMessage = messageData.message
+            setConversation(prevConversation => {
+              const existingMessageIndex = prevConversation.messages.findIndex(m => m._id === newMessage._id)
+              if (existingMessageIndex === -1) {
+                // The received message is not in the conversation, add it as a new message
+                return {...prevConversation, messages: [...prevConversation.messages, newMessage]}
+              }
+              return prevConversation
+            })
+          }
+        }
+      }
+    }
+  }, [ws, conversation])
+
+  const fetchConversation = async () => {
+    const response = await api.get(`/api/conversations/${conversationId}`)
+    const fetchedConversation = await response.data
+
+    // Sort the messages
+    const sortedMessages = fetchedConversation.messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    if (user) {
+      const friend = fetchedConversation.participants.find(participant => participant._id !== user._id)
+      setFriend(friend)
+    }
+    setConversation({...fetchedConversation, messages: sortedMessages})
+    setLoading(false)
+  }
+
 
   const sendMessage = async () => {
     if (ws.current.readyState === WebSocket.OPEN) {
-      console.log('ws open, trying to send message')
-      const token = await AsyncStorage.getItem('userToken')
-      fetch('http://192.168.1.104:3003/api/sendMessage', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // include the token in the Authorization header
-        },
-        body: JSON.stringify({ content: newMessage, conversationId })
+      const userToken = await AsyncStorage.getItem('userToken')
+      const messageContent = {
+        content: newMessage,
+        conversationId,
+        token: userToken,
+        sender: user._id,
+        timestamp: Date.now(),
+      }
+      const messageData = JSON.stringify(messageContent)
+      ws.current.send(messageData)
+
+      // Add the sent message to the conversation immediately
+      setConversation(prevConversation => {
+        return {...prevConversation, messages: [...prevConversation.messages, {...messageContent, sender: user}]}
       })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch((error) => {
-          console.error('Error:', error)
-        })
     }
     setNewMessage('')
   }

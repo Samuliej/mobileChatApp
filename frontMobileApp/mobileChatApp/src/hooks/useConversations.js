@@ -1,13 +1,37 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import api from '../api.js'
+import { createWebSocketConnection } from '../wsApi.js'
 
 const useConversations = (user) => {
   const [conversations, setConversations] = useState([])
   const [loading, setLoading] = useState(false)
+  const ws = useRef(null)
 
   useEffect(() => {
-    setLoading(true)
-    // if (user && user.conversations) {
+    ws.current = createWebSocketConnection('ws://192.168.1.104:3003')
+
+    ws.current.onmessage = async (event) => {
+      const messageData = JSON.parse(event.data)
+      setConversations(prevConversations => {
+        return prevConversations.map(conversation => {
+          if (conversation._id === messageData.conversationId) {
+            return {
+              ...conversation,
+              lastMessage: messageData.message,
+            }
+          } else {
+            return conversation
+          }
+        })
+      })
+    }
+
+    return () => {
+      ws.current.close()
+    }
+  }, [ws])
+
+  useEffect(() => {
     if (user?.conversations) {
       const fetchFriendData = async () => {
         const updatedConversations = await Promise.all(user.conversations.map(async (conversation) => {
