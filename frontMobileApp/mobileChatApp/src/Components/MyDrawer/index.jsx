@@ -13,6 +13,7 @@ import Friends from '../Friends/index.jsx'
 import FriendRequests from '../FriendRequests/index.jsx'
 import NewConversation from '../NewConversation/index.jsx'
 import Chat from '../Chat/index.jsx'
+import NewPost from '../Feed/NewPost/index.jsx'
 
 const Drawer = createDrawerNavigator()
 
@@ -159,6 +160,7 @@ const MyDrawer = () => {
           headerShown: false,
         }}
       />
+      <Drawer.Screen name="NewPost" component={NewPost} />
     </Drawer.Navigator>
   )
 }

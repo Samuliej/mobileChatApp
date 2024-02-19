@@ -8,7 +8,8 @@ const authMiddleware = require('../middlewares/authMiddlewares')
 const User = require('../models/User')
 const Friendship = require('../models/Friendship')
 const Conversation = require('../models/Conversation')
-const Message = require('../models/Message')
+const Post = require('../models/Post')
+const Comment = require('../models/Comment')
 
 const multer = require('multer')
 const upload = multer({ dest: 'uploads/' })
@@ -320,5 +321,65 @@ router.post('/api/updateLastRead', authMiddleware, async (req, res) => {
   }
 })
 
+// Create a new post
+router.post('/api/posts', authMiddleware, async (req, res) => {
+  const { content, author } = req.body
+
+  const currentUser = req.currentUser
+  if (!currentUser) {
+    return res.status(400).json({ error: 'Authentication required' })
+  }
+
+  const newPost = new Post({
+    content: {
+      text: content.text,
+      image: content.image
+    },
+    author: author,
+    comments: [],
+    likes: 0
+  })
+
+  try {
+    const savedPost = await newPost.save()
+    currentUser.posts.push(savedPost._id)
+    await currentUser.save()
+
+    res.status(201).json(savedPost)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Something went wrong creating the post' })
+  }
+})
+
+// Comment a post
+router.post('/api/posts/:postId/comments', authMiddleware, async (req, res) => {
+  const { postId } = req.params
+  const { user, content } = req.body
+
+  const currentUser = req.currentUser
+  if (!currentUser) {
+    return res.status(400).json({ error: 'Authentication required' })
+  }
+
+  const newComment = new Comment({
+    post: postId,
+    user: user,
+    content: content
+  })
+
+  try {
+    const savedComment = await newComment.save()
+
+    const post = await Post.findById(postId)
+    post.comments.push(savedComment._id)
+    await post.save()
+
+    res.status(201).json(savedComment)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Something went wrong creating the comment' })
+  }
+})
 
 module.exports = router

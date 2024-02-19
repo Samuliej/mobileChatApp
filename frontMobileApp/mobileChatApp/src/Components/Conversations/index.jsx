@@ -6,7 +6,7 @@ import useConversations from '../../hooks/useConversations.js'
 import { truncate } from '../../utils/utils.js'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
-// TODO: Sort the conversations by last message time
+// TODO: Implement notifications for new messages on the convo list
 
 const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)

@@ -31,8 +31,8 @@ const schema = new mongoose.Schema({
   },
   pendingFriendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Friendship' }],
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  conversations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Conversation' }]
-
+  conversations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Conversation' }],
+  posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
 })
 
 module.exports = mongoose.model('User', schema)

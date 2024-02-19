@@ -9,9 +9,7 @@ export default function FeedScreen({ navigation }) {
       <Pressable
         style={styles.fab}
         onPress={() => {
-          // Handle the press event
-          console.log('New post button pressed')
-          //navigation.navigate('NewPost') // replace with your screen
+          navigation.navigate('NewPost')
         }}
       >
         <View style={styles.iconContainer}>

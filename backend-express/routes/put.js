@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Friendship = require('../models/Friendship')
 const User = require('../models/User')
+const Post = require('../models/Post')
 
 const authMiddleware = require('../middlewares/authMiddlewares')
 
@@ -65,6 +66,27 @@ router.put('/api/acceptFriendRequest', authMiddleware, async (req, res) => {
     }
   } else {
     res.status(403).json({ error: 'Not authenticated to accept request' })
+  }
+})
+
+// Like a post
+router.put('/api/likePost/:postId/like', authMiddleware, async (req, res) => {
+  const { postId } = req.params
+
+  const currentUser = req.currentUser
+  if (!currentUser) {
+    return res.status(400).json({ error: 'Authentication required' })
+  }
+
+  try {
+    const post = await Post.findById(postId)
+    post.likes += 1
+    await post.save()
+
+    res.status(200).json(post)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error liking post' })
   }
 })
 
