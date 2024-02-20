@@ -335,15 +335,16 @@ router.post('/api/posts', authMiddleware, async (req, res) => {
       text: content.text,
       image: content.image
     },
-    author: author,
+    author: author.user._id,
     comments: [],
     likes: 0
   })
 
   try {
     const savedPost = await newPost.save()
-    currentUser.posts.push(savedPost._id)
-    await currentUser.save()
+    const user = await User.findById(author.user._id)
+    user.posts.push(savedPost._id)
+    await user.save()
 
     res.status(201).json(savedPost)
   } catch (error) {

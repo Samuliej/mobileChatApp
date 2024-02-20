@@ -3,7 +3,7 @@ const router = express.Router()
 const User = require('../models/User')
 const Conversation = require('../models/Conversation')
 const Friendship = require('../models/Friendship')
-const Message = require('../models/Message')
+const Post = require('../models/Post')
 
 const authMiddleware = require('../middlewares/authMiddlewares')
 
@@ -161,6 +161,64 @@ router.get('/api/friendRequests', authMiddleware, async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Error fetching friend requests' })
   }
+})
+
+// Fetch user's posts
+router.get('/api/posts/user/:userId', authMiddleware, async (req, res) => {
+  const currentUser = req.currentUser
+  if (!currentUser) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+  const { userId } = req.params
+
+  try {
+    const user = await User.findById(userId).populate('posts')
+
+    res.status(200).json(user.posts)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error fetching user posts' })
+  }
+
+})
+
+// Fetch friends' posts
+router.get('/api/posts/friends/:userId', authMiddleware, async (req, res) => {
+  const currentUser = req.currentUser
+  if (!currentUser) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+  const { userId } = req.params
+
+  try {
+    const user = await User.findById(userId).populate({
+      path: 'friends',
+      populate: {
+        path: 'posts',
+        model: 'Post',
+      }
+    })
+
+    const friendsPosts = await Promise.all(user.friends.flatMap(async friend => {
+      return await Promise.all(friend.posts.map(async post => {
+        const author = await User.findById(post.author)
+        return {
+          ...post._doc,
+          author: {
+            _id: author._id,
+            username: author.username,
+            profilePicture: author.profilePicture
+          }
+        }
+      }))
+    }))
+
+    res.status(200).json(friendsPosts.flat())
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error fetching friends posts' })
+  }
+
 })
 
 module.exports = router

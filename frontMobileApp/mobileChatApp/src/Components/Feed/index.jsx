@@ -1,11 +1,46 @@
-import React from 'react'
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import React, { useContext } from 'react'
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from 'react-native'
+import { UserContext } from '../../Context/UserContext'
 import { Ionicons } from '@expo/vector-icons'
+import usePosts from '../../hooks/usePosts'
 
-export default function FeedScreen({ navigation }) {
+const FeedScreen = ({ navigation }) => {
+  const { user } = useContext(UserContext)
+  const { loading, posts, error } = usePosts(user._id)
+
+  console.log('posts', posts)
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
+
+  // Add error banner
   return (
     <View style={styles.container}>
-      <Text style={styles.paragraph}>This is a Feed Screen</Text>
+      {posts.map(post => (
+        <View key={post._id} style={styles.postContainer}>
+          <View style={styles.headerContainer}>
+            <Image
+              style={styles.profilePicture}
+              source={{ uri: post.author.profilePicture }}
+            />
+            <Text style={styles.username}>{post.author.username}</Text>
+          </View>
+          {post.content.image && (
+            <Image
+              style={styles.postImage}
+              source={{ uri: post.content.image }}
+            />
+          )}
+          <View style={styles.textContainer}>
+            <Text>{post.content.text}</Text>
+          </View>
+        </View>
+      ))}
       <Pressable
         style={styles.fab}
         onPress={() => {
@@ -20,6 +55,7 @@ export default function FeedScreen({ navigation }) {
     </View>
   )
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -53,4 +89,38 @@ const styles = StyleSheet.create({
     left: 20,
     top: 20
   },
+  postContainer: {
+    width: '95%',
+    margin: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  profilePicture: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  username: {
+    fontWeight: 'bold',
+  },
+  postImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    marginBottom: 10,
+  },
+  textContainer: {
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 10,
+  },
 })
+
+export default FeedScreen
