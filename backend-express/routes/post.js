@@ -322,27 +322,38 @@ router.post('/api/updateLastRead', authMiddleware, async (req, res) => {
 })
 
 // Create a new post
-router.post('/api/posts', authMiddleware, async (req, res) => {
-  const { content, author } = req.body
+router.post('/api/posts', authMiddleware, upload.single('image'), async (req, res) => {
+  const content = req.body.content
+  const author = req.body.author
 
   const currentUser = req.currentUser
   if (!currentUser) {
     return res.status(400).json({ error: 'Authentication required' })
   }
 
+  console.log('reqfile', req.file)
+
+  let result = null
+  if (req.file) {
+    result = await cloudinary.uploader.upload(req.file.path)
+  }
+
+  console.log('author', author)
+  console.log('content', content)
+
   const newPost = new Post({
     content: {
-      text: content.text,
-      image: content.image
+      text: content,
+      image: result ? result.secure_url : null
     },
-    author: author.user._id,
+    author: author,
     comments: [],
     likes: 0
   })
 
   try {
     const savedPost = await newPost.save()
-    const user = await User.findById(author.user._id)
+    const user = await User.findById(author)
     user.posts.push(savedPost._id)
     await user.save()
 

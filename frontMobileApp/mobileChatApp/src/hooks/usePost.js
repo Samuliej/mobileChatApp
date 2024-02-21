@@ -6,15 +6,30 @@ const usePost = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const createPost = async (content, author) => {
+  const createPost = async (content, image, author) => {
     setLoading(true)
     setError(null)
 
+    console.log('author', author.user)
+
     const authToken = await AsyncStorage.getItem('userToken')
 
+    const formData = new FormData()
+    formData.append('content', content)
+    formData.append('author', author.user._id)
+
+    if (image) {
+      formData.append('image', {
+        uri: image.uri,
+        type: image.type,
+        name: image.name,
+      })
+    }
+
     try {
-      const res = await api.post('/api/posts', {content, author}, {
+      const res = await api.post('/api/posts', formData, {
         headers: {
+          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${authToken}`
         }
       })

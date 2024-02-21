@@ -3,6 +3,10 @@ import { View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from 'rea
 import { UserContext } from '../../Context/UserContext'
 import { Ionicons } from '@expo/vector-icons'
 import usePosts from '../../hooks/usePosts'
+// Default user profile picture property of Pixel Perfect:
+// href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
+import defaultProfilePicture from '../../../assets/soldier.png'
+
 
 const FeedScreen = ({ navigation }) => {
   const { user } = useContext(UserContext)
@@ -26,7 +30,11 @@ const FeedScreen = ({ navigation }) => {
           <View style={styles.headerContainer}>
             <Image
               style={styles.profilePicture}
-              source={{ uri: post.author.profilePicture }}
+              source={
+                post.author && post.author._id === user.id
+                  ? { uri: user.profilePicture } : post.author && post.author.profilePicture
+                    ? { uri: post.author.profilePicture } : defaultProfilePicture
+              }
             />
             <Text style={styles.username}>{post.author.username}</Text>
           </View>
