@@ -27,8 +27,9 @@ const usePosts = (userId) => {
         api.get(`/api/posts/friends/${userId}`, config),
         api.get(`/api/posts/user/${userId}`, config)
       ])
-
-      setPosts([...friendsResponse.data, ...userResponse.data])
+      const combinedPosts = [...friendsResponse.data, ...userResponse.data]
+      const sortedPosts = combinedPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      setPosts(sortedPosts)
       setLoading(false)
     } catch (e) {
       setError('Error fetching posts')
@@ -52,9 +53,9 @@ const usePosts = (userId) => {
           api.get(`/api/posts/user/${userId}`, config)
         ])
 
-        console.log('friendsResponse', friendsResponse)
-        console.log('userResponse', userResponse)
-        setPosts([...friendsResponse.data, ...userResponse.data])
+        const combinedPosts = [...friendsResponse.data, ...userResponse.data]
+        const sortedPosts = combinedPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        setPosts(sortedPosts)
       } catch (error) {
         setError(error)
         console.log('error', error)

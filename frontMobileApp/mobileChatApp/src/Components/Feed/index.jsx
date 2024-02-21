@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import { Ionicons } from '@expo/vector-icons'
@@ -44,7 +44,9 @@ const FeedScreen = ({ navigation }) => {
                       ? { uri: post.author.profilePicture } : defaultProfilePicture
                 }
               />
-              <Text style={styles.username}>{post.author.username}</Text>
+              <Text style={styles.username}>
+                {post.author && post.author._id === user.id ? user.username : post.author.username}
+              </Text>
             </View>
             {post.content.image && (
               <Image

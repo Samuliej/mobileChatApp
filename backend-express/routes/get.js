@@ -172,7 +172,10 @@ router.get('/api/posts/user/:userId', authMiddleware, async (req, res) => {
   const { userId } = req.params
 
   try {
-    const user = await User.findById(userId).populate('posts')
+    const user = await User.findById(userId).populate({
+      path: 'posts',
+      options: { sort: { 'createdAt': -1 } }
+    })
 
     res.status(200).json(user.posts)
   } catch (error) {
@@ -196,6 +199,7 @@ router.get('/api/posts/friends/:userId', authMiddleware, async (req, res) => {
       populate: {
         path: 'posts',
         model: 'Post',
+        options: { sort: { 'createdAt': -1 } } // Add this line
       }
     })
 
