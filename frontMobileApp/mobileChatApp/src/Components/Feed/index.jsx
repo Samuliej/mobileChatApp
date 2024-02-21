@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from 'react-native'
+import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import { Ionicons } from '@expo/vector-icons'
 import usePosts from '../../hooks/usePosts'
@@ -25,30 +25,32 @@ const FeedScreen = ({ navigation }) => {
   // Add error banner
   return (
     <View style={styles.container}>
-      {posts.map(post => (
-        <View key={post._id} style={styles.postContainer}>
-          <View style={styles.headerContainer}>
-            <Image
-              style={styles.profilePicture}
-              source={
-                post.author && post.author._id === user.id
-                  ? { uri: user.profilePicture } : post.author && post.author.profilePicture
-                    ? { uri: post.author.profilePicture } : defaultProfilePicture
-              }
-            />
-            <Text style={styles.username}>{post.author.username}</Text>
+      <ScrollView style={styles.scrollView}>
+        {posts.map(post => (
+          <View key={post._id} style={styles.postContainer}>
+            <View style={styles.headerContainer}>
+              <Image
+                style={styles.profilePicture}
+                source={
+                  post.author && post.author._id === user.id
+                    ? { uri: user.profilePicture } : post.author && post.author.profilePicture
+                      ? { uri: post.author.profilePicture } : defaultProfilePicture
+                }
+              />
+              <Text style={styles.username}>{post.author.username}</Text>
+            </View>
+            {post.content.image && (
+              <Image
+                style={styles.postImage}
+                source={{ uri: post.content.image }}
+              />
+            )}
+            <View style={styles.textContainer}>
+              <Text>{post.content.text}</Text>
+            </View>
           </View>
-          {post.content.image && (
-            <Image
-              style={styles.postImage}
-              source={{ uri: post.content.image }}
-            />
-          )}
-          <View style={styles.textContainer}>
-            <Text>{post.content.text}</Text>
-          </View>
-        </View>
-      ))}
+        ))}
+      </ScrollView>
       <Pressable
         style={styles.fab}
         onPress={() => {
@@ -70,6 +72,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  scrollView: {
+    width: '100%',
+    padding: 10,
   },
   paragraph: {
     fontSize: 16,
