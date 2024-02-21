@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import { Ionicons } from '@expo/vector-icons'
@@ -10,9 +10,16 @@ import defaultProfilePicture from '../../../assets/soldier.png'
 
 const FeedScreen = ({ navigation }) => {
   const { user } = useContext(UserContext)
-  const { loading, posts, error } = usePosts(user._id)
+  const { loading, posts, error, refreshPosts } = usePosts(user._id)
 
-  console.log('posts', posts)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('refreshing posts')
+      refreshPosts()
+    })
+
+    return unsubscribe
+  }, [navigation])
 
   if (loading) {
     return (

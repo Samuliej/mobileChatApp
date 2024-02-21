@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import api from '../api'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -89,7 +89,7 @@ const usePost = () => {
     error,
     createPost,
     commentPost,
-    likePost
+    likePost,
   }
 }
 
