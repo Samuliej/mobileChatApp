@@ -32,6 +32,9 @@ const CustomNavBar = ({ navigation, friend }) => {
 }
 
 const MessageItem = ({ item, user }) => {
+  if (!item) {
+    return null
+  }
   if (!item._id) {
     // Item doesn't have an ID, generate a temporary one
     item._id = Math.random().toString(36).substr(2, 9)

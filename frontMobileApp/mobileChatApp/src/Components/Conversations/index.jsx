@@ -21,11 +21,15 @@ const Conversations = ({ navigation }) => {
     )
   }
 
-  const sortedConversations = [...conversations].sort((a, b) => {
-    const aDate = new Date(a.lastMessage.timestamp)
-    const bDate = new Date(b.lastMessage.timestamp)
-    return bDate - aDate
-  })
+  // Also filter out undefined conversations
+  const sortedConversations = conversations
+    .filter(conversation => conversation !== undefined)
+    .sort((a, b) => {
+      if (!a.timestamp || !b.timestamp) {
+        return 0
+      }
+      return new Date(b.timestamp) - new Date(a.timestamp)
+    })
 
 
   return (

@@ -1,17 +1,51 @@
 import React, { useContext, useEffect } from 'react'
-import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, Image } from 'react-native'
+import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, Image, Button } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import { Ionicons } from '@expo/vector-icons'
 import usePosts from '../../hooks/usePosts'
+import usePost from '../../hooks/usePost'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../assets/soldier.png'
+
+const Post = ({ post, onLike, user }) => {
+
+  return (
+    <View key={post._id} style={styles.postContainer}>
+      <View style={styles.headerContainer}>
+        <Image
+          style={styles.profilePicture}
+          source={
+            post.author && post.author._id === user.id
+              ? { uri: user.profilePicture } : post.author && post.author.profilePicture
+                ? { uri: post.author.profilePicture } : defaultProfilePicture
+          }
+        />
+        <Text style={styles.username}>
+          {post.author && post.author._id === user.id ? user.username : post.author.username}
+        </Text>
+      </View>
+      {post.content.image && (
+        <Image
+          style={styles.postImage}
+          source={{ uri: post.content.image }}
+        />
+      )}
+      <View style={styles.textContainer}>
+        <Text>{post.content.text}</Text>
+      </View>
+      <Button title="Like" onPress={() => onLike(post._id)} />
+    </View>
+  )
+}
 
 
 const FeedScreen = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const { loading, posts, error, refreshPosts } = usePosts(user._id)
+  const { likePost } = usePost()
 
+  // refresh posts when the screen is focused
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       console.log('refreshing posts')
@@ -21,10 +55,15 @@ const FeedScreen = ({ navigation }) => {
     return unsubscribe
   }, [navigation])
 
+  const handleLike = async (postId) => {
+    await likePost(postId)
+  }
+
   if (loading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Fetching posts...</Text>
       </View>
     )
   }
@@ -34,30 +73,7 @@ const FeedScreen = ({ navigation }) => {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
         {posts.map(post => (
-          <View key={post._id} style={styles.postContainer}>
-            <View style={styles.headerContainer}>
-              <Image
-                style={styles.profilePicture}
-                source={
-                  post.author && post.author._id === user.id
-                    ? { uri: user.profilePicture } : post.author && post.author.profilePicture
-                      ? { uri: post.author.profilePicture } : defaultProfilePicture
-                }
-              />
-              <Text style={styles.username}>
-                {post.author && post.author._id === user.id ? user.username : post.author.username}
-              </Text>
-            </View>
-            {post.content.image && (
-              <Image
-                style={styles.postImage}
-                source={{ uri: post.content.image }}
-              />
-            )}
-            <View style={styles.textContainer}>
-              <Text>{post.content.text}</Text>
-            </View>
-          </View>
+          <Post key={post._id} post={post} onLike={handleLike} user={user}/>
         ))}
       </ScrollView>
       <Pressable

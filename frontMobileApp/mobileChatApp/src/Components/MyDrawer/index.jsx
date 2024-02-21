@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem,  } from '@react-navigation/drawer'
 import { UserContext } from '../../Context/UserContext.js'
 import { useNavigation } from '@react-navigation/native'
@@ -50,9 +50,14 @@ const CustomDrawerItem = ({ label, badgeCount, ...props }) => (
 
 const MyDrawer = () => {
   const { user, updateUser } = useContext(UserContext)
-  const pendingRequestsCount = user ? user.pendingFriendRequests.filter(request => request.status === 'PENDING').length : 0
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0)
+  //const pendingRequestsCount = user ? user.pendingFriendRequests.filter(request => request.status === 'PENDING').length : 0
   const navigation = useNavigation()
   const [isSigningOut, setIsSigningOut] = useState(false)
+
+  useEffect(() => {
+    setPendingRequestsCount(user ? user.pendingFriendRequests.filter(request => request.status === 'PENDING').length : 0)
+  }, [user])
 
   const handleSignOut = async () => {
     Alert.alert(
