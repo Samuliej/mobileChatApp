@@ -42,13 +42,13 @@ const usePost = () => {
     }
   }
 
-  const commentPost = async (postId, user, author) => {
+  const commentPost = async (postId, content) => {
     setLoading(true)
     setError(null)
 
     const authToken = await AsyncStorage.getItem('userToken')
     try {
-      const res = await api.post(`/api/posts/${postId}/comments`, {user, author}, {
+      const res = await api.post(`/api/posts/${postId}/comments`, {postId, content}, {
         headers: {
           Authorization: `Bearer ${authToken}`
         }

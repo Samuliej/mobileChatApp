@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react'
-import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, Image, Button } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
+import { TextInput, ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, Image, Button } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import { Ionicons } from '@expo/vector-icons'
 import usePosts from '../../hooks/usePosts'
@@ -8,7 +8,28 @@ import usePost from '../../hooks/usePost'
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../assets/soldier.png'
 
-const Post = ({ post, onLike, user }) => {
+const Post = ({ post: initialPost, onLike, commentPost, user }) => {
+  const [commentsOpen, setCommentsOpen] = useState(false)
+  const [commentText, setCommentText] = useState('')
+  const [post, setPost] = useState(initialPost)
+
+  const handleCommentSubmit = async () => {
+    if (commentText) {
+      const newComment = await commentPost(post._id, commentText)
+      if (newComment) {
+        setPost(prevPost => ({
+          ...prevPost,
+          comments: [...prevPost.comments, newComment]
+        }))
+        setCommentText('')
+      } else {
+        console.log('Error commenting post')
+      }
+    }
+  }
+
+
+  console.log(post)
 
   return (
     <View key={post._id} style={styles.postContainer}>
@@ -34,7 +55,32 @@ const Post = ({ post, onLike, user }) => {
       <View style={styles.textContainer}>
         <Text>{post.content.text}</Text>
       </View>
-      <Button title="Like" onPress={() => onLike(post._id)} />
+      <View style={styles.actionsContainer}>
+        <View style={styles.likeContainer}>
+          <Ionicons name="thumbs-up-outline" size={24} color="black" onPress={() => onLike(post._id)} />
+          <Text>{post.likes}</Text>
+        </View>
+        <View style={styles.commentContainer}>
+          <Ionicons name="chatbubble-outline" size={24} color="black" onPress={() => setCommentsOpen(!commentsOpen)} />
+        </View>
+      </View>
+      {commentsOpen && (
+        <View style={styles.commentsSection}>
+          {post.comments.map((comment) => (
+            console.log(comment),
+            <View key={comment._id} style={styles.commentContainer}>
+              <Text style={styles.commentUser}>{comment.user.username}</Text>
+              <Text style={styles.commentContent}>{comment.content}</Text>
+            </View>
+          ))}
+          <TextInput
+            placeholder="Write a comment..."
+            value={commentText}
+            onChangeText={setCommentText}
+          />
+          <Button title="Submit" onPress={handleCommentSubmit} />
+        </View>
+      )}
     </View>
   )
 }
@@ -43,7 +89,7 @@ const Post = ({ post, onLike, user }) => {
 const FeedScreen = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const { loading, posts, error, refreshPosts } = usePosts(user._id)
-  const { likePost } = usePost()
+  const { likePost, commentPost } = usePost()
 
   // refresh posts when the screen is focused
   useEffect(() => {
@@ -73,7 +119,7 @@ const FeedScreen = ({ navigation }) => {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
         {posts.map(post => (
-          <Post key={post._id} post={post} onLike={handleLike} user={user}/>
+          <Post key={post._id} post={post} onLike={handleLike} commentPost={commentPost} user={user}/>
         ))}
       </ScrollView>
       <Pressable
@@ -159,6 +205,26 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 10,
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  likeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  commentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  commentUser: {
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
+  commentContent: {
+    flex: 1,
   },
 })
 

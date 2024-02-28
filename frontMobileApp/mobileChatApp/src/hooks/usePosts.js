@@ -7,8 +7,6 @@ const usePosts = (userId) => {
   const [posts, setPosts] = useState([])
   const [error, setError] = useState(null)
 
-  console.log('userId', userId)
-
   useEffect(() => {
     refreshPosts()
   }, [])

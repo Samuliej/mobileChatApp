@@ -366,8 +366,7 @@ router.post('/api/posts', authMiddleware, upload.single('image'), async (req, re
 
 // Comment a post
 router.post('/api/posts/:postId/comments', authMiddleware, async (req, res) => {
-  const { postId } = req.params
-  const { user, content } = req.body
+  const { postId, content } = req.body
 
   const currentUser = req.currentUser
   if (!currentUser) {
@@ -376,18 +375,21 @@ router.post('/api/posts/:postId/comments', authMiddleware, async (req, res) => {
 
   const newComment = new Comment({
     post: postId,
-    user: user,
+    user: currentUser._id,
     content: content
   })
 
   try {
     const savedComment = await newComment.save()
 
+    const populatedComment = await Comment.findById(savedComment._id).populate('user', 'username')
+
+
     const post = await Post.findById(postId)
     post.comments.push(savedComment._id)
     await post.save()
 
-    res.status(201).json(savedComment)
+    res.status(201).json(populatedComment)
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Something went wrong creating the comment' })

@@ -174,7 +174,16 @@ router.get('/api/posts/user/:userId', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(userId).populate({
       path: 'posts',
-      options: { sort: { 'createdAt': -1 } }
+      options: { sort: { 'createdAt': -1 } },
+      populate: {
+        path: 'comments',
+        model: 'Comment',
+        populate: {
+          path: 'user',
+          model: 'User',
+          select: 'username'
+        }
+      }
     })
 
     res.status(200).json(user.posts)
@@ -199,7 +208,16 @@ router.get('/api/posts/friends/:userId', authMiddleware, async (req, res) => {
       populate: {
         path: 'posts',
         model: 'Post',
-        options: { sort: { 'createdAt': -1 } } // Add this line
+        options: { sort: { 'createdAt': -1 } },
+        populate: {
+          path: 'comments',
+          model: 'Comment',
+          populate: {
+            path: 'user',
+            model: 'User',
+            select: 'username'
+          }
+        }
       }
     })
 
