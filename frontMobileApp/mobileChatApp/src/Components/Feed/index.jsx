@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { TextInput, ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, Image, Button } from 'react-native'
+import React, { useContext, useEffect, useState, useRef } from 'react'
+import { TextInput, ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, Image, Button, Animated } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import { Ionicons } from '@expo/vector-icons'
 import usePosts from '../../hooks/usePosts'
@@ -8,10 +8,11 @@ import usePost from '../../hooks/usePost'
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../assets/soldier.png'
 
-const Post = ({ post: initialPost, onLike, commentPost, user }) => {
+const Post = ({ post: initialPost, likePost, commentPost, user }) => {
   const [commentsOpen, setCommentsOpen] = useState(false)
   const [commentText, setCommentText] = useState('')
   const [post, setPost] = useState(initialPost)
+  const likeScale = useRef(new Animated.Value(1)).current
 
   const handleCommentSubmit = async () => {
     if (commentText) {
@@ -28,8 +29,29 @@ const Post = ({ post: initialPost, onLike, commentPost, user }) => {
     }
   }
 
+  const handleLike = async () => {
+    Animated.sequence([
+      Animated.timing(likeScale, {
+        toValue: 1.3,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(likeScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start()
 
-  console.log(post)
+    const success = await likePost(post._id)
+
+    if (success) {
+      setPost(prevPost => ({
+        ...prevPost,
+        likes: prevPost.likes + 1
+      }))
+    }
+  }
 
   return (
     <View key={post._id} style={styles.postContainer}>
@@ -57,7 +79,9 @@ const Post = ({ post: initialPost, onLike, commentPost, user }) => {
       </View>
       <View style={styles.actionsContainer}>
         <View style={styles.likeContainer}>
-          <Ionicons name="thumbs-up-outline" size={24} color="black" onPress={() => onLike(post._id)} />
+          <Animated.View style={{ transform: [{ scale: likeScale }] }}>
+            <Ionicons name="thumbs-up-outline" size={24} color="black" onPress={handleLike} />
+          </Animated.View>
           <Text>{post.likes}</Text>
         </View>
         <View style={styles.commentContainer}>
@@ -101,10 +125,6 @@ const FeedScreen = ({ navigation }) => {
     return unsubscribe
   }, [navigation])
 
-  const handleLike = async (postId) => {
-    await likePost(postId)
-  }
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -119,7 +139,7 @@ const FeedScreen = ({ navigation }) => {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
         {posts.map(post => (
-          <Post key={post._id} post={post} onLike={handleLike} commentPost={commentPost} user={user}/>
+          <Post key={post._id} post={post} likePost={likePost} commentPost={commentPost} user={user}/>
         ))}
       </ScrollView>
       <Pressable
