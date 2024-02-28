@@ -15,11 +15,12 @@ const multer = require('multer')
 const upload = multer({ dest: 'uploads/' })
 
 const cloudinary = require('../cloudinary')
-// Use cloudinary.uploader.upload() to upload images
 
 
 // Create a user
 router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
+
+  console.log('Registering user')
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
     let result = null
@@ -394,6 +395,11 @@ router.post('/api/posts/:postId/comments', authMiddleware, async (req, res) => {
     console.error(error)
     res.status(500).json({ error: 'Something went wrong creating the comment' })
   }
+})
+
+router.use((req, res, next) => {
+  console.log('Incoming request:', req.method, req.path)
+  next()
 })
 
 module.exports = router

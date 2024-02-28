@@ -79,9 +79,6 @@ module.exports = (server, wsPort) => {
         // Find the user who is the receiver of the message
         const receivingUser = await User.findById(newMessage.receiver._id)
 
-        // Find the corresponding conversation in the user's conversations field
-        console.log('receing user co')
-        console.log(receivingUser.conversations)
         const userConversation = receivingUser.conversations.find(convo => convo._id.toString() === newMessage.conversationId)
 
         if (userConversation) {
@@ -135,7 +132,7 @@ module.exports = (server, wsPort) => {
 
         const messageData = {
           conversationId: conversation._id,
-          message: newMessage
+          message: newMessage,
         }
 
         console.log(messageData)

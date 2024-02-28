@@ -138,9 +138,11 @@ const FeedScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
-        {posts.map(post => (
-          <Post key={post._id} post={post} likePost={likePost} commentPost={commentPost} user={user}/>
-        ))}
+        <View style={styles.scrollViewContentContainer}>
+          {posts.map(post => (
+            <Post key={post._id} post={post} likePost={likePost} commentPost={commentPost} user={user}/>
+          ))}
+        </View>
       </ScrollView>
       <Pressable
         style={styles.fab}
@@ -157,7 +159,6 @@ const FeedScreen = ({ navigation }) => {
   )
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -167,6 +168,9 @@ const styles = StyleSheet.create({
   scrollView: {
     width: '100%',
     padding: 10,
+  },
+  scrollViewContentContainer: {
+    paddingBottom: 100,
   },
   paragraph: {
     fontSize: 16,
@@ -200,6 +204,12 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderRadius: 10,
+    backgroundColor: '#f8f8f8', // Add a light background color to the posts
+    shadowColor: '#000', // Add a shadow to the posts
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 5,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -209,11 +219,12 @@ const styles = StyleSheet.create({
   profilePicture: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 10, // Change the shape of the profile pictures
     marginRight: 10,
   },
   username: {
     fontWeight: 'bold',
+    color: '#333', // Change the color of the username
   },
   postImage: {
     width: '100%',
@@ -225,10 +236,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 10,
+    marginVertical: 10, // Add some margin to the text container
   },
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingVertical: 10, // Add some padding to the actions container
   },
   likeContainer: {
     flexDirection: 'row',
@@ -247,5 +260,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 })
-
 export default FeedScreen

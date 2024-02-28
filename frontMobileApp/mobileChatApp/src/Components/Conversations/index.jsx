@@ -39,6 +39,7 @@ const Conversations = ({ navigation }) => {
           data={sortedConversations}
           keyExtractor={item => item && item._id ? item._id : ''}
           renderItem={({ item }) => item && (
+            console.log(item),
             <Pressable style={styles.conversationItem} onPress={() => item._id && navigation.navigate('Chat', { conversationId: item._id })}>
               <Image source={item.friend && item.friend.profilePicture ? { uri: item.friend.profilePicture } : defaultProfilePicture} style={styles.profilePicture} />
               <View style={styles.textContainer}>
