@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react'
 import { TextInput, View, Text, StyleSheet, Image, Button, Animated } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+// Default user profile picture property of Pixel Perfect:
+// href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../../assets/soldier.png'
 
 

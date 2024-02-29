@@ -133,7 +133,10 @@ const SignUp =  () => {
         if (data) {
           await AsyncStorage.setItem('userToken', data)
           await updateUser(data)
-          navigation.navigate('Main', { screen: 'Home' })
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Main', params: { screen: 'Home' } }],
+          })
         }
       } else {
         console.log('Sign up failed')

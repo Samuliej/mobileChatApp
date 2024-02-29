@@ -81,7 +81,10 @@ const SignIn = () => {
     if (data) {
       await AsyncStorage.setItem('userToken', data)
       await updateUser(data)
-      navigation.navigate('Main', { screen: 'Home' })
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Main', params: { screen: 'Home' } }],
+      })
       setTimeout(() => {
         setUsername('')
         setPassword('')
