@@ -35,10 +35,13 @@ const SearchForUser = () => {
   if (user) userId = user._id
 
   const handleSendFriendRequest = async (username) => {
-    console.log('sending friend request to', username)
-    await sendFriendRequest(username)
-    setSentRequests([...sentRequests, username])
-    setNotification(`Friend request sent to ${username}`)
+    const result = await sendFriendRequest(username)
+    if (result) {
+      setSentRequests([...sentRequests, username])
+      setNotification(`Friend request sent to ${username}`)
+    } else {
+      setNotification(`Failed to send friend request to ${username}`)
+    }
   }
 
   return (

@@ -51,12 +51,18 @@ const CustomDrawerItem = ({ label, badgeCount, ...props }) => (
 const MyDrawer = () => {
   const { user, updateUser } = useContext(UserContext)
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0)
-  //const pendingRequestsCount = user ? user.pendingFriendRequests.filter(request => request.status === 'PENDING').length : 0
   const navigation = useNavigation()
   const [isSigningOut, setIsSigningOut] = useState(false)
 
   useEffect(() => {
-    setPendingRequestsCount(user ? user.pendingFriendRequests.filter(request => request.status === 'PENDING').length : 0)
+    setPendingRequestsCount(
+      user
+        ? user.pendingFriendRequests.filter(
+          (request) =>
+            request.status === 'PENDING' && request.sender !== user._id
+        ).length
+        : 0
+    )
   }, [user])
 
   const handleSignOut = async () => {
