@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react'
-import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
+import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, RefreshControl } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import { Ionicons } from '@expo/vector-icons'
 import usePosts from '../../hooks/usePosts'
@@ -10,6 +10,13 @@ const FeedScreen = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const { loading, posts, error, refreshPosts } = usePosts(user._id)
   const { likePost, commentPost } = usePost()
+
+  const [refreshing, setRefreshing] = useState(false)
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true)
+    refreshPosts().then(() => setRefreshing(false))
+  }, [])
 
   // refresh posts when the screen is focused
   useEffect(() => {
@@ -33,7 +40,12 @@ const FeedScreen = ({ navigation }) => {
   // Add error banner
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.scrollViewContentContainer}>
           {posts.map(post => (
             <Post key={post._id} post={post} likePost={likePost} commentPost={commentPost} user={user}/>
