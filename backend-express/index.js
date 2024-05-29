@@ -8,6 +8,7 @@ const websocketHandler = require('./routes/websockethandler')
 const getRoutes = require('./routes/get')
 const postRoutes = require('./routes/post')
 const putRoutes = require('./routes/put')
+const deleteRoutes = require('./routes/delete')
 
 
 let MONGODB_URI
@@ -38,6 +39,7 @@ app.use(cors())
 app.use(getRoutes)
 app.use(postRoutes)
 app.use(putRoutes)
+app.use(deleteRoutes)
 
 const port = config.PORT || 3000
 const wsPort = config.WS_PORT || 3002
