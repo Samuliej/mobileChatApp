@@ -49,7 +49,8 @@ const NewConversation = () => {
       }} />
 
       <Text>Your Friends</Text>
-      {friends.map(friend => (
+      {/* Exclude the friends with whom there is already a started conversation */}
+      {friends.filter(friend => !user.conversations.map(convo => convo._id).some(conversationId => friend.conversations.includes(conversationId))).map(friend => (
         <View key={friend._id} style={styles.friendItem}>
           <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
           <Text style={styles.username}>{friend.username}</Text>
