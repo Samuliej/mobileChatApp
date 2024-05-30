@@ -4,6 +4,7 @@ const config = require('../utils/config')
 const Conversation = require('../models/Conversation')
 const Message = require('../models/Message')
 const User = require('../models/User')
+const Friendship = require('../models/Friendship')
 
 const validateToken = (token) => {
   try {
@@ -29,6 +30,69 @@ module.exports = (server, wsPort) => {
         if (!ws.user) {
           return ws.send(JSON.stringify({ error: 'Authentication required' }))
         }
+      }
+
+      // For handling friend requests
+      if (messageData.type === 'SEND_FRIEND_REQUEST') {
+        try {
+          const friendUsername = messageData.friendUsername
+          const senderId = ws.userId
+          const receiver = await User.findOne({ username: friendUsername })
+
+          if (!senderId) {
+            return ws.send(JSON.stringify({ error: 'Authentication required' }))
+          }
+
+          let existingFriendship = await Friendship.findOne({
+            $or: [
+              { sender: senderId, receiver: receiver._id },
+              { sender: receiver._id, receiver: senderId }
+            ]
+          })
+
+          if (existingFriendship && existingFriendship.status === 'PENDING') {
+            return ws.send(JSON.stringify({ error: 'Friend request already sent' }))
+          }
+
+          if (existingFriendship && existingFriendship.status === 'DECLINDED') {
+            existingFriendship.status = 'PENDING'
+            await existingFriendship.save()
+            return ws.send(JSON.stringify({ message: 'Friend request sent', friendship: existingFriendship }))
+          } else {
+            const newFriendship = new Friendship({
+              sender: senderId,
+              receiver: receiver._id,
+              status: 'PENDING'
+            })
+
+            await newFriendship.save()
+
+            const sender = await User.findById(senderId)
+            sender.pendingFriendRequests.push(newFriendship._id)
+            await sender.save()
+
+            receiver.pendingFriendRequests.push(newFriendship._id)
+            await receiver.save()
+
+            ws.send(JSON.stringify({ message: 'Friend request sent', friendship: newFriendship }))
+          }
+        } catch (err) {
+          console.error(err)
+          return ws.send(JSON.stringify({ error: 'Sending friend request failed' }))
+        }
+      }
+
+
+      // For handling accepting friend requests
+      if (messageData.type === 'ACCEPT_FRIEND_REQUEST') {
+        const friendship = await Friendship.findOne({ _id: messageData.friendshipId })
+        if (!friendship) {
+          return ws.send(JSON.stringify({ error: 'Friendship not found' }))
+        }
+
+        friendship.status = 'ACCEPTED'
+        await friendship.save()
+        return ws.send(JSON.stringify({ message: 'Friend request accepted' }))
       }
 
       if (messageData.type === 'OPEN_CONVERSATION') {

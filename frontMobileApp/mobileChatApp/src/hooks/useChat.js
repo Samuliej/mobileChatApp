@@ -13,7 +13,7 @@ const useChat = (user, conversationId, initialFriend) => {
   const ws = useRef(null)
 
   useEffect(() => {
-    ws.current = createWebSocketConnection('ws://192.168.1.104:3003')
+    ws.current = createWebSocketConnection('ws://192.168.0.100:3003')
     return () => {
       ws.current.close()
     }

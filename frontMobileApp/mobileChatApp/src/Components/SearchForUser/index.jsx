@@ -14,10 +14,10 @@ const SearchForUser = () => {
   const [searchInput, setSearchInput] = useState('')
   const [page, setPage] = useState(1)
   const { searchResults } = useSearchUser(searchInput)
-  const { sendFriendRequest } = useSendFriendRequest()
   const [sentRequests, setSentRequests] = useState([])
   let userId = null
   const { user } = useContext(UserContext)
+  const { sendFriendRequest } = useSendFriendRequest(user)
   const [notification, setNotification] = useState(null)
 
   const loadMoreResults = () => {
