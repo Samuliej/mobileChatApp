@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Image, Pressable, StyleSheet, Alert } from 'react-native'
+import { View, Text, Image, Pressable, StyleSheet, Alert, ScrollView, RefreshControl } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
 import { NotificationContext } from '../../Context/NotificationContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ErrorBanner from '../Error/index.jsx'
+import io from 'socket.io-client'
 const emptyIcon = require('../../../assets/fist-bump.png')
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
@@ -13,27 +14,42 @@ const FriendRequests = () => {
   const { user, updateUserPendingRequests, updateUser } = useContext(UserContext)
   const { notification, setNotification } = useContext(NotificationContext)
   const [requests, setRequests] = useState([])
+  const [refreshing, setRefreshing] = useState(false)
   const navigation = useNavigation()
   let pendingRequests = []
   if (user) pendingRequests = user.pendingFriendRequests.filter(request => request.receiver === user._id)
 
+  const [socket, setSocket] = useState(null)
+
   useEffect(() => {
-    const fetchRequests = async () => {
-      if (user) {
-        // Fetch all requests
-        const fetchedRequests = await Promise.all(pendingRequests.map(async (request) => {
-          const response = await api.get(`/api/users/id/${request.sender}`)
-          const senderUser = await response.data
-          return {
-            ...request,
-            userObj: senderUser,
-          }
-        }))
+    const newSocket = io.connect('http://192.168.0.104:3001') // replace with your server address
+    setSocket(newSocket)
 
-        setRequests(fetchedRequests)
-      }
+    return () => newSocket.close()
+  }, [])
+
+  const fetchRequests = async () => {
+    setRefreshing(true)
+    if (user) {
+      // Fetch all requests
+      const fetchedRequests = await Promise.all(pendingRequests.map(async (request) => {
+        const response = await api.get(`/api/users/id/${request.sender}`)
+        const senderUser = await response.data
+        return {
+          ...request,
+          userObj: senderUser,
+        }
+      }))
+
+      // Filter out 'ACCEPTED' requests
+      const filteredRequests = fetchedRequests.filter(request => request.status !== 'ACCEPTED')
+
+      setRequests(filteredRequests)
     }
+    setRefreshing(false)
+  }
 
+  useEffect(() => {
     fetchRequests()
   }, [user ? user.pendingFriendRequests : null])
 
@@ -48,11 +64,8 @@ const FriendRequests = () => {
   const handleAccept = async (username, friendshipId) => {
     try {
       const userToken = await AsyncStorage.getItem('userToken')
-      await api.put('/api/acceptFriendRequest', { friendshipId }, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        }
-      })
+      socket.emit('acceptFriendRequest', { friendshipId, token: userToken })
+
       // Update the requests state to remove the accepted request
       const newRequests = requests.filter(request => request._id !== friendshipId)
       setRequests(newRequests)
@@ -105,7 +118,15 @@ const FriendRequests = () => {
   }
 
   return (
-    <>
+    <ScrollView
+      contentContainerStyle={{flex: 1}}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={fetchRequests}
+        />
+      }
+    >
       {notification && <ErrorBanner error={notification} type="success" />}
       <View style={styles.container}>
         {requests.length === 0 && (
@@ -148,7 +169,7 @@ const FriendRequests = () => {
           </>
         )}
       </View>
-    </>
+    </ScrollView>
   )
 }
 

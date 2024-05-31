@@ -1,51 +1,54 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import io from 'socket.io-client'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createWebSocketConnection } from '../wsApi.js'
 
-/**
- * `useSendFriendRequest` is a custom hook that provides the functionality to send a friend request.
- *  It uses the `api` module to send requests to the server.
- *  The hook returns a `sendFriendRequest` function. This function takes a username as a parameter,
- *  and sends a POST request to '/api/sendFriendRequest' with the username in the request body.
- *  If the friend request is sent successfully, the server responds with the friendship data.
- *  The `sendFriendRequest` function returns this data.
- *  If an error occurs while sending the friend request, the `sendFriendRequest` function throws the error.
- *  This allows the component that uses this hook to catch the error and handle it appropriately.
- */
-const useSendFriendRequest = (user) => {
+const useSendFriendRequest = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const ws = useRef(null)
+  const [socket, setSocket] = useState(null)
 
   useEffect(() => {
-    ws.current = createWebSocketConnection('ws://192.168.0.100:3003', () => {})
-    return () => {
-      ws.current.close()
-    }
+    const newSocket = io.connect('http://192.168.0.104:3001') // replace with your server address
+    setSocket(newSocket)
+
+    return () => newSocket.close()
   }, [])
 
   const sendFriendRequest = async (username) => {
     setLoading(true)
     setError(null)
 
-    const authToken = await AsyncStorage.getItem('userToken')
-    console.log('authToken', authToken)
+    console.log('Sending friend request to', username)
+
+    const token = await AsyncStorage.getItem('userToken')
+
+    if (!socket) {
+      console.log('Socket connection not established')
+      setError('Socket connection not established')
+      setLoading(false)
+      return null
+    }
 
     try {
-      if (ws.current.readyState === WebSocket.OPEN) {
-        const userToken = await AsyncStorage.getItem('userToken')
-        const messageContent = {
-          userId: user._id,
-          token: userToken,
-          type: 'SEND_FRIEND_REQUEST',
-          friendUsername: username
-        }
-        const messageData = JSON.stringify(messageContent)
-        ws.current.send(messageData)
-      }
+      socket.emit('sendFriendRequest', { username, token })
 
-      setLoading(false)
-      return { message: 'Friend request sent'}
+      console.log('Friend request sent')
+
+      return new Promise((resolve, reject) => {
+        socket.on('friendRequestSent', (data) => {
+          console.log(data)
+          setLoading(false)
+          resolve(data)
+        })
+
+        socket.on('error', (error) => {
+          console.log(error)
+          setLoading(false)
+          console.log('Error sending friend request')
+          setError('Error sending friend request')
+          reject(null)
+        })
+      })
     } catch (err) {
       setLoading(false)
       setError('Error sending friend request')
