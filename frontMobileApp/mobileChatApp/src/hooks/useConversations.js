@@ -8,7 +8,7 @@ const useConversations = (user) => {
   const ws = useRef(null)
 
   useEffect(() => {
-    ws.current = createWebSocketConnection('ws://192.168.0.104:3003')
+    ws.current = createWebSocketConnection('ws://192.168.0.101:3003')
 
     ws.current.onmessage = async (event) => {
       const messageData = JSON.parse(event.data)

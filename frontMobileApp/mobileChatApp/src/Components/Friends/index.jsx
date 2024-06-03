@@ -3,6 +3,7 @@ import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator } from 'rea
 import { UserContext } from '../../Context/UserContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
+import io from 'socket.io-client'
 const emptyIcon = require('../../../assets/fist-bump.png')
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
@@ -11,6 +12,7 @@ const Friends = () => {
   const [friends, setFriends] = useState([])
   const [loading, setLoading] = useState(true)
   const navigation = useNavigation()
+  const socket = io('http://192.168.0.104:3001')
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -27,6 +29,26 @@ const Friends = () => {
     }
 
     fetchFriends()
+
+    // Listen for the 'friendRequestAccepted' event
+    socket.on('friendRequestAccepted', async (friendship) => {
+      // Check if the current user is involved in the friendship
+      if (friendship.user1._id === user._id || friendship.user2._id === user._id) {
+        // Get the new friend's user object
+        const newFriendId = friendship.user1._id === user._id ? friendship.user2._id : friendship.user1._id
+        const response = await api.get(`/api/users/id/${newFriendId}`)
+        const newFriend = await response.data
+
+        // Update the friends state to include the new friend
+        setFriends(prevFriends => [...prevFriends, newFriend])
+      }
+    })
+
+    return () => {
+      // Disconnect from the socket when the component unmounts
+      socket.disconnect()
+    }
+
   }, [user ? user.friends : null])
 
   if (loading) {

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { View, Text, Image, Pressable, StyleSheet, Alert, ScrollView, RefreshControl } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
 import { NotificationContext } from '../../Context/NotificationContext.js'
+import { FriendRequestContext } from '../../Context/FriendRequestContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -11,9 +12,14 @@ const emptyIcon = require('../../../assets/fist-bump.png')
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
 const FriendRequests = () => {
-  const { user, updateUserPendingRequests, updateUser } = useContext(UserContext)
-  const { notification, setNotification } = useContext(NotificationContext)
-  const [requests, setRequests] = useState([])
+  const userContextValue = useContext(UserContext)
+  const { user, updateUserPendingRequests, updateUser } = userContextValue
+
+  const notificationContextValue = useContext(NotificationContext)
+  const { notification, setNotification } = notificationContextValue
+
+  const friendRequestContextValue = useContext(FriendRequestContext)
+  const { friendRequests, setFriendRequests } = friendRequestContextValue
   const [refreshing, setRefreshing] = useState(false)
   const navigation = useNavigation()
   let pendingRequests = []
@@ -21,12 +27,27 @@ const FriendRequests = () => {
 
   const [socket, setSocket] = useState(null)
 
-  useEffect(() => {
-    const newSocket = io.connect('http://192.168.0.104:3001') // replace with your server address
-    setSocket(newSocket)
 
-    return () => newSocket.close()
-  }, [])
+  useEffect(() => {
+    if (user) {
+      const newSocket = io.connect('http://192.168.0.101:3001', {
+        query: { userId: user._id }
+      })
+
+      newSocket.on('friendRequest', (newFriendRequest) => {
+        console.log('listening to request', newFriendRequest)
+        setFriendRequests(prevRequests =>  [...prevRequests, newFriendRequest])
+      })
+
+      newSocket.on('friendRequestSent', (data) => {
+        fetchRequests()
+      })
+
+      setSocket(newSocket)
+    }
+
+    //return () => socket && socket.close()
+  }, [user])
 
   const fetchRequests = async () => {
     setRefreshing(true)
@@ -44,7 +65,7 @@ const FriendRequests = () => {
       // Filter out 'ACCEPTED' requests
       const filteredRequests = fetchedRequests.filter(request => request.status !== 'ACCEPTED')
 
-      setRequests(filteredRequests)
+      setFriendRequests(filteredRequests)
     }
     setRefreshing(false)
   }
@@ -67,10 +88,14 @@ const FriendRequests = () => {
       socket.emit('acceptFriendRequest', { friendshipId, token: userToken })
 
       // Update the requests state to remove the accepted request
-      const newRequests = requests.filter(request => request._id !== friendshipId)
-      setRequests(newRequests)
+      const newRequests = friendRequests.filter(request => request._id !== friendshipId)
+      setFriendRequests(newRequests)
       updateUserPendingRequests(newRequests)
       updateUser(userToken)
+
+      // Inform that the friend request has been accepted
+      socket.emit('friendRequestAccepted', {username, userToken})
+
       // I have to include this because for some reason updating the user
       // object redirects to the home page
       navigation.navigate('Friend requests')
@@ -100,8 +125,8 @@ const FriendRequests = () => {
                 }
               })
               // Update the requests state to remove the declined request
-              const newRequests = requests.filter(request => request._id !== friendshipId)
-              setRequests(newRequests)
+              const newRequests = friendRequests.filter(request => request._id !== friendshipId)
+              setFriendRequests(newRequests)
               updateUserPendingRequests(newRequests)
               updateUser(userToken)
               // I have to include this because for some reason updating the user
@@ -129,7 +154,7 @@ const FriendRequests = () => {
     >
       {notification && <ErrorBanner error={notification} type="success" />}
       <View style={styles.container}>
-        {requests.length === 0 && (
+        {friendRequests.length === 0 && (
           <View style={styles.emptyContainer}>
             <Image source={emptyIcon} style={styles.emptyIcon} />
             <Text style={styles.emptyText}>
@@ -140,9 +165,10 @@ const FriendRequests = () => {
             </Pressable>
           </View>
         )}
-        {requests.length > 0 && (
+        {friendRequests.length > 0 && (
           <>
-            {requests.map(request => (
+            {friendRequests.map(request => (
+              console.log('printing one request', request),
               <View key={request.userObj._id} style={styles.requestItem}>
                 <Image source={request.userObj.profilePicture ? { uri: request.userObj.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
                 <Text style={styles.username}>{request.userObj.username}</Text>

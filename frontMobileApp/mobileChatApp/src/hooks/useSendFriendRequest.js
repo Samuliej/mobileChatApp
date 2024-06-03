@@ -6,10 +6,16 @@ const useSendFriendRequest = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [socket, setSocket] = useState(null)
+  const [friendRequests, setFriendRequests] = useState([])
 
   useEffect(() => {
-    const newSocket = io.connect('http://192.168.0.104:3001') // replace with your server address
+    const newSocket = io.connect('http://192.168.0.101:3001') // replace with your server address
     setSocket(newSocket)
+
+    newSocket.on('friendRequestAccepted', (data) => {
+      console.log('useSendFR: ', data)
+      setFriendRequests(prevRequests => [...prevRequests, data])
+    })
 
     return () => newSocket.close()
   }, [])
@@ -17,8 +23,6 @@ const useSendFriendRequest = () => {
   const sendFriendRequest = async (username) => {
     setLoading(true)
     setError(null)
-
-    console.log('Sending friend request to', username)
 
     const token = await AsyncStorage.getItem('userToken')
 
@@ -32,11 +36,9 @@ const useSendFriendRequest = () => {
     try {
       socket.emit('sendFriendRequest', { username, token })
 
-      console.log('Friend request sent')
-
       return new Promise((resolve, reject) => {
         socket.on('friendRequestSent', (data) => {
-          console.log(data)
+          socket.emit('friendRequestSent', {username, token})
           setLoading(false)
           resolve(data)
         })
@@ -57,7 +59,7 @@ const useSendFriendRequest = () => {
     }
   }
 
-  return { sendFriendRequest, loading, error, setError }
+  return { sendFriendRequest, loading, error, setError, friendRequests }
 }
 
 export default useSendFriendRequest

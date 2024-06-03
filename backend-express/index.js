@@ -60,8 +60,13 @@ const validateToken = (token) => {
   }
 }
 
-io.on('connection', (socket) => {
+const userSocketIds = {}
+
+io.on('connection', async (socket) => {
   console.log('a user connected')
+
+  const userId = socket.handshake.query.userId
+  userSocketIds[userId] = socket.id
 
   socket.on('sendFriendRequest', async (data) => {
     try {
@@ -110,8 +115,6 @@ io.on('connection', (socket) => {
           status: 'PENDING',
         })
 
-        console.log('newFriendship:', newFriendship)
-
         await newFriendship.save()
 
         user.pendingFriendRequests.push(newFriendship._id)
@@ -121,6 +124,11 @@ io.on('connection', (socket) => {
         await receiver.save()
 
         socket.emit('friendRequestSent', newFriendship)
+
+        const newFriendshipToFront = {...newFriendship, userObj: user}
+
+        const receiverSocketId = userSocketIds[receiver._id]
+        io.to(receiverSocketId).emit('friendRequest', newFriendshipToFront)
       }
 
     } catch (error) {
@@ -161,10 +169,9 @@ io.on('connection', (socket) => {
       friend.friends.push(user._id)
       await friend.save()
 
-      console.log('Friend request accepted:', friendship)
-
-      io.to(user.socketId).emit('friendRequestAccepted', friendship)
-      io.to(friend.socketId).emit('friendRequestAccepted', friendship)
+      console.log('userSocketids accepting request', userSocketIds)
+      io.to(userSocketIds[user._id]).emit('friendRequestAccepted', friendship)
+      io.to(userSocketIds[friend._id]).emit('friendRequestAccepted', friendship)
 
       socket.emit('friendRequestAccepted', friendship)
     } catch (error) {
