@@ -77,7 +77,6 @@ const SignIn = () => {
 
   const handleSignIn = async () => {
     const data = await signIn(username, password)
-    console.log('data', data)
     if (data) {
       await AsyncStorage.setItem('userToken', data)
       await updateUser(data)

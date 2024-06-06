@@ -27,27 +27,6 @@ const FriendRequests = () => {
   let pendingRequests = []
   if (user) pendingRequests = user.pendingFriendRequests.filter(request => request.receiver === user._id)
 
-
-  useEffect(() => {
-    if (user && socket) {
-      socket.on('friendRequest', (newFriendRequest) => {
-        console.log('listening to request', newFriendRequest)
-        setFriendRequests(prevRequests =>  [...prevRequests, newFriendRequest])
-      })
-
-      socket.on('friendRequestSent', (data) => {
-        fetchRequests()
-      })
-    }
-
-    return () => {
-      if (socket) {
-        socket.off('friendRequest')
-        socket.off('friendRequestSent')
-      }
-    }
-  }, [user, socket])
-
   const fetchRequests = async () => {
     setRefreshing(true)
     if (user) {
@@ -167,7 +146,6 @@ const FriendRequests = () => {
         {friendRequests.length > 0 && (
           <>
             {friendRequests.map(request => (
-              console.log('printing one request', request),
               <View key={request.userObj._id} style={styles.requestItem}>
                 <Image source={request.userObj.profilePicture ? { uri: request.userObj.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
                 <Text style={styles.username}>{request.userObj.username}</Text>

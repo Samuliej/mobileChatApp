@@ -3,6 +3,7 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItem,  } from '@r
 import { UserContext } from '../../Context/UserContext.js'
 import { useNavigation } from '@react-navigation/native'
 import { Image, Pressable, Alert, View, Text, ActivityIndicator, StyleSheet } from 'react-native'
+import { SocketContext } from '../../Context/SocketContext.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
@@ -53,6 +54,7 @@ const MyDrawer = () => {
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0)
   const navigation = useNavigation()
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const socket = useContext(SocketContext)
 
   useEffect(() => {
     setPendingRequestsCount(
@@ -82,11 +84,12 @@ const MyDrawer = () => {
             await AsyncStorage.removeItem('userToken')
             // Update the user context
             updateUser(null)
+            socket.close()
             navigation.reset({
               index: 0,
               routes: [{ name: 'Auth', params: { screen: 'The Hive' } }],
             })
-            // No need to set isSigningOut to false because the state will be reset
+            // No need to set isSigning Out to false because the state will be reset
           }
         },
       ],

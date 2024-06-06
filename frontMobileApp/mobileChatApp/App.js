@@ -8,6 +8,7 @@ import RootNavigator from './src/Components/RootNavigator/index.jsx'
 
 
 const App = () => {
+
   return (
     <NotificationProvider>
       <UserProvider>

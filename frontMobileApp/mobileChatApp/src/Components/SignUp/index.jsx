@@ -88,8 +88,6 @@ const SignUp =  () => {
       quality: 1,
     })
 
-    console.log(result)
-
     if (!result.canceled) {
       setImage(result.uri)
       let localUri = result.uri
