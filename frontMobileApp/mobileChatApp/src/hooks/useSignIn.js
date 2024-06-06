@@ -22,6 +22,7 @@ const useSignIn = () => {
     setError(null)
 
     try {
+      console.log(api)
       const res = await api.post('/api/login', { username, password })
       setLoading(false)
       return res.data.token

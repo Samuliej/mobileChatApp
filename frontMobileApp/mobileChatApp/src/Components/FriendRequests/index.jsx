@@ -3,11 +3,11 @@ import { View, Text, Image, Pressable, StyleSheet, Alert, ScrollView, RefreshCon
 import { UserContext } from '../../Context/UserContext.js'
 import { NotificationContext } from '../../Context/NotificationContext.js'
 import { FriendRequestContext } from '../../Context/FriendRequestContext.js'
+import { SocketContext } from '../../Context/SocketContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ErrorBanner from '../Error/index.jsx'
-import io from 'socket.io-client'
 const emptyIcon = require('../../../assets/fist-bump.png')
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
@@ -20,34 +20,33 @@ const FriendRequests = () => {
 
   const friendRequestContextValue = useContext(FriendRequestContext)
   const { friendRequests, setFriendRequests } = friendRequestContextValue
+
+  const socket = useContext(SocketContext)
   const [refreshing, setRefreshing] = useState(false)
   const navigation = useNavigation()
   let pendingRequests = []
   if (user) pendingRequests = user.pendingFriendRequests.filter(request => request.receiver === user._id)
 
-  const [socket, setSocket] = useState(null)
-
 
   useEffect(() => {
-    if (user) {
-      const newSocket = io.connect('http://192.168.0.101:3001', {
-        query: { userId: user._id }
-      })
-
-      newSocket.on('friendRequest', (newFriendRequest) => {
+    if (user && socket) {
+      socket.on('friendRequest', (newFriendRequest) => {
         console.log('listening to request', newFriendRequest)
         setFriendRequests(prevRequests =>  [...prevRequests, newFriendRequest])
       })
 
-      newSocket.on('friendRequestSent', (data) => {
+      socket.on('friendRequestSent', (data) => {
         fetchRequests()
       })
-
-      setSocket(newSocket)
     }
 
-    //return () => socket && socket.close()
-  }, [user])
+    return () => {
+      if (socket) {
+        socket.off('friendRequest')
+        socket.off('friendRequestSent')
+      }
+    }
+  }, [user, socket])
 
   const fetchRequests = async () => {
     setRefreshing(true)

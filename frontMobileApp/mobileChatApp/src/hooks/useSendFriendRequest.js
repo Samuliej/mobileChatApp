@@ -1,24 +1,22 @@
-import { useState, useEffect } from 'react'
-import io from 'socket.io-client'
+import { useState, useEffect, useContext } from 'react'
+import { SocketContext } from '../Context/SocketContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const useSendFriendRequest = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [socket, setSocket] = useState(null)
+  const socket = useContext(SocketContext)
   const [friendRequests, setFriendRequests] = useState([])
 
   useEffect(() => {
-    const newSocket = io.connect('http://192.168.0.101:3001') // replace with your server address
-    setSocket(newSocket)
+    if (socket) {
+      socket.on('friendRequestAccepted', (data) => {
+        setFriendRequests(prevRequests => [...prevRequests, data])
+      })
 
-    newSocket.on('friendRequestAccepted', (data) => {
-      console.log('useSendFR: ', data)
-      setFriendRequests(prevRequests => [...prevRequests, data])
-    })
-
-    return () => newSocket.close()
-  }, [])
+      return () => socket.off('friendRequestAccepted')
+    }
+  }, [socket])
 
   const sendFriendRequest = async (username) => {
     setLoading(true)
