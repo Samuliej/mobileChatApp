@@ -3,7 +3,7 @@ import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator } from 'rea
 import { UserContext } from '../../Context/UserContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
-import io from 'socket.io-client'
+import { SocketContext } from '../../Context/SocketContext.js'
 const emptyIcon = require('../../../assets/fist-bump.png')
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
@@ -12,7 +12,7 @@ const Friends = () => {
   const [friends, setFriends] = useState([])
   const [loading, setLoading] = useState(true)
   const navigation = useNavigation()
-  const socket = io('http://192.168.0.104:3001')
+  const socket = useContext(SocketContext)
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -32,6 +32,7 @@ const Friends = () => {
 
     // Listen for the 'friendRequestAccepted' event
     socket.on('friendRequestAccepted', async (friendship) => {
+      console.log('Friends/friendRequestAccepted', friendship)
       // Check if the current user is involved in the friendship
       if (friendship.user1._id === user._id || friendship.user2._id === user._id) {
         // Get the new friend's user object
@@ -49,7 +50,7 @@ const Friends = () => {
       socket.disconnect()
     }
 
-  }, [user ? user.friends : null])
+  }, [user ? user.friends : null, socket])
 
   if (loading) {
     return (
