@@ -109,21 +109,11 @@ router.get('/api/conversations/:convoId', async (req, res) => {
       .populate('participants')
       .populate({
         path: 'messages',
-        populate: {
-          path: 'sender receiver',
-          model: 'User'
-        }
       })
-      .populate({
-        path: 'lastRead',
-        populate: {
-          path: 'user message',
-          model: 'User Message'
-        }
-
-      })
+    console.log('fetched c')
     res.json(convo)
   } catch (error) {
+    console.log('error fetching conversation')
     res.status(500).json({ error: 'Error fetching conversation' })
   }
 })

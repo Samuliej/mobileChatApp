@@ -32,7 +32,6 @@ const Friends = () => {
 
     // Listen for the 'friendRequestAccepted' event
     socket.on('friendRequestAccepted', async (friendship) => {
-      console.log('Friends/friendRequestAccepted', friendship)
       // Check if the current user is involved in the friendship
       if (friendship.user1._id === user._id || friendship.user2._id === user._id) {
         // Get the new friend's user object

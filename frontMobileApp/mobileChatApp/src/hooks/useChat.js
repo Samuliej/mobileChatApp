@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import api from '../api.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createWebSocketConnection } from '../wsApi.js'
+import { SocketContext } from '../Context/SocketContext.js'
 
 
 const useChat = (user, conversationId, initialFriend) => {
@@ -10,14 +10,7 @@ const useChat = (user, conversationId, initialFriend) => {
   const [newMessage, setNewMessage] = useState('')
   const [inputHeight, setInputHeight] = useState(0)
   const [loading, setLoading] = useState(false)
-  const ws = useRef(null)
-
-  useEffect(() => {
-    ws.current = createWebSocketConnection('ws://192.168.0.101:3003')
-    return () => {
-      ws.current.close()
-    }
-  }, [])
+  const socket = useContext(SocketContext)
 
   useEffect(() => {
     setLoading(true)
@@ -25,35 +18,28 @@ const useChat = (user, conversationId, initialFriend) => {
   }, [conversationId, user])
 
   useEffect(() => {
-    if (ws.current) {
-      ws.current.onmessage = (message) => {
-        const messageData = JSON.parse(message.data)
-        if (messageData.conversationId === conversationId) {
-          console.log(user._id)
-          console.log(messageData)
-          // another user sent a message to the conversation
-          if (messageData.message.sender !== user._id) {
-            const newMessage = messageData.message
-            setConversation(prevConversation => {
-              const existingMessageIndex = prevConversation.messages.findIndex(m => m._id === newMessage._id)
-              if (existingMessageIndex === -1) {
-                // The received message is not in the conversation, add it as a new message
-                return {...prevConversation, messages: [...prevConversation.messages, newMessage]}
-              }
-              return prevConversation
-            })
-          }
+    socket.on('message', (newMessage) => {
+      setConversation((prevConversation) => {
+        return {
+          ...prevConversation,
+          messages: [...prevConversation.messages, newMessage]
         }
-      }
+      })
+    })
+
+    socket.emit('newMessage', { conversationId, message: newMessage })
+
+    return () => {
+      socket.off('message')
     }
-  }, [ws, conversation])
+  }, [socket])
 
   const fetchConversation = async () => {
     const response = await api.get(`/api/conversations/${conversationId}`)
     const fetchedConversation = await response.data
 
     // Sort the messages
-    const sortedMessages = fetchedConversation.messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    const sortedMessages = fetchedConversation.messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
 
     if (user) {
       const friend = fetchedConversation.participants.find(participant => participant._id !== user._id)
@@ -65,23 +51,17 @@ const useChat = (user, conversationId, initialFriend) => {
 
 
   const sendMessage = async () => {
-    if (ws.current.readyState === WebSocket.OPEN) {
-      const userToken = await AsyncStorage.getItem('userToken')
-      const messageContent = {
-        content: newMessage,
-        conversationId,
-        token: userToken,
-        sender: user._id,
-        timestamp: Date.now(),
-      }
-      const messageData = JSON.stringify(messageContent)
-      ws.current.send(messageData)
-
-      // Add the sent message to the conversation immediately
-      setConversation(prevConversation => {
-        return {...prevConversation, messages: [...prevConversation.messages, {...messageContent, sender: user}]}
-      })
+    const userToken = await AsyncStorage.getItem('userToken')
+    const messageContent = {
+      content: newMessage,
+      conversationId,
+      token: userToken,
+      receiver: friend._id,
+      sender: user._id,
+      timestamp: Date.now(),
     }
+    socket.emit('message', messageContent)
+
     setNewMessage('')
   }
 

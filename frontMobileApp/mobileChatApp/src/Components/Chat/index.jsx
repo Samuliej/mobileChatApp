@@ -49,10 +49,12 @@ const MessageItem = ({ item, user }) => {
     minute: '2-digit'
   })
 
+  console.log('fdasfdsfasdfdsfdsafdsafsafdsffdasdsaf',item)
+  const isMyMessage = user && item.sender === user._id
 
   return (
-    <View style={user && item.sender._id === user._id ? styles.myMessageContainer : styles.messageContainer}>
-      <View key={item._id} style={[styles.messageItem, user && item.sender._id === user._id ? styles.myMessage : styles.friendMessage]}>
+    <View style={isMyMessage ? styles.myMessageContainer : styles.messageContainer}>
+      <View key={item._id} style={[styles.messageItem, user && item.sender === user._id ? styles.myMessage : styles.friendMessage]}>
         <Text>{item.content}</Text>
       </View>
       <Text style={styles.timestamp}>{formattedDate} {item.status}</Text>

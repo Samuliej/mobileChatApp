@@ -24,18 +24,15 @@ const RootNavigator = () => {
       }
 
       socket.on('friendRequest', (newFriendshipToFront, callback) => {
-        console.log('Received new friend request', newFriendshipToFront)
         fetchTokenAndUpdateUser()
         callback()
       })
 
       socket.on('friendRequestSent', (newFriendship) => {
-        console.log('Friend request sent', newFriendship)
         fetchTokenAndUpdateUser()
       })
 
       socket.on('friendRequestAccepted', (updatedFriendship) => {
-        console.log('Friend request accepted', updatedFriendship)
         fetchTokenAndUpdateUser()
       })
 

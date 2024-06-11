@@ -14,6 +14,7 @@ const Conversations = ({ navigation }) => {
   const { conversations, loading } = useConversations(user)
   const [selectedConversation, setSelectedConversation] = useState(null)
   const [deleteConversation, isLoading, error] = useDeleteConversation()
+  const [sortedConversations, setSortedConversations] = useState([])
 
   if (loading) {
     // Display a loading screen when loading
@@ -56,22 +57,24 @@ const Conversations = ({ navigation }) => {
     setSelectedConversation(null)
   }
 
-  // Also filter out undefined conversations
-  const sortedConversations = conversations
-    .filter(conversation => conversation !== undefined)
-    .sort((a, b) => {
-      if (!a.timestamp || !b.timestamp) {
-        return 0
-      }
-      return new Date(b.timestamp) - new Date(a.timestamp)
-    })
+  useEffect(() => {
+    const sorted = conversations
+      .filter(conversation => conversation !== undefined)
+      .sort((a, b) => {
+        if (!a.timestamp || !b.timestamp) {
+          return 0
+        }
+        return new Date(b.timestamp) - new Date(a.timestamp)
+      })
+
+    setSortedConversations(sorted)
+  }, [conversations])
 
 
   return (
     <View style={styles.container}>
       {selectedConversation && (
         <View style={styles.redBar}>
-          {console.log('Selected conversation', selectedConversation.friend.name)}
           <Text style={styles.redBarText}>Remove conversation with {selectedConversation.friend.name}?</Text>
           <Pressable onPress={handleRemoveConversation}>
             <Text style={[styles.redBarText, { borderWidth: 1, borderColor: '#000', borderRadius: 5, padding: 3 }]}>Remove</Text>
@@ -86,7 +89,6 @@ const Conversations = ({ navigation }) => {
           data={sortedConversations}
           keyExtractor={item => item && item._id ? item._id : ''}
           renderItem={({ item }) => item && (
-            console.log(item),
             <Pressable
               style={styles.conversationItem}
               onPress={() => {

@@ -4,6 +4,8 @@ const config = require('./utils/config')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const websocketHandler = require('./routes/websockethandler')
+const Conversation = require('./models/Conversation')
+const Message = require('./models/Message')
 const socketIo = require('socket.io')
 const User = require('./models/User')
 const Friendship = require('./models/Friendship')
@@ -66,14 +68,7 @@ io.on('connection', async (socket) => {
   console.log('a user connected')
   const socketId = socket.id
   const userId = socket.handshake.query.userId
-  console.log('userid', userId)
-  console.log('socketId', socketId)
-  userSocketIds[userId] = socket.id
-
-  console.log(userSocketIds)
-
-
-//  console.log('io sockets', io.sockets.sockets)
+  userSocketIds[userId] = socketId
 
   socket.on('sendFriendRequest', async (data) => {
     try {
@@ -178,6 +173,60 @@ io.on('connection', async (socket) => {
     } catch (error) {
       console.log('Error accepting friend request:', error)
       socket.emit('error', { error: 'Error accepting friend request' })
+    }
+  })
+
+  socket.on('message', async (message) => {
+    const messageData = message
+    const currentUser = validateToken(messageData.token)
+
+    console.log(message)
+
+    if (!currentUser) {
+      console.log('Authentication required sending a message')
+      socket.emit('error', { error: 'Authentication required' })
+    }
+
+    const conversation = await Conversation.findById(messageData.conversationId)
+    const isNewConvo = conversation.messages.length === 0
+
+    if (!conversation) {
+      console.log('conversation not found')
+      socket.emit('error', { error: 'Conversation not found' })
+    }
+
+    let newMessage
+
+    try {
+      newMessage = new Message({
+        sender: messageData.sender,
+        receiver: messageData.receiver,
+        content: messageData.content,
+        timestamp: new Date().toISOString(),
+        conversationId: conversation._id
+      })
+
+      await newMessage.save()
+
+    } catch (error) {
+      console.log('something went wrong creating new message')
+      socket.emit('error', { error: 'Something went wrong creating new message' })
+    }
+
+    try {
+      conversation.messages.push(newMessage._id)
+
+      await conversation.save()
+    } catch (error) {
+      console.log('something went wrong updating the conversation')
+      socket.emit('error', { error: 'Something went wrong updating the conversation'})
+    }
+
+    io.to(userSocketIds[messageData.sender]).emit('message', newMessage)
+    io.to(userSocketIds[messageData.receiver]).emit('message', newMessage)
+    if (isNewConvo) {
+      console.log('new convo')
+      io.to(userSocketIds[messageData.receiver]).emit('newConversation', conversation)
     }
   })
 

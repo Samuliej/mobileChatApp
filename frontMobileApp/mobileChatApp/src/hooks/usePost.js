@@ -10,8 +10,6 @@ const usePost = () => {
     setLoading(true)
     setError(null)
 
-    console.log('author', author.user)
-
     const authToken = await AsyncStorage.getItem('userToken')
 
     const formData = new FormData()

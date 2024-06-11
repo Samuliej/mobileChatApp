@@ -27,8 +27,6 @@ const useGetCurrentUser = () => {
           'Authorization': `Bearer ${token}`
         }
       })
-      console.log('user')
-      console.log(response.data)
       setUser(response.data)
       setLoading(false)
       return user

@@ -31,7 +31,6 @@ const useSignUp = () => {
       })
 
       setLoading(false)
-      console.log(res.data)
       return res.data
     } catch (err) {
       setLoading(false)

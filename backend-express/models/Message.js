@@ -18,6 +18,10 @@ const schema = new mongoose.Schema({
     type: String,
     required: true
   },
+  conversationId: {
+    type: mongoose.Schema.Types.ObjectId, ref: 'Conversation',
+    requried: true
+  }
 })
 
 module.exports = mongoose.model('Message', schema)

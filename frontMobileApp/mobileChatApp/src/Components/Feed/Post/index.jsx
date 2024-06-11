@@ -89,7 +89,6 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
       {commentsOpen && (
         <View style={styles.commentsSection}>
           {post.comments.map((comment) => (
-            console.log(comment),
             <View key={comment._id} style={styles.commentContainer}>
               <Text style={styles.commentUser}>{comment.user.username}</Text>
               <Text style={styles.commentContent}>{comment.content}</Text>
