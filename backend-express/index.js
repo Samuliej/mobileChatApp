@@ -3,7 +3,6 @@ const bodyParser = require('body-parser')
 const config = require('./utils/config')
 const mongoose = require('mongoose')
 const cors = require('cors')
-const websocketHandler = require('./routes/websockethandler')
 const Conversation = require('./models/Conversation')
 const Message = require('./models/Message')
 const socketIo = require('socket.io')
@@ -17,6 +16,7 @@ const putRoutes = require('./routes/put')
 const deleteRoutes = require('./routes/delete')
 
 
+// Configure the correct Mongodb url
 let MONGODB_URI
 if (process.env.NODE_ENV !== 'test') {
   MONGODB_URI = config.MONGODB_URI
@@ -24,13 +24,12 @@ if (process.env.NODE_ENV !== 'test') {
   MONGODB_URI = config.MONGODB_TEST_URI
 }
 
-console.log('connecting to', MONGODB_URI)
+console.log('connecting to MongoDB')
 
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
     console.log('Connected to MongoDB')
-    console.log(MONGODB_URI)
   })
   .catch((error) => {
     console.log('error connecting to MongoDB: ', error)
@@ -49,9 +48,8 @@ app.use(putRoutes)
 app.use(deleteRoutes)
 
 const port = config.PORT || 3000
-const wsPort = config.WS_PORT || 3002
-//const wsIoPort = config.WS_IO_PORT || 3001
 
+// Function for validating a json webtoken
 const validateToken = (token) => {
   try {
     const decoded = jwt.verify(token, config.JWT_SECRET)
@@ -62,20 +60,22 @@ const validateToken = (token) => {
   }
 }
 
+// container for userId's and their corresponding sockets id's
 const userSocketIds = {}
 
+// handle websocket activity with socket.io
 io.on('connection', async (socket) => {
   console.log('a user connected')
   const socketId = socket.id
   const userId = socket.handshake.query.userId
+  // Store user id and the socket id as key-value pair
   userSocketIds[userId] = socketId
 
+  // Handles sending friend requests
   socket.on('sendFriendRequest', async (data) => {
     try {
       const { username: friendUsername, token } = data
       const currentUser = validateToken(token)
-
-      console.log('currentUser:', currentUser)
 
       if (!currentUser) {
         console.log('Authentication required')
@@ -86,8 +86,6 @@ io.on('connection', async (socket) => {
       const user = await User.findOne({ _id: currentUser.id })
       const receiver = await User.findOne({ username: friendUsername })
 
-      console.log('sending friend request to:', receiver.username)
-
       let existingFriendship = await Friendship.findOne({
         $or: [
           { sender: currentUser._id, receiver: receiver._id },
@@ -95,16 +93,21 @@ io.on('connection', async (socket) => {
         ]
       })
 
+      // If a friendship already exists, create an error
       if (existingFriendship && existingFriendship.status === 'PENDING') {
         socket.emit('error', { error: 'Friend request already sent' })
         return
       }
 
+      // If an friendship is declined, change it back to pending
+      // I'll later decide what to do with declined friendships
       if (existingFriendship && existingFriendship.status === 'DECLINED') {
         existingFriendship.status = 'PENDING'
         await existingFriendship.save()
         socket.emit('friendRequestUpdated', existingFriendship)
-      } else {
+      }
+      // Else create a new friendship
+      else {
         const newFriendship = new Friendship({
           sender: user._id,
           receiver: receiver._id,
@@ -113,18 +116,20 @@ io.on('connection', async (socket) => {
 
         await newFriendship.save()
 
+        // Push the friendship to both of the user's pending requests
         user.pendingFriendRequests.push(newFriendship._id)
         await user.save()
 
         receiver.pendingFriendRequests.push(newFriendship._id)
         await receiver.save()
 
+        // Emit the new friendship to catch on the frontend
         socket.emit('friendRequestSent', newFriendship)
 
         const newFriendshipToFront = { ...newFriendship._doc, userObj: user }
 
         const receiverSocketId = userSocketIds[receiver._id]
-        console.log('receiverSocketId sending friend request', receiverSocketId)
+
         io.sockets.sockets.get(receiverSocketId).emit('friendRequest', newFriendshipToFront, (error) => {
           if (error) {
             console.error('Error sending friend request:', error)
@@ -139,6 +144,8 @@ io.on('connection', async (socket) => {
     }
   })
 
+
+  // Handling accepting friend requests with socket
   socket.on('acceptFriendRequest', async (data) => {
     try {
       const { friendshipId, token } = data
@@ -158,6 +165,7 @@ io.on('connection', async (socket) => {
       friendship.status = 'ACCEPTED'
       await friendship.save()
 
+      // Update the user's and friend's friend list
       const user = await User.findById(currentUser.id)
       user.friends.push(friendship.sender)
       await user.save()
@@ -176,11 +184,11 @@ io.on('connection', async (socket) => {
     }
   })
 
+
+  // Handle messages with socket
   socket.on('message', async (message) => {
     const messageData = message
     const currentUser = validateToken(messageData.token)
-
-    console.log(message)
 
     if (!currentUser) {
       console.log('Authentication required sending a message')
@@ -188,6 +196,7 @@ io.on('connection', async (socket) => {
     }
 
     const conversation = await Conversation.findById(messageData.conversationId)
+    // If no messages, it's a new conversation
     const isNewConvo = conversation.messages.length === 0
 
     if (!conversation) {
@@ -222,10 +231,11 @@ io.on('connection', async (socket) => {
       socket.emit('error', { error: 'Something went wrong updating the conversation'})
     }
 
+    // Broadcast the messages to the sender and receiver
     io.to(userSocketIds[messageData.sender]).emit('message', newMessage)
     io.to(userSocketIds[messageData.receiver]).emit('message', newMessage)
     if (isNewConvo) {
-      console.log('new convo')
+      // If it's a new conversation, broadcast the conversation to the receiver
       io.to(userSocketIds[messageData.receiver]).emit('newConversation', conversation)
     }
   })
@@ -235,7 +245,6 @@ io.on('connection', async (socket) => {
     delete userSocketIds[userId]
   })
 })
-//websocketHandler(server, wsPort)
 
 if (config.NODE_ENV !== 'test') {
   server.listen(port, () => {

@@ -1,5 +1,11 @@
 require('dotenv').config()
 
+/*
+
+  This file contains necessary variables that are created from the env
+
+*/
+
 let PORT = process.env.PORT
 let WS_PORT = process.env.WS_PORT
 let MONGODB_URI = process.env.MONGODB_URI

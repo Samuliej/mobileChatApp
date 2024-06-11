@@ -1,6 +1,11 @@
 const crypto = require('crypto')
-
 const key = crypto.randomBytes(32).toString('hex')
+
+/*
+
+  Middle ware for encrypting and decrypting messages
+
+*/
 
 const encryptMessage = (message, key) => {
   const iv = crypto.randomBytes(16)

@@ -1,5 +1,13 @@
 const mongoose = require('mongoose')
 
+/*
+
+  Mongoose Schema for a single message.
+  The message contains the sender and the receiver of the message,
+  content, timestamp and the conversationId that the message belongs to.
+
+*/
+
 const schema = new mongoose.Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId, ref: 'User',

@@ -2,6 +2,12 @@ const express = require('express')
 const router = express.Router()
 const Conversation = require('../models/Conversation')
 
+/*
+
+  routes for delete operations
+
+*/
+
 // Delete a conversation
 router.delete('/api/conversations/:id', async (req, res) => {
   console.log('deleting conversation')

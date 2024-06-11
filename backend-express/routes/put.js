@@ -6,6 +6,12 @@ const Post = require('../models/Post')
 
 const authMiddleware = require('../middlewares/authMiddlewares')
 
+/*
+
+  Routes for put operations
+
+*/
+
 // Decline friend request
 router.put('/api/declineFriendRequest/:friendshipId', authMiddleware, async (req, res) => {
   console.log('Declining friend request')

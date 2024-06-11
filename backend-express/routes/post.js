@@ -16,21 +16,21 @@ const upload = multer({ dest: 'uploads/' })
 
 const cloudinary = require('../cloudinary')
 
+/*
+
+  Routes for post operations
+
+*/
+
 
 // Create a user
 router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
-
-  console.log('Registering user')
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
     let result = null
     if (req.file) {
       result = await cloudinary.uploader.upload(req.file.path)
     }
-
-    console.log(req.body)
-    console.log('Registering')
-
 
     const newUser = new User({
       username: req.body.username,
@@ -83,7 +83,6 @@ router.post('/api/login', async (req, res) => {
     const token = jwt.sign(userForToken, process.env.JWT_SECRET)
     res.json({ token })
   } catch (error) {
-    //console.error(error)
     console.error(req.body)
     res.status(500).json({ error: 'Something went wrong signing in' })
   }
@@ -106,8 +105,6 @@ router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
         { sender: receiver._id, receiver: currentUser._id }
       ]
     })
-
-    console.log(existingFriendship)
 
     if (existingFriendship && existingFriendship.status === 'PENDING') {
       return res.status(400).json({ error: 'Friend request already sent' })
@@ -154,8 +151,6 @@ router.post('/api/startConversation', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'User not found' })
   }
 
-  console.log(friend)
-
   let conversation = await Conversation.findOne({
     participants: {
       $all: [currentUser._id, friend._id]
@@ -187,76 +182,6 @@ router.post('/api/startConversation', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'Person is not currently on your friend list' })
   }
 })
-
-/*
-// Send message
-router.post('/api/sendMessage', authMiddleware, async (req, res) => {
-  console.log('sending message')
-  const currentUser = req.currentUser
-  console.log(currentUser)
-  if (!currentUser) {
-    return res.status(400).json({ error: 'Authentication required' })
-  }
-
-  console.log('Authentication successful')
-
-  const conversation = await Conversation.findById(req.body.conversationId)
-
-  if (!conversation) {
-    return res.status(400).json({ error: 'Conversation not found' })
-  }
-
-  console.log('Conversation found')
-
-  if (conversation.participants.includes(currentUser._id)) {
-    const currentDate = new Date()
-    const timestampString = currentDate.toISOString()
-
-    const newMessage = new Message({
-      content: req.body.content,
-      sender: currentUser._id.toString(),
-      receiver: conversation.participants.find(participant => participant.toString() !== currentUser._id.toString()),
-      timestamp: timestampString
-    })
-
-    conversation.messages.push(newMessage._id)
-
-    try {
-      await newMessage.save()
-      await conversation.save()
-      await conversation.populate([
-        {
-          path: 'messages',
-          populate: {
-            path: 'sender receiver',
-            model: 'User',
-            select: '-password'
-          }
-        },
-        {
-          path: 'lastRead',
-          populate: {
-            path: 'user message',
-            model: 'User Message'
-          }
-        }
-      ])
-
-      return res.status(201).json({
-        conversation: conversation,
-        message: newMessage
-      })
-    } catch (error) {
-      console.error(error)
-      return res.status(500).json({ error: `Sending the message failed: ${error.message}` })
-    }
-  } else {
-    console.log('Not a participant')
-    return res.status(400).json({ error: 'You are not a participant in this conversation' })
-  }
-})
-
-*/
 
 // Mark message as read
 router.post('/api/markAsRead', authMiddleware, async (req, res) => {
@@ -291,7 +216,7 @@ router.post('/api/markAsRead', authMiddleware, async (req, res) => {
 })
 
 
-// Update lastRead
+// Update last read message
 router.post('/api/updateLastRead', authMiddleware, async (req, res) => {
   const currentUser = req.currentUser
   const { conversationId, messageId } = req.body
@@ -339,9 +264,6 @@ router.post('/api/posts', authMiddleware, upload.single('image'), async (req, re
     result = await cloudinary.uploader.upload(req.file.path)
   }
 
-  console.log('author', author)
-  console.log('content', content)
-
   const newPost = new Post({
     content: {
       text: content,
@@ -382,9 +304,7 @@ router.post('/api/posts/:postId/comments', authMiddleware, async (req, res) => {
 
   try {
     const savedComment = await newComment.save()
-
     const populatedComment = await Comment.findById(savedComment._id).populate('user', 'username')
-
 
     const post = await Post.findById(postId)
     post.comments.push(savedComment._id)

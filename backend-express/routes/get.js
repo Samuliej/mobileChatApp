@@ -3,9 +3,13 @@ const router = express.Router()
 const User = require('../models/User')
 const Conversation = require('../models/Conversation')
 const Friendship = require('../models/Friendship')
-const Post = require('../models/Post')
-
 const authMiddleware = require('../middlewares/authMiddlewares')
+
+/*
+
+  routes for get operations.
+
+*/
 
 // Fetch all users
 router.get('/api/users', async (req, res) => {
@@ -110,7 +114,7 @@ router.get('/api/conversations/:convoId', async (req, res) => {
       .populate({
         path: 'messages',
       })
-    console.log('fetched c')
+
     res.json(convo)
   } catch (error) {
     console.log('error fetching conversation')
@@ -153,7 +157,7 @@ router.get('/api/me', authMiddleware, async (req, res) => {
   res.json(user)
 })
 
-// Fetch friend requests;
+// Fetch friend requests
 router.get('/api/friendRequests', authMiddleware, async (req, res) => {
   const currentUser = req.currentUser
   if (!currentUser) {
@@ -163,13 +167,14 @@ router.get('/api/friendRequests', authMiddleware, async (req, res) => {
     const friendRequests = await Friendship.find({
       receiver: currentUser._id,
       status: 'PENDING'
-    }).populate('sender', 'username') // populate the sender field with the username of the sender
+    }).populate('sender', 'username')
 
     res.json(friendRequests)
   } catch (error) {
     res.status(500).json({ error: 'Error fetching friend requests' })
   }
 })
+
 
 // Fetch user's posts
 router.get('/api/posts/user/:userId', authMiddleware, async (req, res) => {
@@ -199,8 +204,8 @@ router.get('/api/posts/user/:userId', authMiddleware, async (req, res) => {
     console.error(error)
     res.status(500).json({ error: 'Error fetching user posts' })
   }
-
 })
+
 
 // Fetch friends' posts
 router.get('/api/posts/friends/:userId', authMiddleware, async (req, res) => {

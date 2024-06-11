@@ -1,5 +1,17 @@
 const mongoose = require('mongoose')
 
+/*
+
+  Mongoose Schema for a single User.
+  The user contains mandatory fields, username, password an name.
+  There are also non-mandatory fields: profile picture, phone and city.
+
+  Inside the user are also fields for
+  pending friend requests, friends, converastions that the user is a part of and
+  the posts that the user has made.
+
+*/
+
 const schema = new mongoose.Schema({
   username: {
     type: String,
@@ -12,14 +24,14 @@ const schema = new mongoose.Schema({
     required: true,
     minlength: 5
   },
-  profilePicture: {
-    type: String,
-    required: false
-  },
   name: {
     type: String,
     required: true,
     minlength: 3
+  },
+  profilePicture: {
+    type: String,
+    required: false
   },
   phone: {
     type: String,

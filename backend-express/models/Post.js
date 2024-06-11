@@ -1,5 +1,14 @@
 const mongoose = require('mongoose')
 
+/*
+
+  Mongoose Schema for a single Post.
+  The post contains content, which includes text content and image content.
+  There are also fields for comments, likes and fields for author and a
+  timestamp when it's created
+
+*/
+
 const postSchema = new mongoose.Schema({
   content: {
     text: {

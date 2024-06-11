@@ -1,6 +1,6 @@
-// cloudinary.js
-
 const cloudinary = require('cloudinary').v2
+
+// Initialize cloudinary for uploading media
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
