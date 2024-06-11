@@ -4,20 +4,27 @@ import { SocketContext } from '../Context/SocketContext.js'
 import { UserContext } from '../Context/UserContext.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+/*
+
+  Custom hook for fetching conversations and updating them in real-time.
+
+*/
+
 const useConversations = (user) => {
   const [conversations, setConversations] = useState([])
   const [loading, setLoading] = useState(false)
   const socket = useContext(SocketContext)
   const { updateUser } = useContext(UserContext)
 
+  // Fetch and update the conversations
   const fetchAndUpdate = async () => {
     const token = await AsyncStorage.getItem('userToken')
     await updateUser(token)
-    await fetchFriendData() // Fetch and update the conversations
+    await fetchFriendData()
   }
 
   useEffect(() => {
-    socket.on('newConversation', ({ conversationId, message }) => {
+    socket.on('newConversation', () => {
       fetchAndUpdate()
     })
 
@@ -27,6 +34,7 @@ const useConversations = (user) => {
   }, [socket])
 
   useEffect(() => {
+    // Listens to new messages and updates the conversations
     socket.on('message', (newMessage) => {
       setConversations((prevConversations) => {
         return prevConversations.map((conversation) => {
@@ -53,6 +61,7 @@ const useConversations = (user) => {
     }
   }, [user, socket])
 
+  // Function for fetching messages and friend's data
   const fetchFriendData = async () => {
     const updatedConversations = await Promise.all(user.conversations.map(async (conversation) => {
       const friendId = conversation.participants.find(id => id !== user._id)

@@ -12,10 +12,18 @@ import { UserContext } from '../../Context/UserContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import useIsUsernameTaken from '../../hooks/useIsUsernameTaken'
 
+/*
+
+  Component for handling signing up. The user enters his information,
+  username, passwords etc. The user can also upload his own profile picture.
+
+*/
+
 
 const width = Dimensions.get('window').width
 const height = Dimensions.get('window').height
 
+// Schema for validating the fields
 const validationSchema = yup.object().shape({
   username: yup
     .string()
@@ -30,6 +38,8 @@ const validationSchema = yup.object().shape({
     .required('Name is required'),
 })
 
+
+//
 const SignUp =  () => {
   const { signUp, error: signUpError, loading } = useSignUp()
   const { signIn, error: signInError } = useSignIn()
@@ -80,6 +90,7 @@ const SignUp =  () => {
     clearTimeout(timeout)
   }, [loading])
 
+  // Function for selecting an image to upload
   const selectImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -119,6 +130,7 @@ const SignUp =  () => {
     }
   }
 
+  // Handle signing up
   const handleSignUp = async () => {
     if ((passwordsMatch && !usernameError && !passwordError && !nameError)
         && (username && password && name && confirmPassword)) {
@@ -276,6 +288,8 @@ const SignUp =  () => {
     </KeyboardAwareScrollView>
   )
 }
+
+// Styles
 
 const styles = StyleSheet.create({
   container: {

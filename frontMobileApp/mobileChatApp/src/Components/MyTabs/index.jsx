@@ -4,8 +4,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import Conversations from '../Conversations/index.jsx'
 import FeedScreen from '../Feed/index.jsx'
 
-const Tab = createBottomTabNavigator()
+/*
 
+  Navigator for switching between the two main components Conversations and Feed
+
+*/
+
+const Tab = createBottomTabNavigator()
 
 const MyTabs = () => {
   return (

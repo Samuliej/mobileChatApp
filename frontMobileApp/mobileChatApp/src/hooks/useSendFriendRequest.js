@@ -2,12 +2,19 @@ import { useState, useEffect, useContext } from 'react'
 import { SocketContext } from '../Context/SocketContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+/*
+
+  Custom hook for sending friend requests in real-time.
+
+*/
+
 const useSendFriendRequest = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const socket = useContext(SocketContext)
   const [friendRequests, setFriendRequests] = useState([])
 
+  // Listen for accepted friend requests and update the friend requests
   useEffect(() => {
     if (socket) {
       socket.on('friendRequestAccepted', (data) => {
@@ -18,6 +25,8 @@ const useSendFriendRequest = () => {
     }
   }, [socket])
 
+
+  // Function for sending a single friend request
   const sendFriendRequest = async (username) => {
     setLoading(true)
     setError(null)
@@ -32,6 +41,7 @@ const useSendFriendRequest = () => {
     }
 
     try {
+      // Friend requests are sent via websocket
       socket.emit('sendFriendRequest', { username, token })
 
       return new Promise((resolve, reject) => {

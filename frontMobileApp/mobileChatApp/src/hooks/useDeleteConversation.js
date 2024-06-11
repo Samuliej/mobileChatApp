@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import api from '../api'
 
+/*
+
+  Custom hook for deleting a single conversation between users.
+
+*/
+
 const useDeleteConversation = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)

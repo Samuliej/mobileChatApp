@@ -11,6 +11,14 @@ import ErrorBanner from '../Error/index.jsx'
 const emptyIcon = require('../../../assets/fist-bump.png')
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
+/*
+
+  Component for displaying the user's reveived friend requests.
+  The user can either deny or accept the friend request.
+  The component is updated in real-time with socket.io
+
+*/
+
 const FriendRequests = () => {
   const userContextValue = useContext(UserContext)
   const { user, updateUserPendingRequests, updateUser } = userContextValue
@@ -27,6 +35,7 @@ const FriendRequests = () => {
   let pendingRequests = []
   if (user) pendingRequests = user.pendingFriendRequests.filter(request => request.receiver === user._id)
 
+  // Function for fetching friend requests
   const fetchRequests = async () => {
     setRefreshing(true)
     if (user) {
@@ -60,6 +69,7 @@ const FriendRequests = () => {
     return () => clearTimeout(timeout)
   }, [notification])
 
+  // Function for accepting friend requests
   const handleAccept = async (username, friendshipId) => {
     try {
       const userToken = await AsyncStorage.getItem('userToken')
@@ -83,6 +93,8 @@ const FriendRequests = () => {
     }
   }
 
+
+  // Function for handling declining friend request
   const handleDecline = (username, friendshipId) => {
     Alert.alert(
       "Decline Friend Request",
@@ -175,6 +187,8 @@ const FriendRequests = () => {
     </ScrollView>
   )
 }
+
+// Styles
 
 const styles = StyleSheet.create({
   container: {

@@ -1,6 +1,11 @@
-// useIsUsernameTaken.js
 import { useState } from 'react'
 import api from '../api'
+
+/*
+
+  Custom hook for checking whether a username is taken or not
+
+*/
 
 const useIsUsernameTaken = () => {
   const [isLoading, setIsLoading] = useState(false)

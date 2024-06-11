@@ -6,8 +6,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
+/*
+
+  Component for displaying a list of friends of the users who you can start a conversation with.
+
+*/
+
 // TODO: If a conversation exists between the two users, don't create a new one
 // but just navigate to the existing one
+// TODO: group
 
 const NewConversation = () => {
   const { user, updateUser } = useContext(UserContext)
@@ -73,6 +80,8 @@ const NewConversation = () => {
     </View>
   )
 }
+
+//  Styles
 
 const styles = StyleSheet.create({
   container: {

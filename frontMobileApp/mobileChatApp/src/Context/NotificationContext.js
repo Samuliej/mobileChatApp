@@ -1,5 +1,11 @@
 import React, { createContext, useState } from 'react'
 
+/*
+
+  Notification context for displaying notifications
+
+*/
+
 export const NotificationContext = createContext()
 
 export const NotificationProvider = ({ children }) => {

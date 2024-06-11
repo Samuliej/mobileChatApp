@@ -3,6 +3,13 @@ import { UserContext } from './UserContext'
 import io from 'socket.io-client'
 import { HTTP_URL } from '@env'
 
+/*
+
+  The user is connected to a websocket the whole time during using the app.
+  We're passing socket as a context so it can be used at multiple places without
+  needing to open a new socket.
+
+*/
 
 export const SocketContext = createContext()
 

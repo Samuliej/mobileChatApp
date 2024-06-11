@@ -5,6 +5,13 @@ import { Ionicons } from '@expo/vector-icons'
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../../assets/soldier.png'
 
+/*
+
+  Component for displaying a single uploaded post
+  There are options for liking and commenting the post.
+
+*/
+
 
 const Post = ({ post: initialPost, likePost, commentPost, user }) => {
   const [commentsOpen, setCommentsOpen] = useState(false)
@@ -12,6 +19,7 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
   const [post, setPost] = useState(initialPost)
   const likeScale = useRef(new Animated.Value(1)).current
 
+  // Handles submitting a new comment to a post
   const handleCommentSubmit = async () => {
     if (commentText) {
       const newComment = await commentPost(post._id, commentText)
@@ -27,6 +35,7 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
     }
   }
 
+  // Handles liking the post, also animates the icon
   const handleLike = async () => {
     Animated.sequence([
       Animated.timing(likeScale, {
@@ -105,6 +114,8 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
     </View>
   )
 }
+
+// Styles
 
 const styles = StyleSheet.create({
   postContainer: {

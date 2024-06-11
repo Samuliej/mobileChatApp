@@ -13,6 +13,20 @@ import uuid from 'react-native-uuid'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 const defaultBackgroundPicture = require('../../../assets/rm222-mind-14.jpg')
 
+/*
+
+Module for the Chat functionality in the app
+
+1. CustomNavBar: This component displays a navigation bar at the top of the chat screen.
+   It includes a back button and displays the friend's profile picture and username.
+2. MessageItem: This component is responsible for rendering individual messages in the chat.
+   It formats the timestamp of the message and determines whether the message was sent by the current user or a friend.
+3. Chat: This is the main component of the module. It uses the UserContext to access the current user's data and the useChat
+   hook to manage the chat state. It renders the CustomNavBar and a FlatList of MessageItem components.
+   It also includes a TextInput for sending new messages and a send button.
+
+*/
+
 
 const CustomNavBar = ({ navigation, friend }) => {
   const handleBackButton = () => {
@@ -49,7 +63,7 @@ const MessageItem = ({ item, user }) => {
     minute: '2-digit'
   })
 
-  console.log('fdasfdsfasdfdsfdsafdsafsafdsffdasdsaf',item)
+  // Variable for figuring out whether the message is sent by the current user
   const isMyMessage = user && item.sender === user._id
 
   return (
@@ -95,16 +109,6 @@ const Chat = ({ route }) => {
           key={conversationId}
           data={conversation.messages}
           keyExtractor={item => item && item._id ? item._id : uuid.v4()}
-          /*
-          onScroll={({nativeEvent}) => {
-            if (nativeEvent.contentOffset.y === 0) {
-              // User has scrolled to the top, load more messages
-              console.log('load more messages')
-
-            }
-          }}
-          */
-          // Scroll down when opening an conversation
           onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: false })}
           renderItem={({ item }) => <MessageItem item={item} user={user} />}
         />}
@@ -128,6 +132,8 @@ const Chat = ({ route }) => {
 
   )
 }
+
+// Styles
 
 const styles = StyleSheet.create({
   container: {

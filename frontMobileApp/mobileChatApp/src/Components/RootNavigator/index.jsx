@@ -7,6 +7,12 @@ import { SocketContext } from '../../Context/SocketContext.js'
 import { UserContext } from '../../Context/UserContext.js'
 import { FriendRequestContext } from '../../Context/FriendRequestContext.js'
 
+/*
+
+  Component for the main Stack navigator
+
+*/
+
 const RootStack = createStackNavigator()
 
 const RootNavigator = () => {
@@ -23,16 +29,18 @@ const RootNavigator = () => {
         }
       }
 
+      // These 3 listeners handle updating the user whenever a friend request
+      // is sent or accepted
       socket.on('friendRequest', (newFriendshipToFront, callback) => {
         fetchTokenAndUpdateUser()
         callback()
       })
 
-      socket.on('friendRequestSent', (newFriendship) => {
+      socket.on('friendRequestSent', () => {
         fetchTokenAndUpdateUser()
       })
 
-      socket.on('friendRequestAccepted', (updatedFriendship) => {
+      socket.on('friendRequestAccepted', () => {
         fetchTokenAndUpdateUser()
       })
 

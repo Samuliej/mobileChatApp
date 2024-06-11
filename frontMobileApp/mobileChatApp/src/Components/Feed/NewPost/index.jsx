@@ -1,9 +1,16 @@
 import React, { useState, useContext } from 'react'
 import { UserContext } from '../../../Context/UserContext'
-import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Text, Image, Dimensions } from 'react-native'
+import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Text, Image } from 'react-native'
 import usePost from '../../../hooks/usePost'
 import * as ImagePicker from 'expo-image-picker'
 import { MaterialIcons, Ionicons } from '@expo/vector-icons'
+
+/*
+
+  Component for creating new posts.
+  The user can pick an image and enter text for the post to upload.
+
+*/
 
 const NewPost = ({ navigation }) => {
   const [content, setContent] = useState('')
@@ -12,6 +19,7 @@ const NewPost = ({ navigation }) => {
   const user = useContext(UserContext)
   const [creatingPost, setCreatingPost] = useState(false)
 
+  // Handles image selection
   const selectImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -88,6 +96,8 @@ const NewPost = ({ navigation }) => {
     </View>
   )
 }
+
+// Styles
 
 const styles = StyleSheet.create({
   container: {

@@ -9,6 +9,14 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
 // TODO: Implement notifications for new messages on the convo list
 
+/*
+
+  Conversations component. This app displays the ongoing conversations between the current user and
+  his friends. The single conversation component shows the profile picture and the name of the friend,
+  and also it displays the last message in the conversation.
+
+*/
+
 const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const { conversations, loading } = useConversations(user)
@@ -16,8 +24,7 @@ const Conversations = ({ navigation }) => {
   const [deleteConversation, isLoading, error] = useDeleteConversation()
   const [sortedConversations, setSortedConversations] = useState([])
 
-  if (loading) {
-    // Display a loading screen when loading
+  if (loading || isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -25,28 +32,13 @@ const Conversations = ({ navigation }) => {
     )
   }
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        selectedConversation ? (
-          <Ionicons
-            name="trash-outline"
-            size={25}
-            color="#000"
-            style={{ marginRight: 10 }}
-            onPress={handleRemoveConversation}
-          />
-        ) : null
-      ),
-    })
-  }, [selectedConversation])
-
   // Function to handle long press on a conversation item
   const handleLongPress = (conversation) => {
     console.log('long pressed')
     setSelectedConversation(conversation)
   }
 
+  // Function to handle conversation removal
   const handleRemoveConversation = async () => {
     console.log('removing conversation')
     await deleteConversation(selectedConversation._id)
@@ -57,6 +49,7 @@ const Conversations = ({ navigation }) => {
     setSelectedConversation(null)
   }
 
+  // Sort conversations when the conversations change
   useEffect(() => {
     const sorted = conversations
       .filter(conversation => conversation !== undefined)
@@ -84,6 +77,7 @@ const Conversations = ({ navigation }) => {
           </Pressable>
         </View>
       )}
+      {/* Display conversations */}
       {conversations.length > 0 && (
         <FlatList
           data={sortedConversations}
@@ -109,6 +103,7 @@ const Conversations = ({ navigation }) => {
           )}
         />
       )}
+      {/* Icon for entering the view to start new conversations */}
       <Pressable
         style={styles.fab}
         onPress={() => navigation.navigate('New conversation')}
@@ -121,6 +116,8 @@ const Conversations = ({ navigation }) => {
     </View>
   )
 }
+
+// Styles
 
 const styles = StyleSheet.create({
   container: {

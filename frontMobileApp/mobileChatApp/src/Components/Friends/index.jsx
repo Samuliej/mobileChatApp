@@ -7,6 +7,14 @@ import { SocketContext } from '../../Context/SocketContext.js'
 const emptyIcon = require('../../../assets/fist-bump.png')
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
+/*
+
+  Component for displaying all the friends of the user.
+  The component is updated in real-time with socket.io
+  TODO: Implement scrolling
+
+*/
+
 const Friends = () => {
   const { user } = useContext(UserContext)
   const [friends, setFriends] = useState([])
@@ -14,6 +22,7 @@ const Friends = () => {
   const navigation = useNavigation()
   const socket = useContext(SocketContext)
 
+  // Fetch friends in a useEffect
   useEffect(() => {
     const fetchFriends = async () => {
       if (user) {
@@ -45,8 +54,7 @@ const Friends = () => {
     })
 
     return () => {
-      // Disconnect from the socket when the component unmounts
-      socket.disconnect()
+      socket.off('friendRequestAccepted')
     }
 
   }, [user ? user.friends : null, socket])
@@ -85,6 +93,8 @@ const Friends = () => {
     </View>
   )
 }
+
+// Styles
 
 const styles = StyleSheet.create({
   container: {

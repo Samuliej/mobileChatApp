@@ -2,6 +2,12 @@ import { useState, useEffect, useContext } from 'react'
 import api from '../api'
 import { UserContext } from '../Context/UserContext'
 
+/*
+
+  Custom hook for searching for a user by username
+
+*/
+
 export const useSearchUser = (query, page) => {
   const [loading, setLoading] = useState(false)
   const [searchResults, setSearchResults] = useState([])

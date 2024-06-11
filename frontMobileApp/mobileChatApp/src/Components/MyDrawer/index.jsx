@@ -16,6 +16,22 @@ import NewConversation from '../NewConversation/index.jsx'
 import Chat from '../Chat/index.jsx'
 import NewPost from '../Feed/NewPost/index.jsx'
 
+/*
+
+  Component for drawer navigation for the app.
+  You press the user's profile picture to open the drawer and choose a component you want to enter
+  or click out of the drawer to exit.
+
+  The user can navigate to:
+    * Home, which is the Tab navigator for switching between Chat and Feed.
+    * Search for a User, component for searching for users to add friends
+    * Friends, component for displaying all the user's friends
+    * Friend requests, component for displaying all the user's pending friend requests
+    * Sign Out, for signing out of the app.
+
+
+*/
+
 const Drawer = createDrawerNavigator()
 
 const CustomHeader = ({ user }) => {
@@ -31,7 +47,7 @@ const CustomHeader = ({ user }) => {
   )
 }
 
-// Custom drawer item with badge
+// Custom drawer item with badge for indicating pending friend requests in the drawer
 const CustomDrawerItem = ({ label, badgeCount, ...props }) => (
   <DrawerItem
     label={() => (
@@ -67,6 +83,7 @@ const MyDrawer = () => {
     )
   }, [user])
 
+  // Function for handling signing out
   const handleSignOut = async () => {
     Alert.alert(
       'Confirmation',

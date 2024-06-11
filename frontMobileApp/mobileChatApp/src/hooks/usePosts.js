@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from '../api'
 
+/*
+
+  Custom hook for fetching posts to display for the user
+
+*/
+
 const usePosts = (userId) => {
   const [loading, setLoading] = useState(true)
   const [posts, setPosts] = useState([])
@@ -11,6 +17,7 @@ const usePosts = (userId) => {
     refreshPosts()
   }, [])
 
+  // Function to refresh the posts
   const refreshPosts = async () => {
     setLoading(true)
     setError(null)
@@ -35,6 +42,7 @@ const usePosts = (userId) => {
     }
   }
 
+  // Feetch the posts in a useEffect hook
   useEffect(() => {
     const fetchPosts = async () => {
       console.log('fetchPosts')

@@ -2,10 +2,17 @@ import { useState } from 'react'
 import api from '../api'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+/*
+
+  Custom hook for posting, commenting and liking a post.
+
+*/
+
 const usePost = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  // Function that creates the post to upload
   const createPost = async (content, image, author) => {
     setLoading(true)
     setError(null)
@@ -40,6 +47,7 @@ const usePost = () => {
     }
   }
 
+  // Function for commenting on a post
   const commentPost = async (postId, content) => {
     setLoading(true)
     setError(null)
@@ -60,6 +68,8 @@ const usePost = () => {
     }
   }
 
+
+  // Function for liking a post
   const likePost = async (postId) => {
     setLoading(true)
     setError(null)

@@ -2,6 +2,12 @@ import React, { createContext, useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from '../api'
 
+/*
+
+  User Context for easier user management and updating
+
+*/
+
 export const UserContext = createContext()
 
 export const UserProvider = ({ children }) => {
@@ -19,6 +25,7 @@ export const UserProvider = ({ children }) => {
     return data
   }
 
+  // Updates the user when there are changes to the user in the DB
   const updateUser = async (token) => {
     if (token) {
       const fetchedUser = await fetchUser(token)

@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react'
 import api from '../api'
 
+/*
+
+  Custom hook for fetching a certain user by id.
+
+*/
+
 export const useGetUserById = (userId) => {
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState(null)

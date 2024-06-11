@@ -2,6 +2,13 @@ import { createStackNavigator } from '@react-navigation/stack'
 import SignIn from '../SignIn/index.jsx'
 import SignUp from '../SignUp/index.jsx'
 
+/*
+
+This component sets up the authentication flow of the application.
+If you are registered, you can sign in, otherwise, you can register.
+
+*/
+
 const AuthStack = createStackNavigator()
 
 const AuthFlow = () => (

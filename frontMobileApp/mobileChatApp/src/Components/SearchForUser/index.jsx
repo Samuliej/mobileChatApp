@@ -10,6 +10,13 @@ import ErrorBanner from '../Error/index.jsx'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 
+/*
+
+  Component for searching for new users to add as friends.
+  The icon updates according to the friendship status
+
+*/
+
 const SearchForUser = () => {
   const [searchInput, setSearchInput] = useState('')
   const [page, setPage] = useState(1)
@@ -34,6 +41,7 @@ const SearchForUser = () => {
 
   if (user) userId = user._id
 
+  // Handles sending a friend request
   const handleSendFriendRequest = async (username) => {
     const result = await sendFriendRequest(username)
     if (result) {
@@ -95,6 +103,8 @@ const SearchForUser = () => {
     </>
   )
 }
+
+// Styles
 
 const styles = StyleSheet.create({
   container: {

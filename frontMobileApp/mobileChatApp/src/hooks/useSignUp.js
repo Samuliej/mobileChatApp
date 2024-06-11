@@ -1,10 +1,17 @@
 import { useState } from 'react'
 import api from '../api'
 
+/*
+
+  Custom hook for signing up as a new user.
+
+*/
+
 const useSignUp = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  // Function for signing up
   const signUp = async (username, password, name, profilePicture, phone, city) => {
     setLoading(true)
     setError(null)

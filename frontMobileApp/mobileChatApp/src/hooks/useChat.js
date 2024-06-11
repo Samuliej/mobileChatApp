@@ -3,6 +3,11 @@ import api from '../api.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SocketContext } from '../Context/SocketContext.js'
 
+/*
+
+  Custom hook for enabling real-time messaging in the application
+
+*/
 
 const useChat = (user, conversationId, initialFriend) => {
   const [friend, setFriend] = useState(initialFriend)
@@ -12,12 +17,14 @@ const useChat = (user, conversationId, initialFriend) => {
   const [loading, setLoading] = useState(false)
   const socket = useContext(SocketContext)
 
+  // Fetch the first page of messages when the component mounts
   useEffect(() => {
     setLoading(true)
-    fetchConversation() // Fetch the first page of messages when the component mounts
+    fetchConversation()
   }, [conversationId, user])
 
   useEffect(() => {
+    // Listens to new messages, and updates the conversation
     socket.on('message', (newMessage) => {
       setConversation((prevConversation) => {
         return {
@@ -27,13 +34,12 @@ const useChat = (user, conversationId, initialFriend) => {
       })
     })
 
-    socket.emit('newMessage', { conversationId, message: newMessage })
-
     return () => {
       socket.off('message')
     }
   }, [socket])
 
+  // Function for fetching a single conversation
   const fetchConversation = async () => {
     const response = await api.get(`/api/conversations/${conversationId}`)
     const fetchedConversation = await response.data
@@ -50,6 +56,7 @@ const useChat = (user, conversationId, initialFriend) => {
   }
 
 
+  // Function for sending a message
   const sendMessage = async () => {
     const userToken = await AsyncStorage.getItem('userToken')
     const messageContent = {

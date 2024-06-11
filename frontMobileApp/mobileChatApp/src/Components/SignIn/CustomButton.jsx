@@ -1,6 +1,12 @@
 import React, { useRef } from 'react'
 import { Animated, TouchableOpacity, Text, StyleSheet } from 'react-native'
 
+/*
+
+ Custom button component that has built-in animation
+
+*/
+
 const CustomButton = ({ onPress, title, style }) => {
   const scaleValue = useRef(new Animated.Value(1)).current
 

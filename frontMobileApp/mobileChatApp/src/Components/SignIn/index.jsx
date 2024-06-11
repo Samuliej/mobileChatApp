@@ -67,6 +67,7 @@ const SignIn = () => {
     return () => clearTimeout(timeout)
   }, [error])
 
+  // Function to validate the fields with yup
   const validateField = (field, value) => {
     try {
       yup.reach(validationSchema, field).validateSync(value)
@@ -75,6 +76,7 @@ const SignIn = () => {
     }
   }
 
+  // Function for handling signing in
   const handleSignIn = async () => {
     const data = await signIn(username, password)
     if (data) {
@@ -103,6 +105,8 @@ const SignIn = () => {
 
 }
 
+
+// Sign in view component
 const SignInView = ({ username, setUsername, password, setUsernameError, setPasswordError,
   setPassword, handleSignIn, usernameError, passwordError, validateField }) => {
   const navigation = useNavigation()

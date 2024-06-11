@@ -6,6 +6,13 @@ import usePosts from '../../hooks/usePosts'
 import usePost from '../../hooks/usePost'
 import Post from './Post/index'
 
+/*
+
+  Main screen for the feed component that is navigated through the
+  tab navigation. Displays all the posts that the user's friends have posted.
+
+*/
+
 const FeedScreen = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const { loading, posts, error, refreshPosts } = usePosts(user._id)
@@ -13,6 +20,7 @@ const FeedScreen = ({ navigation }) => {
 
   const [refreshing, setRefreshing] = useState(false)
 
+  // For refreshing when scrolling up
   const onRefresh = React.useCallback(() => {
     setRefreshing(true)
     refreshPosts().then(() => setRefreshing(false))
@@ -66,6 +74,8 @@ const FeedScreen = ({ navigation }) => {
     </View>
   )
 }
+
+// Styles
 
 const styles = StyleSheet.create({
   container: {

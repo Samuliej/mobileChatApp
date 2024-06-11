@@ -14,6 +14,8 @@ const ErrorBanner = ({ error, type = 'error' }) => {
   )
 }
 
+// Styles
+
 const styles = StyleSheet.create({
   errorBanner: {
     position: 'absolute',
@@ -25,9 +27,9 @@ const styles = StyleSheet.create({
     zIndex: 1,
     width: '100%',
     borderRadius: 15,
-    justifyContent: 'center', // Center the text vertically
-    alignItems: 'center', // Center the text horizontally
-    alignSelf: 'center', // Center the banner horizontally within its parent
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
   },
   successBanner: {
     backgroundColor: 'green',
