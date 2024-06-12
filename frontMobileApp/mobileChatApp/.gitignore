@@ -34,3 +34,5 @@ yarn-error.*
 .env
 # typescript
 *.tsbuildinfo
+
+hive-426207-56d8e85d743d.json

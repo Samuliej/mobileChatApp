@@ -51,7 +51,7 @@ router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
     res.status(201).json(userWithoutPassword)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Something went wrong creating the user' })
+    res.status(400).json({ error: 'Something went wrong creating the user' })
   }
 })
 

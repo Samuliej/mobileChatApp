@@ -32,24 +32,6 @@ router.get('/api/conversations', async (req, res) => {
   }
 })
 
-router.get('api/conversations/:user1/:user2', async (req, res) => {
-  try {
-    const user1 = await User.findOne({ username: req.params.user1 })
-    const user2 = await User.findOne({ username: req.params.user2 })
-
-    const convo = await Conversation.findOne({
-      participants: {
-        $all: [user1._id, user2._id]
-      }
-    })
-
-    res.json(convo)
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching conversation' })
-  }
-
-})
-
 
 // Fetch user by username
 router.get('/api/users/:username', async (req, res) => {

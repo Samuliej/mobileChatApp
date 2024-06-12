@@ -29,10 +29,12 @@ console.log('connecting to MongoDB')
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
-    console.log('Connected to MongoDB')
+    if (process.env.NODE_ENV !== 'test')
+      console.log('Connected to MongoDB')
   })
   .catch((error) => {
-    console.log('error connecting to MongoDB: ', error)
+    if (process.env.NODE_ENV !== 'test')
+      console.log('error connecting to MongoDB: ', error)
   })
 
 const app = express()
