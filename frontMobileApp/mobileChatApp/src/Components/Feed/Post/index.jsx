@@ -92,6 +92,7 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
           <Text>{post.likes}</Text>
         </View>
         <View style={styles.commentContainer}>
+          {post.comments.length > 0 && <Text>{post.comments.length}</Text>}
           <Ionicons name="chatbubble-outline" size={24} color="black" onPress={() => setCommentsOpen(!commentsOpen)} />
         </View>
       </View>
