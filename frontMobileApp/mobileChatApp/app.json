@@ -24,7 +24,8 @@
       },
       "versionCode": 2,
       "package": "com.samuli.toppi.mobileChatApp",
-      "permissions": []
+      "permissions": [],
+      "blockedPermissions" : ["android.permission.CAMERA"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
