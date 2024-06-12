@@ -5,7 +5,7 @@ const url = HTTP_URL
 console.log('api url', url)
 
 const api = axios.create({
-  baseURL: url + ':3001'
+  baseURL: url
 })
 
 export default api

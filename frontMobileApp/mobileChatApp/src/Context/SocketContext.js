@@ -20,7 +20,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     let newSocket = null
     if (userContext.user) {
-      newSocket = io.connect(`${HTTP_URL}:3001`, {
+      newSocket = io.connect(HTTP_URL, {
         query: { userId: userContext.user._id }
       })
       console.log('Connected to socket at context')

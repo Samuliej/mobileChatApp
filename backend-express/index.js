@@ -49,6 +49,10 @@ app.use(postRoutes)
 app.use(putRoutes)
 app.use(deleteRoutes)
 
+app.get('/', (req, res) => {
+  res.send('Backend server is running!')
+})
+
 const port = config.PORT || 3000
 
 // Function for validating a json webtoken
