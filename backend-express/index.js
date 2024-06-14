@@ -24,7 +24,7 @@ if (process.env.NODE_ENV !== 'test') {
   MONGODB_URI = config.MONGODB_TEST_URI
 }
 
-console.log('connecting to MongoDB')
+console.log('connecting to MongoDB: ', + MONGODB_URI)
 
 mongoose
   .connect(MONGODB_URI)
