@@ -257,8 +257,6 @@ router.post('/api/posts', authMiddleware, upload.single('image'), async (req, re
     return res.status(400).json({ error: 'Authentication required' })
   }
 
-  console.log('reqfile', req.file)
-
   let result = null
   if (req.file) {
     result = await cloudinary.uploader.upload(req.file.path)

@@ -219,7 +219,6 @@ test('authenticated user can create posts', async () => {
 
   const token = result.body.token
   const loggedInUser = await User.findOne({username: newUser.username})
-  console.log('loggedInuser ', loggedInUser)
 
   // Create post
   const newPost = {
