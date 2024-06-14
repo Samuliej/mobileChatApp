@@ -25,6 +25,8 @@ jobs:
           npm run lint
 
       - name: test
+        env:
+          MONGODB_TEST_URI: ${{ secrets.MONGODB_TEST_URI }}
         run: |
           cd backend-express
           npm test -- tests/get.test.js
