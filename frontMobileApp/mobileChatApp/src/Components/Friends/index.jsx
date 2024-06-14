@@ -11,6 +11,7 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
   Component for displaying all the friends of the user.
   The component is updated in real-time with socket.io
+  asd
 
 */
 
