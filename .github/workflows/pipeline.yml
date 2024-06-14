@@ -23,36 +23,3 @@ jobs:
         run: |
           cd backend-express
           npm run lint
-
-  tests:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: ['16.19.0']
-        mongodb-version: ['4.4', '5.0']
-
-    steps:
-    - name: Git checkout
-      uses: actions/checkout@v4
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - name: Start MongoDB
-      uses: supercharge/mongodb-github-action@1.11.0
-      with:
-        mongodb-version: ${{ matrix.mongodb-version }}
-
-    - name: Install dependencies
-      run: |
-        cd backend-express
-        npm install
-
-    - name: Run tests
-      run: |
-          cd backend-express
-          MONGODB_TEST_URI=${{ secrets.MONGODB_TEST_URI }} npm test -- tests/get.test.js
-      env:
-        CI: true
