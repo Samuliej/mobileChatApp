@@ -22,4 +22,4 @@ jobs:
       - name: Check style
         run: |
           cd backend-express
-          npm run eslint
+          npm run lint
