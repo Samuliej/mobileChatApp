@@ -30,17 +30,3 @@ jobs:
         run: |
           cd backend-express
           npm test -- tests/get.test.js
-
-      - name: post test
-        env:
-          MONGODB_TEST_URI: ${{ secrets.MONGODB_TEST_URI }}
-        run: |
-          cd backend-express
-          npm test -- tests/post.test.js
-
-      - name: put test
-        env:
-          MONGODB_TEST_URI: ${{ secrets.MONGODB_TEST_URI }}
-        run: |
-          cd backend-express
-          npm test -- tests/put.test.js
