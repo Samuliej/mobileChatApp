@@ -155,7 +155,7 @@ const SignInView = ({ username, setUsername, password, setUsernameError, setPass
         />
         {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
         <CustomButton style={{ marginTop: 10 }} onPress={handleSignIn} title='Sign in' />
-        <Text style={{ marginBottom: 10, marginTop: 30, textAlign: 'center' }}>Don't have an account?</Text>
+        <Text style={{ marginBottom: 10, marginTop: 30, textAlign: 'center' }}>{"Don't have an account?"}</Text>
         <CustomButton title='Register' style={{ backgroundColor: 'black' }}
           onPress={() => navigation.navigate('SignUp')} />
       </View>

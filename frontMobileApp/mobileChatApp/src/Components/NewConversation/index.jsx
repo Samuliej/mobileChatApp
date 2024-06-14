@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Button, Image, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, Text, Button, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
 import api from '../../api.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -12,7 +12,6 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
 */
 
-// TODO: If a conversation exists between the two users, don't create a new one
 // but just navigate to the existing one
 // TODO: group
 
@@ -56,27 +55,29 @@ const NewConversation = () => {
       }} />
 
       <Text>Your Friends</Text>
-      {/* Exclude the friends with whom there is already a started conversation */}
-      {friends.filter(friend => !user.conversations.map(convo => convo._id).some(conversationId => friend.conversations.includes(conversationId))).map(friend => (
-        <View key={friend._id} style={styles.friendItem}>
-          <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
-          <Text style={styles.username}>{friend.username}</Text>
-          <Button title="Chat" onPress={async () => {
-            // start a new conversation with this friend
-            const userToken = await AsyncStorage.getItem('userToken')
-            const response = await api.post('/api/startConversation', { username: friend.username }, {
-              headers: {
-                Authorization: `Bearer ${userToken}`
-              }
-            })
-            const conversation = response.data.conversation
-            console.log('created conversation', conversation)
-            updateUser(userToken)
-            // navigate to Chat screen with this conversation
-            navigation.navigate('Chat', { conversationId: conversation._id, friend: friend })
-          }} />
-        </View>
-      ))}
+      <ScrollView>
+        {/* Exclude the friends with whom there is already a started conversation */}
+        {friends.filter(friend => !user.conversations.map(convo => convo._id).some(conversationId => friend.conversations.includes(conversationId))).map(friend => (
+          <View key={friend._id} style={styles.friendItem}>
+            <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
+            <Text style={styles.username}>{friend.username}</Text>
+            <Button title="Chat" onPress={async () => {
+              // start a new conversation with this friend
+              const userToken = await AsyncStorage.getItem('userToken')
+              const response = await api.post('/api/startConversation', { username: friend.username }, {
+                headers: {
+                  Authorization: `Bearer ${userToken}`
+                }
+              })
+              const conversation = response.data.conversation
+              console.log('created conversation', conversation)
+              updateUser(userToken)
+              // navigate to Chat screen with this conversation
+              navigation.navigate('Chat', { conversationId: conversation._id, friend: friend })
+            }} />
+          </View>
+        ))}
+      </ScrollView>
     </View>
   )
 }

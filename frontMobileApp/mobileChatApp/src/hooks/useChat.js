@@ -27,10 +27,15 @@ const useChat = (user, conversationId, initialFriend) => {
     // Listens to new messages, and updates the conversation
     socket.on('message', (newMessage) => {
       setConversation((prevConversation) => {
-        return {
-          ...prevConversation,
-          messages: [...prevConversation.messages, newMessage]
-        }
+        const messages = prevConversation.messages.map((message) =>
+          message.content === newMessage.content &&
+          message.sender === newMessage.sender &&
+          message.placeHolder
+            ? { ...newMessage, placeHolder: false }
+            : message
+        )
+
+        return { ...prevConversation, messages }
       })
     })
 
@@ -59,7 +64,9 @@ const useChat = (user, conversationId, initialFriend) => {
   // Function for sending a message
   const sendMessage = async () => {
     const userToken = await AsyncStorage.getItem('userToken')
+
     const messageContent = {
+      placeHolder: true,
       content: newMessage,
       conversationId,
       token: userToken,
@@ -67,6 +74,12 @@ const useChat = (user, conversationId, initialFriend) => {
       sender: user._id,
       timestamp: Date.now(),
     }
+
+    setConversation(prevConversation => ({
+      ...prevConversation,
+      messages: [...prevConversation.messages, messageContent],
+    }))
+
     socket.emit('message', messageContent)
 
     setNewMessage('')

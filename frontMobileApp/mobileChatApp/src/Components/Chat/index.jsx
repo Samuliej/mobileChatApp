@@ -123,7 +123,9 @@ const Chat = ({ route }) => {
               setInputHeight(event.nativeEvent.contentSize.height)
             }}
           />
-          <Pressable style={styles.sendButton} onPress={sendMessage}>
+          <Pressable style={styles.sendButton} onPress={() => {
+            if (newMessage.length !== 0) sendMessage()
+          }}>
             <Icon name="send" size={24} color="lightgreen" />
           </Pressable>
         </View>

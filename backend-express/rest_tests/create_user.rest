@@ -2,7 +2,7 @@ POST https://hive-backend.fly.dev/api/users
 Content-Type: application/json
 
 {
-  "username": "Ukko5",
+  "username": "Ukko9",
   "name": "Otus",
   "password": "Salis",
   "phone": "1234567980",

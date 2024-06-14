@@ -31,15 +31,19 @@ const RootNavigator = () => {
 
       // These 3 listeners handle updating the user whenever a friend request
       // is sent or accepted
+
+      // This updates to the receiver
       socket.on('friendRequest', (newFriendshipToFront, callback) => {
         fetchTokenAndUpdateUser()
         callback()
       })
 
+      // To the sender when the request is sent
       socket.on('friendRequestSent', () => {
         fetchTokenAndUpdateUser()
       })
 
+      // To receiver and sender when a friend request is accepted
       socket.on('friendRequestAccepted', () => {
         fetchTokenAndUpdateUser()
       })

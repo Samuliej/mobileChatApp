@@ -105,13 +105,6 @@ io.on('connection', async (socket) => {
         return
       }
 
-      // If an friendship is declined, change it back to pending
-      // I'll later decide what to do with declined friendships
-      if (existingFriendship && existingFriendship.status === 'DECLINED') {
-        existingFriendship.status = 'PENDING'
-        await existingFriendship.save()
-        socket.emit('friendRequestUpdated', existingFriendship)
-      }
       // Else create a new friendship
       else {
         const newFriendship = new Friendship({
