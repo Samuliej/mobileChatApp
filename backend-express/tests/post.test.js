@@ -1,6 +1,7 @@
 const assert = require('assert')
 const User = require('../models/User')
 const Post = require('../models/Post.js')
+const Conversation = require('../models/Conversation.js')
 const supertest = require('supertest')
 const mongoose  = require('mongoose')
 const app = require('../index.js')
@@ -22,13 +23,11 @@ const initialUsers = [
 ]
 
 let postId = null
+let user1, user2
 
 beforeAll(async () => {
-  await User.deleteMany({})
-  await Post.deleteMany({})
-
-  let user1 = new User(initialUsers[0])
-  let user2 = new User(initialUsers[1])
+  user1 = new User(initialUsers[0])
+  user2 = new User(initialUsers[1])
 
   await user1.save()
   await user2.save()
@@ -278,7 +277,81 @@ test('a valid comment can be added to a post', async () => {
 })
 
 
+test('authorized user can start a conversation', async () => {
+  let newUser = {
+    username: 'conversationStarter',
+    password: 'password',
+    name: 'convo'
+  }
+
+  const receivingUser = {
+    username: 'receivingUser',
+    password: 'password',
+    name: 'receiver'
+  }
+
+  // Create user
+  let result = await api
+    .post('/api/users')
+    .send(newUser)
+    .expect(201)
+
+  const createdNewUser = result.body
+
+  // Login
+  result = await api
+    .post('/api/login')
+    .send({ username: newUser.username, password: newUser.password })
+    .expect(200)
+
+  const newUserToken = result.body.token
+
+  result = await api
+    .post('/api/users')
+    .send(receivingUser)
+    .expect(201)
+
+  const createdReceivingUser = result.body
+
+  result = await api
+    .post('/api/login')
+    .send({ username: receivingUser.username, password: receivingUser.password })
+    .expect(200)
+
+  const receivingUserToken = result.body.token
+
+  result = await api
+    .post('/api/sendFriendRequest')
+    .set('Authorization', `Bearer ${newUserToken}`)
+    .send({ username: receivingUser.username })
+    .expect(201)
+
+  const friendship = result.body
+
+  console.log('friendship at post.test', friendship)
+
+  result = await api
+    .put('/api/acceptFriendRequest')
+    .set('Authorization', `Bearer ${receivingUserToken}`)
+    .send({ friendshipId: friendship._id })
+    .expect(200)
+
+  result = await api
+    .post('/api/startConversation')
+    .set('Authorization', `Bearer ${newUserToken}`)
+    .send({ username: receivingUser.username })
+    .expect(201)
+
+  const conversation = result.body.conversation
+
+  expect(conversation.participants).toContain(createdNewUser._id.toString())
+  expect(conversation.participants).toContain(createdReceivingUser._id.toString())
+}, 10000)
+
+
 afterAll(async () => {
   await User.deleteMany({})
+  await Post.deleteMany({})
+  await Conversation.deleteMany({})
   await mongoose.connection.close()
 })

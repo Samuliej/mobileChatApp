@@ -139,7 +139,6 @@ router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
 
 // Start a new conversation
 router.post('/api/startConversation', authMiddleware, async (req, res) => {
-  console.log('Starting conversation')
   const currentUser = req.currentUser
   let user = await User.findOne({ username: currentUser.username })
   if (!currentUser) {

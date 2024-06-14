@@ -44,10 +44,11 @@ router.put('/api/declineFriendRequest/:friendshipId', authMiddleware, async (req
 router.put('/api/acceptFriendRequest', authMiddleware, async (req, res) => {
   const friendship = await Friendship.findOne({ _id: req.body.friendshipId })
   const currentUser = req.currentUser
+  let requestSender
 
-  console.log(friendship)
-
-  const requestSender = await User.findOne({ _id: friendship.sender })
+  if (friendship)
+    requestSender = await User.findOne({ _id: friendship.sender })
+  else return res.status(404).json({ error: 'Friendship not found' })
 
   if (!currentUser) {
     return res.status(401).json({ error: 'Authentication required' })
