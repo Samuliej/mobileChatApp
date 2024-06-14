@@ -23,3 +23,8 @@ jobs:
         run: |
           cd backend-express
           npm run lint
+
+      - name: test
+        run: |
+          cd backend-express
+          npm test -- --runInBand
