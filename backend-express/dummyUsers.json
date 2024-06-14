@@ -1,0 +1,112 @@
+[
+{
+    "username": "User1",
+    "password": "password1",
+    "name": "Name1",
+    "phone": "1234567890",
+    "city": "City1",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  },
+  {
+    "username": "User2",
+    "password": "password2",
+    "name": "Name2",
+    "phone": "0987654321",
+    "city": "City2",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  },
+  {
+    "username": "User3",
+    "password": "password3",
+    "name": "Name3",
+    "phone": "2345678901",
+    "city": "City3",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  },
+  {
+    "username": "User4",
+    "password": "password4",
+    "name": "Name4",
+    "phone": "3456789012",
+    "city": "City4",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  },
+  {
+    "username": "User5",
+    "password": "password5",
+    "name": "Name5",
+    "phone": "4567890123",
+    "city": "City5",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  },
+  {
+    "username": "User6",
+    "password": "password6",
+    "name": "Name6",
+    "phone": "5678901234",
+    "city": "City6",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  },
+  {
+    "username": "User7",
+    "password": "password7",
+    "name": "Name7",
+    "phone": "6789012345",
+    "city": "City7",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  },
+  {
+    "username": "User8",
+    "password": "password8",
+    "name": "Name8",
+    "phone": "7890123456",
+    "city": "City8",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  },
+  {
+    "username": "User9",
+    "password": "password9",
+    "name": "Name9",
+    "phone": "8901234567",
+    "city": "City9",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  },
+  {
+    "username": "User10",
+    "password": "password10",
+    "name": "Name10",
+    "phone": "9012345678",
+    "city": "City10",
+    "pendingFriendRequests": [],
+    "friends": [],
+    "conversations": [],
+    "posts": []
+  }
+]

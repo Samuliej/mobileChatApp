@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { View, StyleSheet, Text, TextInput, Dimensions, Image, } from 'react-native'
+import { View, StyleSheet, Text, TextInput, Dimensions, Image, ActivityIndicator } from 'react-native'
 import * as yup from 'yup'
 import useSignIn from '../../hooks/useSignIn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -20,19 +20,6 @@ const validationSchema = yup.object().shape({
   password: yup.string()
     .min(5, 'Password must be at least 5 characters')
     .required('Password is required'),
-})
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  button: theme.button,
-  buttonText: theme.buttonText,
-  showPasswordButton: {
-    marginVertical: 10,
-  },
-  inputBox: theme.inputBox,
 })
 
 /**
@@ -58,6 +45,7 @@ const SignIn = () => {
   const [password, setPassword] = useState('')
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [signingIn, setSigningIn] = useState(false)
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -80,6 +68,7 @@ const SignIn = () => {
   const handleSignIn = async () => {
     const data = await signIn(username, password)
     if (data) {
+      setSigningIn(true)
       await AsyncStorage.setItem('userToken', data)
       await updateUser(data)
       navigation.reset({
@@ -89,6 +78,7 @@ const SignIn = () => {
       setTimeout(() => {
         setUsername('')
         setPassword('')
+        setSigningIn(false)
       }, 2000)
     }
   }
@@ -96,10 +86,19 @@ const SignIn = () => {
   return (
     <>
       {error && <ErrorBanner error={error} />}
-      <SignInView username={username} setUsername={setUsername} setUsernameError={setUsernameError}
-        password={password} setPassword={setPassword} setPasswordError={setPasswordError}
-        handleSignIn={handleSignIn} usernameError={usernameError} passwordError={passwordError}
-        validateField={validateField} />
+      {signingIn ? (
+        <>
+          <View style={[styles.container, { marginTop: height / 3, justifyContent: 'center', alignItems: 'center', } ]}>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Flying to the Hive...</Text>
+          </View>
+        </>
+      ) : (
+        <SignInView username={username} setUsername={setUsername} setUsernameError={setUsernameError}
+          password={password} setPassword={setPassword} setPasswordError={setPasswordError}
+          handleSignIn={handleSignIn} usernameError={usernameError} passwordError={passwordError}
+          validateField={validateField} />
+      )}
     </>
   )
 
@@ -163,5 +162,18 @@ const SignInView = ({ username, setUsername, password, setUsernameError, setPass
     </>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  button: theme.button,
+  buttonText: theme.buttonText,
+  showPasswordButton: {
+    marginVertical: 10,
+  },
+  inputBox: theme.inputBox,
+})
 
 export default SignIn

@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Image, Pressable, StyleSheet, Alert, ScrollView, RefreshControl } from 'react-native'
+import React, { useContext, useEffect  } from 'react'
+import { View, Text, Image, Pressable, StyleSheet, Alert, ScrollView } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
 import { NotificationContext } from '../../Context/NotificationContext.js'
 import { FriendRequestContext } from '../../Context/FriendRequestContext.js'
@@ -30,14 +30,12 @@ const FriendRequests = () => {
   const { friendRequests, setFriendRequests } = friendRequestContextValue
 
   const socket = useContext(SocketContext)
-  const [refreshing, setRefreshing] = useState(false)
   const navigation = useNavigation()
   let pendingRequests = []
   if (user) pendingRequests = user.pendingFriendRequests.filter(request => request.receiver === user._id)
 
   // Function for fetching friend requests
   const fetchRequests = async () => {
-    setRefreshing(true)
     if (user) {
       // Fetch all requests
       const fetchedRequests = await Promise.all(pendingRequests.map(async (request) => {
@@ -54,7 +52,6 @@ const FriendRequests = () => {
 
       setFriendRequests(filteredRequests)
     }
-    setRefreshing(false)
   }
 
   useEffect(() => {
@@ -135,12 +132,6 @@ const FriendRequests = () => {
   return (
     <ScrollView
       contentContainerStyle={{flex: 1}}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={fetchRequests}
-        />
-      }
     >
       {notification && <ErrorBanner error={notification} type="success" />}
       <View style={styles.container}>

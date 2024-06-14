@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
@@ -11,7 +11,6 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
   Component for displaying all the friends of the user.
   The component is updated in real-time with socket.io
-  TODO: Implement scrolling
 
 */
 
@@ -81,14 +80,14 @@ const Friends = () => {
         </View>
       )}
       {friends.length > 0 && (
-        <>
+        <ScrollView>
           {friends.map(friend => (
             <View key={friend._id} style={styles.friendItem}>
               <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
               <Text style={styles.username}>{friend.username}</Text>
             </View>
           ))}
-        </>
+        </ScrollView>
       )}
     </View>
   )
