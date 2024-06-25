@@ -11,7 +11,6 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
   Component for displaying all the friends of the user.
   The component is updated in real-time with socket.io
-  asd
 
 */
 
@@ -84,7 +83,12 @@ const Friends = () => {
         <ScrollView>
           {friends.map(friend => (
             <View key={friend._id} style={styles.friendItem}>
-              <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
+              <Pressable key={friend._id} onPress={() => {
+                console.log(`Navigating to friend with ID: ${friend._id}`)
+                navigation.navigate('Friend', { friendId: friend._id })
+              }}>
+                <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
+              </Pressable>
               <Text style={styles.username}>{friend.username}</Text>
             </View>
           ))}
