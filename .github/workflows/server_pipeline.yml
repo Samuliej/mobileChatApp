@@ -1,0 +1,118 @@
+name: Deployment pipeline for server
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
+
+jobs:
+
+  check_style_server:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: |
+          cd backend-express
+          npm install
+      - name: Check style
+        run: |
+          cd backend-express
+          npm run lint
+
+
+
+
+  run_tests_server:
+    needs: [check_style_server]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.11.0
+        with:
+          mongodb-version: 5.0
+          mongodb-replica-set: test-rs
+          mongodb-port: 42069
+
+      - name: Set MongoDB connection string
+        run: echo "MONGODB_URI=mongodb://localhost:42069" >> $GITHUB_ENV
+
+      - name: Set MongoDB test connection string
+        run: echo "MONGODB_TEST_URI=mongodb://localhost:42069/test" >> $GITHUB_ENV
+
+      - name: Set secret
+        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+
+      - name: Set port
+        run: echo "PORT=3000" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          cd backend-express
+          npm install
+
+      - name: Run server tests
+        run: |
+          cd backend-express
+          npm run test
+        env:
+          CI: true
+
+
+  server_deployment_pipeline:
+    needs: [run_tests_server]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+      - name: Install dependencies
+        run: |
+          cd backend-express
+          npm install
+
+      - name: Deploy the app to Fly.io
+        if: ${{ github.event_name == 'push' && !contains(join(fromJSON(toJson(github.event.commits.*.message)), ' '), '#skip') }}
+        uses: actions/checkout@v4
+
+      - name: Setup Flyctl
+        if: ${{ github.event_name == 'push' && !contains(join(fromJSON(toJson(github.event.commits.*.message)), ' '), '#skip') }}
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy with Flyctl
+        if: ${{ github.event_name == 'push' && !contains(join(fromJSON(toJson(github.event.commits.*.message)), ' '), '#skip') }}
+        run: |
+          cd backend-express
+          flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+
+  tag_release:
+      needs: [server_deployment_pipeline]
+      if: github.event_name == 'push'
+      runs-on: ubuntu-20.04
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Bump version and push tag
+          if: ${{ github.event_name == 'push' && !contains(join(fromJSON(toJson(github.event.commits.*.message)), ' '), '#skip') }}
+          uses: anothrNick/github-tag-action@1.68.0
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            DEFAULT_BUMP: patch
