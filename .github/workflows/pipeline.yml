@@ -62,12 +62,10 @@ jobs:
         run: |
           cd backend-express
           npm install
-      - name: Builds
-        run: |
-          cd backend-express
-          npm run build
 
       - name: Run server tests
-        run: npm run test
+        run: |
+          cd backend-express
+          npm run test
         env:
           CI: true
