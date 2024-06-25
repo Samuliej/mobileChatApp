@@ -15,7 +15,7 @@ import Post from './Post/index'
 
 const FeedScreen = ({ navigation }) => {
   const { user } = useContext(UserContext)
-  const { loading, posts, error, refreshPosts } = usePosts(user._id)
+  const { loading, posts, refreshPosts } = usePosts(user._id)
   const { likePost, commentPost } = usePost()
 
   const [refreshing, setRefreshing] = useState(false)

@@ -1,0 +1,28 @@
+name: Deployment pipeline for client
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
+
+jobs:
+
+  check_style_client:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: |
+          cd frontMobileApp/mobileChatApp
+          npm install
+      - name: Check style
+        run: |
+          cd frontMobileApp/mobileChatApp
+          npm run lint

@@ -21,7 +21,7 @@ const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const { conversations, loading } = useConversations(user)
   const [selectedConversation, setSelectedConversation] = useState(null)
-  const [deleteConversation, isLoading, error] = useDeleteConversation()
+  const [deleteConversation, isLoading] = useDeleteConversation()
   const [sortedConversations, setSortedConversations] = useState([])
 
   if (loading || isLoading) {
