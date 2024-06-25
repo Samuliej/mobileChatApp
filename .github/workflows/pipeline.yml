@@ -11,7 +11,7 @@ on:
 
 jobs:
 
-  check_style:
+  check_style_server:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
@@ -23,4 +23,6 @@ jobs:
           cd backend-express
           npm install
       - name: Check style
-        run: npm run lint
+        run: |
+          cd backend-express
+          npm run lint
