@@ -50,7 +50,7 @@ jobs:
         run: echo "MONGODB_URI=mongodb://localhost:42069" >> $GITHUB_ENV
 
       - name: Set MongoDB test connection string
-        run: echo "TEST_MONGODB_URI=mongodb://localhost:42069/test" >> $GITHUB_ENV
+        run: echo "MONGODB_TEST_URI=mongodb://localhost:42069/test" >> $GITHUB_ENV
 
       - name: Set secret
         run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
