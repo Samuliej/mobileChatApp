@@ -126,7 +126,7 @@ const Chat = ({ route }) => {
           <Pressable style={styles.sendButton} onPress={() => {
             if (newMessage.length !== 0) sendMessage()
           }}>
-            <Icon name="send" size={24} color="lightgreen" />
+            <Icon name="send" size={24} color="white" />
           </Pressable>
         </View>
       </View>
@@ -186,6 +186,12 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     marginLeft: 10,
+    backgroundColor: '#009000',
+    borderRadius: 24,
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   loadingContainer: {
     flex: 1,
