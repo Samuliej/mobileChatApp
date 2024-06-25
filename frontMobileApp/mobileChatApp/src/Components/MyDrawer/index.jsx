@@ -15,6 +15,7 @@ import FriendRequests from '../FriendRequests/index.jsx'
 import NewConversation from '../NewConversation/index.jsx'
 import Chat from '../Chat/index.jsx'
 import NewPost from '../Feed/NewPost/index.jsx'
+import Friend from '../Friends/Friend/index.jsx'
 
 /*
 
@@ -192,6 +193,7 @@ const MyDrawer = () => {
         }}
       />
       <Drawer.Screen name="NewPost" component={NewPost} />
+      <Drawer.Screen name="Friend" component={Friend} />
     </Drawer.Navigator>
   )
 }
