@@ -40,6 +40,8 @@ mongoose
       console.log('error connecting to MongoDB: ', error)
   })
 
+// Comment
+
 const app = express()
 const server = require('http').createServer(app)
 const io = socketIo(server)
