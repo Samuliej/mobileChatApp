@@ -15,7 +15,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest",
+    "test": "cross-env NODE_ENV=test jest tests --runInBand",
     "lint": "eslint .",
     "lintfix": "eslint . --fix"
   },

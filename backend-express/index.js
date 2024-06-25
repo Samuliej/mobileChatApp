@@ -27,7 +27,10 @@ if (process.env.NODE_ENV !== 'test') {
 console.log('connecting to MongoDB: ', + MONGODB_URI)
 
 mongoose
-  .connect(MONGODB_URI)
+  .connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
   .then(() => {
     if (process.env.NODE_ENV !== 'test')
       console.log('Connected to MongoDB')

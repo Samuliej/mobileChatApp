@@ -3,23 +3,24 @@ name: Deployment pipeline
 on:
   push:
     branches:
-      - master
+      - main
+
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
 
 jobs:
 
-  deployment_pipeline:
+  check_style:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '16'
-      - name: Install backend dependencies
+          node-version: 16
+      - name: Install dependencies
         run: |
           cd backend-express
           npm install
-
       - name: Check style
-        run: |
-          cd backend-express
-          npm run lint
+        run: npm run lint
