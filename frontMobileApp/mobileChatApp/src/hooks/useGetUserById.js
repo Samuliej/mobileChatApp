@@ -7,7 +7,7 @@ import api from '../api'
 
 */
 
-export const useGetUserById = (userId) => {
+const useGetUserById = (userId) => {
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState(null)
   const [error, setError] = useState(null)
@@ -30,3 +30,5 @@ export const useGetUserById = (userId) => {
 
   return { loading, user, error }
 }
+
+export default useGetUserById
