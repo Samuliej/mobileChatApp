@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
+import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator, ScrollView, Animated } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
@@ -11,8 +11,50 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
   Component for displaying all the friends of the user.
   The component is updated in real-time with socket.io
+  You can navigate to a single friend's info and posts displaying component from here also.
 
 */
+
+const FriendItem = ({ friend, navigation }) => {
+  const animateScale = new Animated.Value(1)
+
+  const startAnimation = () => {
+    Animated.spring(animateScale, {
+      toValue: 1.1,
+      friction: 2,
+      useNativeDriver: true,
+    }).start()
+  }
+
+  const resetAnimation = () => {
+    Animated.spring(animateScale, {
+      toValue: 1,
+      friction: 2,
+      useNativeDriver: true,
+    }).start()
+  }
+
+  return (
+    <Animated.View
+      style={[
+        styles.friendItem,
+        {
+          transform: [{ scale: animateScale }],
+        },
+      ]}
+    >
+      <Pressable
+        onPress={() => navigation.navigate('Friend', { friendId: friend._id })}
+        onPressIn={startAnimation}
+        onPressOut={resetAnimation}
+        style={{ flexDirection: 'row', alignItems: 'center' }}
+      >
+        <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
+        <Text style={styles.username}>{friend.username}</Text>
+      </Pressable>
+    </Animated.View>
+  )
+}
 
 const Friends = () => {
   const { user } = useContext(UserContext)
@@ -82,15 +124,7 @@ const Friends = () => {
       {friends.length > 0 && (
         <ScrollView>
           {friends.map(friend => (
-            <View key={friend._id} style={styles.friendItem}>
-              <Pressable key={friend._id} onPress={() => {
-                console.log(`Navigating to friend with ID: ${friend._id}`)
-                navigation.navigate('Friend', { friendId: friend._id })
-              }}>
-                <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
-              </Pressable>
-              <Text style={styles.username}>{friend.username}</Text>
-            </View>
+            <FriendItem key={friend._id} friend={friend} navigation={navigation} />
           ))}
         </ScrollView>
       )}

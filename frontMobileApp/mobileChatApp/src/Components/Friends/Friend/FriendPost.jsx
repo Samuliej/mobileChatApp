@@ -8,8 +8,6 @@ const FriendPost = ({ post: initialPost, likePost, commentPost }) => {
   const [post, setPost] = useState(initialPost)
   const likeScale = useRef(new Animated.Value(1)).current
 
-  console.log('initialPost', initialPost)
-
   const handleCommentSubmit = async () => {
     if (commentText) {
       const newComment = await commentPost(post._id, commentText)
