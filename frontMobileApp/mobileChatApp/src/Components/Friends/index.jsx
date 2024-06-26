@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator, ScrollView, Animated } from 'react-native'
+import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
 import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
 import { SocketContext } from '../../Context/SocketContext.js'
 const emptyIcon = require('../../../assets/fist-bump.png')
-const defaultProfilePicture = require('../../../assets/soldier.png')
+import FriendItem from './FriendItem.jsx'
 
 /*
 
@@ -14,47 +14,6 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
   You can navigate to a single friend's info and posts displaying component from here also.
 
 */
-
-const FriendItem = ({ friend, navigation }) => {
-  const animateScale = new Animated.Value(1)
-
-  const startAnimation = () => {
-    Animated.spring(animateScale, {
-      toValue: 1.1,
-      friction: 2,
-      useNativeDriver: true,
-    }).start()
-  }
-
-  const resetAnimation = () => {
-    Animated.spring(animateScale, {
-      toValue: 1,
-      friction: 2,
-      useNativeDriver: true,
-    }).start()
-  }
-
-  return (
-    <Animated.View
-      style={[
-        styles.friendItem,
-        {
-          transform: [{ scale: animateScale }],
-        },
-      ]}
-    >
-      <Pressable
-        onPress={() => navigation.navigate('Friend', { friendId: friend._id })}
-        onPressIn={startAnimation}
-        onPressOut={resetAnimation}
-        style={{ flexDirection: 'row', alignItems: 'center' }}
-      >
-        <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
-        <Text style={styles.username}>{friend.username}</Text>
-      </Pressable>
-    </Animated.View>
-  )
-}
 
 const Friends = () => {
   const { user } = useContext(UserContext)
@@ -143,29 +102,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-  },
-  friendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 20,
-  },
-  username: {
-    flex: 1,
-    fontSize: 18,
   },
   emptyContainer: {
     flex: 1,

@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, Image, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
 import { useRoute } from '@react-navigation/native'
 import useFriendsPosts from '../../../hooks/useFriendsPosts'
 import useGetUserById from '../../../hooks/useGetUserById'
@@ -12,8 +12,8 @@ const DisplayUser = ({ friendId }) => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
     )
   }
@@ -45,8 +45,8 @@ const Friend = () => {
 
   if (loading) {
     return (
-      <View>
-        <Text>loading...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
     )
   }
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     padding: 10,
+    paddingBottom: 20,
     borderRadius: 7
   },
   profileAndInfo: {
@@ -132,6 +133,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 })
 
 export default Friend
