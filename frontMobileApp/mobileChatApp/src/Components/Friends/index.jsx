@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React from 'react'
 import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
-import { UserContext } from '../../Context/UserContext.js'
-import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
-import { SocketContext } from '../../Context/SocketContext.js'
 const emptyIcon = require('../../../assets/fist-bump.png')
 import FriendItem from './FriendItem.jsx'
+import useFriends from '../../hooks/useFriends.js'
 
 /*
 
@@ -16,48 +14,8 @@ import FriendItem from './FriendItem.jsx'
 */
 
 const Friends = () => {
-  const { user } = useContext(UserContext)
-  const [friends, setFriends] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { friends, loading } = useFriends()
   const navigation = useNavigation()
-  const socket = useContext(SocketContext)
-
-  // Fetch friends in a useEffect
-  useEffect(() => {
-    const fetchFriends = async () => {
-      if (user) {
-        const fetchedFriends = await Promise.all(user.friends.map(async (friendId) => {
-          const response = await api.get(`/api/users/id/${friendId}`)
-          const friendUser = await response.data
-          return friendUser
-        }))
-
-        setFriends(fetchedFriends)
-      }
-      setLoading(false)
-    }
-
-    fetchFriends()
-
-    // Listen for the 'friendRequestAccepted' event
-    socket.on('friendRequestAccepted', async (friendship) => {
-      // Check if the current user is involved in the friendship
-      if (friendship.user1._id === user._id || friendship.user2._id === user._id) {
-        // Get the new friend's user object
-        const newFriendId = friendship.user1._id === user._id ? friendship.user2._id : friendship.user1._id
-        const response = await api.get(`/api/users/id/${newFriendId}`)
-        const newFriend = await response.data
-
-        // Update the friends state to include the new friend
-        setFriends(prevFriends => [...prevFriends, newFriend])
-      }
-    })
-
-    return () => {
-      socket.off('friendRequestAccepted')
-    }
-
-  }, [user ? user.friends : null, socket])
 
   if (loading) {
     return (
