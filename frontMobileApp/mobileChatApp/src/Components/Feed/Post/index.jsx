@@ -18,6 +18,7 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
   const [commentText, setCommentText] = useState('')
   const [post, setPost] = useState(initialPost)
   const likeScale = useRef(new Animated.Value(1)).current
+  const [justLiked, setJustLiked] = useState(false)
 
   // Handles submitting a new comment to a post
   const handleCommentSubmit = async () => {
@@ -37,18 +38,21 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
 
   // Handles liking the post, also animates the icon
   const handleLike = async () => {
-    Animated.sequence([
-      Animated.timing(likeScale, {
-        toValue: 1.3,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(likeScale, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start()
+
+    if (!post.likedBy.includes(user._id) || justLiked) {
+      Animated.sequence([
+        Animated.timing(likeScale, {
+          toValue: 1.3,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(likeScale, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]).start()
+    }
 
     const success = await likePost(post._id)
 
@@ -57,6 +61,7 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
         ...prevPost,
         likes: prevPost.likes + 1
       }))
+      setJustLiked(true)
     }
   }
 
@@ -87,7 +92,12 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
       <View style={styles.actionsContainer}>
         <View style={styles.likeContainer}>
           <Animated.View style={{ transform: [{ scale: likeScale }] }}>
-            <Ionicons name="thumbs-up-outline" size={24} color="black" onPress={handleLike} />
+            <Ionicons
+              name="thumbs-up-outline"
+              size={24}
+              color={(post.likedBy.includes(user._id) || justLiked) ? "blue" : "black"}
+              onPress={handleLike}
+            />
           </Animated.View>
           <Text>{post.likes}</Text>
         </View>

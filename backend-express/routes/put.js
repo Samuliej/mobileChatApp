@@ -79,18 +79,23 @@ router.put('/api/acceptFriendRequest', authMiddleware, async (req, res) => {
 // Like a post
 router.put('/api/likePost/:postId/like', authMiddleware, async (req, res) => {
   const { postId } = req.params
-
   const currentUser = req.currentUser
+
   if (!currentUser) {
     return res.status(400).json({ error: 'Authentication required' })
   }
 
   try {
     const post = await Post.findById(postId)
-    post.likes += 1
-    await post.save()
 
-    res.status(200).json(post)
+    if (!post.likedBy.includes(currentUser._id)) {
+      post.likes += 1
+      post.likedBy.push(currentUser._id)
+      await post.save()
+      res.status(200).json(post)
+    } else {
+      res.status(400).json({ error: 'User has already liked this post' })
+    }
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Error liking post' })
