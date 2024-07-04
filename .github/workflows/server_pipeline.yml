@@ -73,7 +73,7 @@ jobs:
 
   server_deployment_pipeline:
     needs: [run_tests_server]
-    if: github.event_name == 'push'
+    if: ${{ github.event_name == 'push' && !contains(join(fromJSON(toJson(github.event.commits.*.message)), ' '), '#skip') }}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
@@ -104,7 +104,7 @@ jobs:
 
   tag_release:
       needs: [server_deployment_pipeline]
-      if: github.event_name == 'push'
+      if: ${{ github.event_name == 'push' && !contains(join(fromJSON(toJson(github.event.commits.*.message)), ' '), '#skip') }}
       runs-on: ubuntu-20.04
       steps:
         - name: Checkout repository
