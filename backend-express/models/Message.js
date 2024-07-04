@@ -19,9 +19,16 @@ const schema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: true,
-    minlength: 1
+    required: false,
   },
+  justEmojis: {
+    type: Boolean,
+    required: true
+  },
+  emojis: [{
+    emoji: { type: String },
+    index: { type: Number }
+  }],
   timestamp: {
     type: String,
     required: true

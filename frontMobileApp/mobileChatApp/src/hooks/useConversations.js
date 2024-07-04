@@ -3,6 +3,7 @@ import api from '../api.js'
 import { SocketContext } from '../Context/SocketContext.js'
 import { UserContext } from '../Context/UserContext.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { decrypt } from 'react-native-simple-encryption'
 
 /*
 
@@ -35,11 +36,21 @@ const useConversations = (user) => {
 
   useEffect(() => {
     // Listens to new messages and updates the conversations
+    // Also handles adding the emojies back, since they can't be encrypted
     socket.on('message', (newMessage) => {
       setConversations((prevConversations) => {
         return prevConversations.map((conversation) => {
           if (conversation._id === newMessage.conversationId) {
-            return { ...conversation, lastMessage: newMessage }
+            let decryptedContent = decrypt(conversation.encryptionKey, newMessage.content)
+
+            if (newMessage.emojis && newMessage.emojis.length > 0) {
+              const sortedEmojis = newMessage.emojis.sort((a, b) => b.index - a.index)
+              sortedEmojis.forEach(({ emoji, index }) => {
+                decryptedContent = decryptedContent.slice(0, index) + emoji + decryptedContent.slice(index)
+              })
+            }
+
+            return { ...conversation, lastMessage: {...newMessage, content: decryptedContent} }
           } else {
             return conversation
           }
@@ -70,9 +81,25 @@ const useConversations = (user) => {
         const friend = await response.data
 
         // Fetch the messages for the conversation
+        // Also handles adding the emojies back, since they can't be encrypted
         const messagesResponse = await api.get(`/api/conversations/${conversation._id}/messages`)
         const messages = await messagesResponse.data
-        const lastMessage = messages[messages.length - 1]
+        let lastMessage = messages[messages.length - 1]
+        try {
+          if (lastMessage) {
+            let decryptedContent = decrypt(conversation.encryptionKey, lastMessage.content)
+            if (lastMessage.emojis && lastMessage.emojis.length > 0) {
+              const sortedEmojis = lastMessage.emojis.sort((a, b) => b.index - a.index)
+              sortedEmojis.forEach(({ emoji, index }) => {
+                decryptedContent = decryptedContent.slice(0, index) + emoji + decryptedContent.slice(index)
+              })
+            }
+
+            lastMessage.content = decryptedContent
+          }
+        } catch (error) {
+          console.error("Decryption error:", error)
+        }
 
         return { ...conversation, friend, lastMessage }
       }

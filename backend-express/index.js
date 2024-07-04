@@ -215,6 +215,8 @@ io.on('connection', async (socket) => {
         sender: messageData.sender,
         receiver: messageData.receiver,
         content: messageData.content,
+        emojis: messageData.emojis,
+        justEmojis: messageData.justEmojis,
         timestamp: new Date().toISOString(),
         conversationId: conversation._id
       })
@@ -223,6 +225,7 @@ io.on('connection', async (socket) => {
 
     } catch (error) {
       console.log('something went wrong creating new message')
+      console.log(error)
       socket.emit('error', { error: 'Something went wrong creating new message' })
     }
 

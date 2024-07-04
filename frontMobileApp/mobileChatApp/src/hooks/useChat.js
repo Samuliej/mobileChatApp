@@ -2,12 +2,35 @@ import { useState, useEffect, useContext } from 'react'
 import api from '../api.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SocketContext } from '../Context/SocketContext.js'
+import { encrypt, decrypt } from 'react-native-simple-encryption'
 
 /*
 
   Custom hook for enabling real-time messaging in the application
 
 */
+
+// Utility function to extract emojis and their indices from a message
+const extractEmojis = (message) => {
+  const emojiRegex = /([\uD800-\uDBFF][\uDC00-\uDFFF])/g // Basic regex for matching surrogate pairs (common for emojis)
+  let match
+  const emojis = []
+  let cleanedMessage = message
+
+  while ((match = emojiRegex.exec(message)) !== null) {
+    const emoji = match[0]
+    const index = match.index
+    emojis.push({ emoji, index })
+    cleanedMessage = cleanedMessage.replace(emoji, "") // Remove emoji from the message
+  }
+
+  return { cleanedMessage, emojis }
+}
+
+const isMessageOnlyEmojis = (message) => {
+  const { cleanedMessage } = extractEmojis(message)
+  return cleanedMessage.length === 0
+}
 
 const useChat = (user, conversationId, initialFriend) => {
   const [friend, setFriend] = useState(initialFriend)
@@ -56,7 +79,27 @@ const useChat = (user, conversationId, initialFriend) => {
       const friend = fetchedConversation.participants.find(participant => participant._id !== user._id)
       setFriend(friend)
     }
-    setConversation({...fetchedConversation, messages: sortedMessages})
+
+    const encryptionKey = fetchedConversation.encryptionKey
+
+    // Use encryptionKey for decrypting messages
+    // Also handles adding the emojies back, since they can't be encrypted
+    const decryptedMessages = sortedMessages.map(m => {
+      let content = m.justEmojis ? m.content : decrypt(encryptionKey, m.content)
+      if (m.emojis && m.emojis.length > 0) {
+        const sortedEmojis = m.emojis.sort((a, b) => b.index - a.index)
+        sortedEmojis.forEach(({ emoji, index }) => {
+          content = content.slice(0, index) + emoji + content.slice(index)
+        })
+      }
+
+      return {
+        ...m,
+        content: content
+      }
+    })
+
+    setConversation({...fetchedConversation, messages: decryptedMessages})
     setLoading(false)
   }
 
@@ -65,7 +108,43 @@ const useChat = (user, conversationId, initialFriend) => {
   const sendMessage = async () => {
     const userToken = await AsyncStorage.getItem('userToken')
 
-    const messageContent = {
+    const { cleanedMessage, emojis } = extractEmojis(newMessage)
+
+    const onlyEmojis = isMessageOnlyEmojis(cleanedMessage)
+    let messageContent
+    let displayedMessageContent
+
+    if (!onlyEmojis) {
+
+      const encryptedMessage = encrypt(conversation.encryptionKey, cleanedMessage)
+
+      messageContent = {
+        placeHolder: true,
+        content: encryptedMessage,
+        emojis: emojis,
+        justEmojis: false,
+        conversationId,
+        token: userToken,
+        receiver: friend._id,
+        sender: user._id,
+        timestamp: Date.now(),
+      }
+
+    } else {
+      messageContent = {
+        placeHolder: true,
+        content: '',
+        emojis: emojis,
+        justEmojis: true,
+        conversationId,
+        token: userToken,
+        receiver: friend._id,
+        sender: user._id,
+        timestamp: Date.now(),
+      }
+    }
+
+    displayedMessageContent = {
       placeHolder: true,
       content: newMessage,
       conversationId,
@@ -77,7 +156,7 @@ const useChat = (user, conversationId, initialFriend) => {
 
     setConversation(prevConversation => ({
       ...prevConversation,
-      messages: [...prevConversation.messages, messageContent],
+      messages: [...prevConversation.messages, displayedMessageContent],
     }))
 
     socket.emit('message', messageContent)
