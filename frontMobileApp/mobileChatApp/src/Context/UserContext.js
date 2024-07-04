@@ -25,6 +25,23 @@ export const UserProvider = ({ children }) => {
     return data
   }
 
+  const updateUserFields = async (fields) => {
+    const { name, phone, city } = fields
+    const token = await AsyncStorage.getItem('userToken')
+    try {
+      const response = await api.put(`/api/users/${user._id}`, {name, phone, city}, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      const updatedUser = response.data
+      setUser(updatedUser)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   // Updates the user when there are changes to the user in the DB
   const updateUser = async (token) => {
     if (token) {
@@ -56,7 +73,7 @@ export const UserProvider = ({ children }) => {
   }, [])
 
   return (
-    <UserContext.Provider value={{ user, isSignedIn, updateUser, updateUserPendingRequests }}>
+    <UserContext.Provider value={{ user, isSignedIn, updateUser, updateUserPendingRequests, updateUserFields }}>
       {children}
     </UserContext.Provider>
   )

@@ -1,22 +1,42 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, Image, TextInput, StyleSheet, Pressable } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CustomButton from '../SignIn/CustomButton'
+import ErrorBanner from '../Error/index'
 
 const Profile = () => {
-  const { user } = useContext(UserContext)
+  const { user, updateUserFields } = useContext(UserContext)
   const [editMode, setEditMode] = useState(false)
   const [name, setName] = useState(user.name)
   const [phone, setPhone] = useState(user.phone)
   const [city, setCity] = useState(user.city)
+  const [notif, setNotif] = useState('')
 
-  const handleSave = () => {
-    console.log('modified')
+  const handleSave = async () => {
+    const fields = {
+      name, phone, city
+    }
+    updateUserFields(fields)
+    setEditMode(false)
+    setNotif('User info updated')
   }
+
+  useEffect(() => {
+    if (notif) {
+      const timeout = setTimeout(() => {
+        setNotif('')
+      }, 3000)
+
+      return () => clearTimeout(timeout)
+    }
+  },[notif])
 
   return (
     <View style={styles.container}>
+      {notif && (
+        <ErrorBanner error={notif} type={'success'} />
+      )}
       <Pressable style={styles.editIcon} onPress={() => setEditMode(!editMode)}>
         <Ionicons name="settings-outline" size={30} color="#000" />
       </Pressable>
