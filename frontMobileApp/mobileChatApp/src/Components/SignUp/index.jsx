@@ -196,6 +196,8 @@ const SignUp =  () => {
             value={username}
             onChangeText={setUsername}
             onBlur={async () => {
+              const trimmedUsername = username.trim()
+              setUsername(trimmedUsername)
               const errorMessage = validateField('username', { username })
               if (errorMessage) {
                 setUsernameError(errorMessage)
@@ -203,7 +205,7 @@ const SignUp =  () => {
                   setUsernameError('')
                 }, 3500)
               }
-              await check(username)
+              await check(trimmedUsername)
             }}
             placeholder='Username (min. 3 characters)'
           />
@@ -216,6 +218,8 @@ const SignUp =  () => {
             value={password}
             onChangeText={setPassword}
             onBlur={() => {
+              const trimmedPassword = password.trim()
+              setPassword(trimmedPassword)
               const errorMessage = validateField('password', { password })
               if (errorMessage) {
                 setPasswordError(errorMessage)
@@ -234,7 +238,9 @@ const SignUp =  () => {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             onBlur={() => {
-              const errorMessage = validateConfirmPassword(password, confirmPassword)
+              const trimmedConfirmPassword = confirmPassword.trim()
+              setConfirmPassword(trimmedConfirmPassword)
+              const errorMessage = validateConfirmPassword(password, trimmedConfirmPassword)
               if (errorMessage) {
                 setPasswordsMatch(false)
               } else {
@@ -254,6 +260,8 @@ const SignUp =  () => {
             value={name}
             onChangeText={setName}
             onBlur={() => {
+              const trimmedName = name.trim()
+              setName(trimmedName)
               const errorMessage = validateField('name', { name })
               if (errorMessage) {
                 setNameError(errorMessage)
@@ -274,6 +282,10 @@ const SignUp =  () => {
             onChangeText={setPhone}
             placeholder='Phone'
             keyboardType='phone-pad'
+            onBlur={() => {
+              const trimmedPhone = phone.trim()
+              setPhone(trimmedPhone)
+            }}
           />
           <Text style={{ marginTop: 16 }}>City:</Text>
           <TextInput
@@ -281,6 +293,10 @@ const SignUp =  () => {
             value={city}
             onChangeText={setCity}
             placeholder='City'
+            onBlur={() => {
+              const trimmedCity = city.trim()
+              setCity(trimmedCity)
+            }}
           />
           <CustomButton style={{ marginTop: 10, marginBottom: 20 }} onPress={handleSignUp} title='Register' />
         </View>
