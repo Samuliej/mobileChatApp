@@ -38,7 +38,6 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
 
   // Handles liking the post, also animates the icon
   const handleLike = async () => {
-
     if (!post.likedBy.includes(user._id) || justLiked) {
       Animated.sequence([
         Animated.timing(likeScale, {

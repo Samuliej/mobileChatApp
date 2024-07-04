@@ -1,11 +1,14 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useContext } from 'react'
 import { View, Text, StyleSheet, Image, Button, Animated, TextInput } from 'react-native'
+import { UserContext } from '../../../Context/UserContext.js'
 import { Ionicons } from '@expo/vector-icons'
 
 const FriendPost = ({ post: initialPost, likePost, commentPost }) => {
   const [commentsOpen, setCommentsOpen] = useState(false)
   const [commentText, setCommentText] = useState('')
   const [post, setPost] = useState(initialPost)
+  const [justLiked, setJustLiked] = useState(false)
+  const { user } = useContext(UserContext)
   const likeScale = useRef(new Animated.Value(1)).current
 
   const handleCommentSubmit = async () => {
@@ -24,18 +27,20 @@ const FriendPost = ({ post: initialPost, likePost, commentPost }) => {
   }
 
   const handleLike = async () => {
-    Animated.sequence([
-      Animated.timing(likeScale, {
-        toValue: 1.3,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(likeScale, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start()
+    if (!post.likedBy.includes(user._id) || justLiked) {
+      Animated.sequence([
+        Animated.timing(likeScale, {
+          toValue: 1.3,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(likeScale, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]).start()
+    }
 
     const success = await likePost(post._id)
 
@@ -44,6 +49,7 @@ const FriendPost = ({ post: initialPost, likePost, commentPost }) => {
         ...prevPost,
         likes: prevPost.likes + 1
       }))
+      setJustLiked(true)
     }
   }
 
@@ -61,7 +67,12 @@ const FriendPost = ({ post: initialPost, likePost, commentPost }) => {
       <View style={styles.actionsContainer}>
         <View style={styles.likeContainer}>
           <Animated.View style={{ transform: [{ scale: likeScale }] }}>
-            <Ionicons name="thumbs-up-outline" size={24} color="black" onPress={handleLike} />
+            <Ionicons
+              name="thumbs-up-outline"
+              size={24}
+              color={(post.likedBy.includes(user._id) || justLiked) ? "blue" : "black"}
+              onPress={handleLike}
+            />
           </Animated.View>
           <Text>{post.likes}</Text>
         </View>
