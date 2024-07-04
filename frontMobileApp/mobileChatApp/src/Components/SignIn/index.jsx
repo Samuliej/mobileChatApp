@@ -119,11 +119,14 @@ const SignInView = ({ username, setUsername, password, setUsernameError, setPass
             style={{ width: 90, height: 90 }}
           />
         </View>
-        <TextInput style={styles.inputBox}
+        <TextInput
+          style={styles.inputBox}
           value={username}
           onChangeText={setUsername}
           onBlur={() => {
-            const errorMessage = validateField('username', username)
+            const trimmedUsername = username.trim()
+            setUsername(trimmedUsername)
+            const errorMessage = validateField('username', trimmedUsername)
             if (errorMessage) {
               setUsernameError(errorMessage)
               setTimeout(() => {
@@ -136,11 +139,14 @@ const SignInView = ({ username, setUsername, password, setUsernameError, setPass
           placeholder='Username'
         />
         {usernameError ? <Text style={{ color: 'red' }}>{usernameError}</Text> : null}
-        <TextInput style={styles.inputBox}
+        <TextInput
+          style={styles.inputBox}
           value={password}
           onChangeText={setPassword}
           onBlur={() => {
-            const errorMessage = validateField('password', username)
+            const trimmedPassword = password.trim()
+            setPassword(trimmedPassword)
+            const errorMessage = validateField('password', trimmedPassword)
             if (errorMessage) {
               setPasswordError(errorMessage)
               setTimeout(() => {
