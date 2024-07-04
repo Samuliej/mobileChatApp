@@ -16,6 +16,7 @@ import NewConversation from '../NewConversation/index.jsx'
 import Chat from '../Chat/index.jsx'
 import NewPost from '../Feed/NewPost/index.jsx'
 import Friend from '../Friends/Friend/index.jsx'
+import Profile from '../Profile/index.jsx'
 
 /*
 
@@ -42,7 +43,7 @@ const CustomHeader = ({ user }) => {
     <Pressable onPress={() => navigation.toggleDrawer()}>
       <Image
         source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
-        style={{ width: 40, height: 40, borderRadius: 20, paddingLeft: 5 }}
+        style={{ width: 40, height: 40, borderRadius: 20, marginLeft: 8 }}
       />
     </Pressable>
   )
@@ -152,6 +153,10 @@ const MyDrawer = () => {
             badgeCount={pendingRequestsCount}
             onPress={() => props.navigation.navigate('Friend requests')}
           />
+          <CustomDrawerItem
+            label="Profile"
+            onPress={() => props.navigation.navigate('Profile')}
+          />
           <DrawerItem
             label="Sign Out"
             onPress={handleSignOut}
@@ -185,6 +190,7 @@ const MyDrawer = () => {
       <Drawer.Screen name="Friends" component={Friends} />
       <Drawer.Screen name="Friend requests" component={FriendRequests} />
       <Drawer.Screen name="New conversation" component={NewConversation} />
+      <Drawer.Screen name="Profile" component={Profile} />
       <Drawer.Screen
         name="Chat"
         component={Chat}
