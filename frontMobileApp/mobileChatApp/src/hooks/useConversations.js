@@ -3,6 +3,7 @@ import api from '../api.js'
 import { SocketContext } from '../Context/SocketContext.js'
 import { UserContext } from '../Context/UserContext.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { decrypt } from 'react-native-simple-encryption'
 
 /*
 
@@ -39,7 +40,8 @@ const useConversations = (user) => {
       setConversations((prevConversations) => {
         return prevConversations.map((conversation) => {
           if (conversation._id === newMessage.conversationId) {
-            return { ...conversation, lastMessage: newMessage }
+            const decryptedContent = decrypt(conversation.encryptionKey, newMessage.content)
+            return { ...conversation, lastMessage: {...newMessage, content: decryptedContent} }
           } else {
             return conversation
           }
@@ -72,7 +74,15 @@ const useConversations = (user) => {
         // Fetch the messages for the conversation
         const messagesResponse = await api.get(`/api/conversations/${conversation._id}/messages`)
         const messages = await messagesResponse.data
-        const lastMessage = messages[messages.length - 1]
+        let lastMessage = messages[messages.length - 1]
+        try {
+          if (lastMessage) {
+            lastMessage.content = decrypt(conversation.encryptionKey, lastMessage.content)
+          }
+        } catch (error) {
+          console.error("Decryption error:", error)
+          // Handle the error appropriately
+        }
 
         return { ...conversation, friend, lastMessage }
       }

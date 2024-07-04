@@ -15,6 +15,7 @@ const multer = require('multer')
 const upload = multer({ dest: 'uploads/' })
 
 const cloudinary = require('../cloudinary')
+const crypto = require('crypto')
 
 /*
 
@@ -159,7 +160,8 @@ router.post('/api/startConversation', authMiddleware, async (req, res) => {
   if (!conversation) {
     conversation = new Conversation({
       participants: [currentUser._id, friend._id],
-      messages: []
+      messages: [],
+      encryptionKey: crypto.randomBytes(32).toString('hex')
     })
   }
 

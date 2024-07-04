@@ -14,6 +14,7 @@ const schema = new mongoose.Schema({
   messages: [
     { type: mongoose.Schema.Types.ObjectId, ref: 'Message' }
   ],
+  encryptionKey: { type: String, required: true }
 })
 
 module.exports = mongoose.model('Conversation', schema)

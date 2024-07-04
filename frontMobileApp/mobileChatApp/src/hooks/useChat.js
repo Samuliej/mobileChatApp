@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import api from '../api.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SocketContext } from '../Context/SocketContext.js'
+import { encrypt, decrypt } from 'react-native-simple-encryption'
 
 /*
 
@@ -56,7 +57,16 @@ const useChat = (user, conversationId, initialFriend) => {
       const friend = fetchedConversation.participants.find(participant => participant._id !== user._id)
       setFriend(friend)
     }
-    setConversation({...fetchedConversation, messages: sortedMessages})
+
+    const encryptionKey = fetchedConversation.encryptionKey
+
+    // Use encryptionKey for decrypting messages
+    const decryptedMessages = sortedMessages.map(m => ({
+      ...m,
+      content: decrypt(encryptionKey, m.content) // Use the retrieved key
+    }))
+
+    setConversation({...fetchedConversation, messages: decryptedMessages})
     setLoading(false)
   }
 
@@ -65,7 +75,19 @@ const useChat = (user, conversationId, initialFriend) => {
   const sendMessage = async () => {
     const userToken = await AsyncStorage.getItem('userToken')
 
+    const encryptedMessage = encrypt(conversation.encryptionKey, newMessage)
+
     const messageContent = {
+      placeHolder: true,
+      content: encryptedMessage,
+      conversationId,
+      token: userToken,
+      receiver: friend._id,
+      sender: user._id,
+      timestamp: Date.now(),
+    }
+
+    const displayedMessageContent = {
       placeHolder: true,
       content: newMessage,
       conversationId,
@@ -77,7 +99,7 @@ const useChat = (user, conversationId, initialFriend) => {
 
     setConversation(prevConversation => ({
       ...prevConversation,
-      messages: [...prevConversation.messages, messageContent],
+      messages: [...prevConversation.messages, displayedMessageContent],
     }))
 
     socket.emit('message', messageContent)
