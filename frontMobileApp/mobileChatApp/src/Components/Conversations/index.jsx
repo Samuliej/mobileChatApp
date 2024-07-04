@@ -5,9 +5,8 @@ import { UserContext } from '../../Context/UserContext.js'
 import useConversations from '../../hooks/useConversations.js'
 import { truncate } from '../../utils/utils.js'
 import useDeleteConversation from '../../hooks/useDeleteConversation.js'
+import ErrorBanner from '../Error/index.jsx'
 const defaultProfilePicture = require('../../../assets/soldier.png')
-
-// TODO: Implement notifications for new messages on the convo list
 
 /*
 
@@ -19,29 +18,34 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
 const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)
-  const { conversations, loading } = useConversations(user)
+  const { conversations, loading, setConversations } = useConversations(user)
   const [selectedConversation, setSelectedConversation] = useState(null)
   const [deleteConversation, isLoading] = useDeleteConversation()
   const [sortedConversations, setSortedConversations] = useState([])
-
-  if (loading || isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    )
-  }
+  const [error, setError] = useState('')
 
   // Function to handle long press on a conversation item
   const handleLongPress = (conversation) => {
-    console.log('long pressed')
     setSelectedConversation(conversation)
   }
 
+  // Clear error message
+  useEffect(() => {
+    if (error) {
+      const timeout = setTimeout(() => {
+        setError('')
+      }, 5000)
+
+
+      return () => clearTimeout(timeout)
+    }
+  }, [error])
+
   // Function to handle conversation removal
   const handleRemoveConversation = async () => {
-    console.log('removing conversation')
     await deleteConversation(selectedConversation._id)
+    setConversations(conversations.filter(c => c._id !== selectedConversation._id))
+    setError('Conversation removed succesfully')
     setSelectedConversation(null)
   }
 
@@ -66,6 +70,14 @@ const Conversations = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {error && (
+        <ErrorBanner error={error} type={'success'} />
+      )}
+      {(loading || isLoading) && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )}
       {selectedConversation && (
         <View style={styles.redBar}>
           <Text style={styles.redBarText}>Remove conversation with {selectedConversation.friend.name}?</Text>

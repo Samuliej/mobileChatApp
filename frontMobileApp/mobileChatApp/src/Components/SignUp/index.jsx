@@ -159,7 +159,16 @@ const SignUp =  () => {
     }
   }
 
-  // TODO: maybe create component for displaying text input and errors
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Fetching posts...</Text>
+      </View>
+    )
+  }
+
+
   return (
     <KeyboardAwareScrollView
       resetScrollToCoords={{ x: 0, y: 0 }}
