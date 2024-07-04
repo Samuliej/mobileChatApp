@@ -109,7 +109,7 @@ const useConversations = (user) => {
     setLoading(false)
   }
 
-  return { conversations, loading }
+  return { conversations, loading, setConversations }
 }
 
 export default useConversations
