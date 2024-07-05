@@ -110,7 +110,11 @@ const theme = {
     marginTop: 10,
   },
   platformStyle: {
-    color: '#4CAF50'
+    color: Platform.select({
+      android: '#4CAF50',
+      ios: '#318CE7',
+      default: '#4CAF50'
+    })
   }
 }
 
