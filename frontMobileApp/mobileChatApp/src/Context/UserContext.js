@@ -28,14 +28,15 @@ export const UserProvider = ({ children }) => {
   const updateUserFields = async (fields) => {
     const { name, phone, city } = fields
     const token = await AsyncStorage.getItem('userToken')
+    console.log('user before updating fields', user)
     try {
       const response = await api.put(`/api/users/${user._id}`, {name, phone, city}, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
-
       const updatedUser = response.data
+      console.log('updatedUser', updatedUser)
       setUser(updatedUser)
     } catch (error) {
       console.log(error)

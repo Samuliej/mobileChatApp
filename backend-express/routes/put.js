@@ -114,6 +114,9 @@ router.put('/api/users/:id', authMiddleware, async (req, res) => {
 
   try {
     const userToModify = await User.findById(currentUser._id)
+      .select('-password')
+      .populate('pendingFriendRequests')
+      .populate('conversations')
     if (name) userToModify.name = name
     if (phone) userToModify.phone = phone
     if (city) userToModify.city = city
