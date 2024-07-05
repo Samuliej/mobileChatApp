@@ -12,7 +12,7 @@ import * as ImagePicker from 'expo-image-picker'
 import defaultProfilePicture from '../../../assets/soldier.png'
 import FriendPost from '../Friends/Friend/FriendPost'
 
-const Profile = () => {
+const Profile = ({ navigation }) => {
   const { user, updateUserFields, loading } = useContext(UserContext)
   const [editMode, setEditMode] = useState(false)
   const [name, setName] = useState(user.name)
@@ -23,7 +23,7 @@ const Profile = () => {
   const [newProfilePicture, setNewProfilePicture] = useState(null)
   const [currentView, setCurrentView] = useState('info')
   const { likePost, commentPost } = usePost()
-  const { userPosts } = useUserPosts(user._id)
+  const { userPosts, refreshUserPosts } = useUserPosts(user._id)
 
   // Function for selecting an image to upload
   const selectImage = async () => {
@@ -74,6 +74,15 @@ const Profile = () => {
       return () => clearTimeout(timeout)
     }
   },[notif])
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('refreshing posts')
+      refreshUserPosts()
+    })
+
+    return unsubscribe
+  }, [navigation])
 
   if (loading) {
     return (

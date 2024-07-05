@@ -7,31 +7,35 @@ const useUserPosts = (userId) => {
   const [userPosts, setUserPosts] = useState([])
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    const fetchUserPosts = async () => {
-      setLoading(true)
-      setError(null)
+  const fetchUserPosts = async () => {
+    setLoading(true)
+    setError(null)
 
-      try {
-        const userToken = await AsyncStorage.getItem('userToken')
-        const config = {
-          headers: { Authorization: `Bearer ${userToken}` }
-        }
-
-        const response = await api.get(`/api/posts/user/${userId}`, config)
-        const sortedPosts = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        setUserPosts(sortedPosts)
-        setLoading(false)
-      } catch (error) {
-        setError('Error fetching user posts')
-        setLoading(false)
+    try {
+      const userToken = await AsyncStorage.getItem('userToken')
+      const config = {
+        headers: { Authorization: `Bearer ${userToken}` }
       }
-    }
 
+      const response = await api.get(`/api/posts/user/${userId}`, config)
+      const sortedPosts = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      setUserPosts(sortedPosts)
+      setLoading(false)
+    } catch (error) {
+      setError('Error fetching user posts')
+      setLoading(false)
+    }
+  }
+
+  const refreshUserPosts = () => {
+    fetchUserPosts()
+  }
+
+  useEffect(() => {
     fetchUserPosts()
   }, [userId])
 
-  return { loading, userPosts, error }
+  return { loading, userPosts, error, refreshUserPosts }
 }
 
 export default useUserPosts
