@@ -1,25 +1,62 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, Image, TextInput, StyleSheet, Pressable } from 'react-native'
+import { View, Text, Image, TextInput, StyleSheet, Pressable, ActivityIndicator } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CustomButton from '../SignIn/CustomButton'
 import ErrorBanner from '../Error/index'
+import * as ImagePicker from 'expo-image-picker'
+// Default user profile picture property of Pixel Perfect:
+// href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
+import defaultProfilePicture from '../../../assets/soldier.png'
 
 const Profile = () => {
-  const { user, updateUserFields } = useContext(UserContext)
+  const { user, updateUserFields, loading } = useContext(UserContext)
   const [editMode, setEditMode] = useState(false)
   const [name, setName] = useState(user.name)
   const [phone, setPhone] = useState(user.phone)
   const [city, setCity] = useState(user.city)
   const [notif, setNotif] = useState('')
+  const [image, setImage] = useState(user.profilePicture)
+  const [newProfilePicture, setNewProfilePicture] = useState(null)
+
+  // Function for selecting an image to upload
+  const selectImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    })
+
+    if (!result.canceled) {
+      setImage(result.uri)
+      let localUri = result.uri
+      let filename = localUri.split('/').pop()
+
+      // Infer the type of the image
+      let match = /\.(\w+)$/.exec(filename)
+      let type = match ? `image/${match[1]}` : `image`
+      setNewProfilePicture({ uri: localUri, name: filename, type })
+    }
+  }
+
+  const toggleEditMode = () => {
+    // User doesn't save, revert back to original info
+    if (editMode) {
+      setName(user.name)
+      setPhone(user.phone)
+      setCity(user.city)
+      setImage(user.profilePicture)
+      setNewProfilePicture(null)
+      setEditMode(!editMode)
+    }
+    else setEditMode(!editMode)
+  }
 
   const handleSave = async () => {
-    const fields = {
-      name, phone, city
-    }
-    updateUserFields(fields)
+    updateUserFields(name, phone, city, newProfilePicture)
     setEditMode(false)
-    setNotif('User info updated')
+    setNotif('Profile updated')
   }
 
   useEffect(() => {
@@ -32,17 +69,36 @@ const Profile = () => {
     }
   },[notif])
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Updating profile...</Text>
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container}>
       {notif && (
         <ErrorBanner error={notif} type={'success'} />
       )}
-      <Pressable style={styles.editIcon} onPress={() => setEditMode(!editMode)}>
+      <Pressable style={styles.editIcon} onPress={toggleEditMode}>
         <Ionicons name="settings-outline" size={30} color="#000" />
       </Pressable>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: user.profilePicture }} style={styles.image} />
-      </View>
+      {editMode ? (
+        <Pressable style={styles.imageContainer} onPress={selectImage}>
+          <Image source={image ? { uri: image } : defaultProfilePicture} style={styles.image} />
+          <View style={styles.iconContainer}>
+            <Ionicons name="create-outline" size={24} color="white" />
+          </View>
+        </Pressable>
+      ) : (
+        <View style={styles.imageContainer}>
+          <Image source={user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture} style={styles.image} />
+        </View>
+      )}
+
       <View style={styles.infoContainer}>
         <Text style={styles.title}>{user.username}</Text>
         {editMode ? (
@@ -58,9 +114,9 @@ const Profile = () => {
         ) : (
           <>
             <Text style={styles.infoText}>Username: {user.username}</Text>
-            <Text style={styles.infoText}>Name: {name}</Text>
-            <Text style={styles.infoText}>Phone: {phone}</Text>
-            <Text style={styles.infoText}>City: {city}</Text>
+            <Text style={styles.infoText}>Name: {user.name}</Text>
+            <Text style={styles.infoText}>Phone: {user.phone}</Text>
+            <Text style={styles.infoText}>City: {user.city}</Text>
           </>
         )}
       </View>
@@ -127,6 +183,19 @@ const styles = StyleSheet.create({
     right: 10,
     top: 10,
   },
+  iconContainer: {
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 5,
+    borderRadius: 15,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 })
 
 export default Profile

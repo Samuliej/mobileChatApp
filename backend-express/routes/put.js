@@ -4,6 +4,11 @@ const Friendship = require('../models/Friendship')
 const User = require('../models/User')
 const Post = require('../models/Post')
 
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
+
+const cloudinary = require('../cloudinary')
+
 const authMiddleware = require('../middlewares/authMiddlewares')
 
 /*
@@ -14,7 +19,6 @@ const authMiddleware = require('../middlewares/authMiddlewares')
 
 // Decline friend request
 router.put('/api/declineFriendRequest/:friendshipId', authMiddleware, async (req, res) => {
-  console.log('Declining friend request')
   const friendship = await Friendship.findOne({ _id: req.params.friendshipId })
   const currentUser = req.currentUser
 
@@ -104,7 +108,7 @@ router.put('/api/likePost/:postId/like', authMiddleware, async (req, res) => {
 
 
 // update user info
-router.put('/api/users/:id', authMiddleware, async (req, res) => {
+router.put('/api/users/:id', upload.single('profilePicture'), authMiddleware, async (req, res) => {
   const currentUser = req.currentUser
   const {name, phone, city} = req.body
 
@@ -113,12 +117,19 @@ router.put('/api/users/:id', authMiddleware, async (req, res) => {
   }
 
   try {
+    let result = null
+    if (req.file) {
+      result = await cloudinary.uploader.upload(req.file.path)
+    }
     const userToModify = await User.findById(currentUser._id)
+      .select('-password')
+      .populate('pendingFriendRequests')
+      .populate('conversations')
     if (name) userToModify.name = name
     if (phone) userToModify.phone = phone
     if (city) userToModify.city = city
+    if (result) userToModify.profilePicture = result.secure_url
 
-    console.log(userToModify)
 
     await userToModify.save()
     res.status(200).json(userToModify)

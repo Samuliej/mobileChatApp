@@ -75,7 +75,7 @@ const useConversations = (user) => {
   // Function for fetching messages and friend's data
   const fetchFriendData = async () => {
     const updatedConversations = await Promise.all(user.conversations.map(async (conversation) => {
-      const friendId = conversation.participants.find(id => id !== user._id)
+      const friendId = conversation.participants?.find(id => id !== user._id)
       if (friendId) {
         const response = await api.get(`/api/users/id/${friendId}`)
         const friend = await response.data

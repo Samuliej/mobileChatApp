@@ -13,6 +13,7 @@ export const UserContext = createContext()
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [isSignedIn, setIsSignedIn] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const fetchUser = async (token) => {
     // Fetch the user data using the token
@@ -25,19 +26,33 @@ export const UserProvider = ({ children }) => {
     return data
   }
 
-  const updateUserFields = async (fields) => {
-    const { name, phone, city } = fields
+  const updateUserFields = async (name, phone, city, newProfilePicture) => {
+    setLoading(true)
     const token = await AsyncStorage.getItem('userToken')
+    const formData = new FormData()
+    formData.append('name', name)
+    if (newProfilePicture) {
+      formData.append('profilePicture', {
+        uri: newProfilePicture.uri,
+        type: newProfilePicture.type,
+        name: newProfilePicture.name,
+      })
+    }
+    formData.append('phone', phone)
+    formData.append('city', city)
+
     try {
-      const response = await api.put(`/api/users/${user._id}`, {name, phone, city}, {
+      const response = await api.put(`/api/users/${user._id}`, formData, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         }
       })
-
       const updatedUser = response.data
       setUser(updatedUser)
+      setLoading(false)
     } catch (error) {
+      console.log('something went wrong updating the user')
       console.log(error)
     }
   }
@@ -73,7 +88,7 @@ export const UserProvider = ({ children }) => {
   }, [])
 
   return (
-    <UserContext.Provider value={{ user, isSignedIn, updateUser, updateUserPendingRequests, updateUserFields }}>
+    <UserContext.Provider value={{ user, isSignedIn, loading, updateUser, updateUserPendingRequests, updateUserFields }}>
       {children}
     </UserContext.Provider>
   )
