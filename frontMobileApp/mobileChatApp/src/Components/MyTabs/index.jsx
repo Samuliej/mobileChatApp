@@ -1,5 +1,4 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import theme from '../../theme.js'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Conversations from '../Conversations/index.jsx'
 import FeedScreen from '../Feed/index.jsx'
@@ -17,7 +16,6 @@ const MyTabs = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        activeTintColor: theme.platformStyle.color,
         inactiveTintColor: 'gray',
         tabBarIcon: ({ focused, color, size }) => {
           let iconName
@@ -30,6 +28,8 @@ const MyTabs = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />
         },
+        tabBarActiveTintColor: '#4CAF50',
+        tabBarInactiveTintColor: 'gray',
       })}
     >
       <Tab.Screen name="Conversations" component={Conversations} />

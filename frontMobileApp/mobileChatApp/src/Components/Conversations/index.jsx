@@ -134,6 +134,7 @@ const Conversations = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 5
   },
   redBar: {
     backgroundColor: 'red',
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     right: 20,
     bottom: 20,
-    backgroundColor: '#03A9F4',
+    backgroundColor: '#4CAF50',
     borderRadius: 35,
     elevation: 8
   },
@@ -175,6 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     marginBottom: 10,
+    marginHorizontal: 10,
     backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',

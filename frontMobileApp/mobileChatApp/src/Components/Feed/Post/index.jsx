@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react'
-import { TextInput, View, Text, StyleSheet, Image, Button, Animated } from 'react-native'
+import { TextInput, View, Text, StyleSheet, Image, Animated } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../../assets/soldier.png'
+import CustomButton from '../../SignIn/CustomButton'
 
 /*
 
@@ -118,7 +119,7 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
             value={commentText}
             onChangeText={setCommentText}
           />
-          <Button title="Submit" onPress={handleCommentSubmit} />
+          <CustomButton style={{ marginTop: 10, marginBottom: 5 }} onPress={handleCommentSubmit} title='Submit' />
         </View>
       )}
     </View>

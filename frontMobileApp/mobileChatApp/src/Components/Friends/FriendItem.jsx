@@ -51,8 +51,9 @@ const styles = StyleSheet.create({
   friendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    marginBottom: 20,
+    padding: 15,
+    marginBottom: 10,
+    marginHorizontal: 5,
     backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
