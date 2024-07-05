@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { TextInput, View, Text, StyleSheet, Image, Animated } from 'react-native'
+import { TextInput, View, Text, StyleSheet, Image, Animated, Pressable } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
@@ -14,7 +14,7 @@ import CustomButton from '../../SignIn/CustomButton'
 */
 
 
-const Post = ({ post: initialPost, likePost, commentPost, user }) => {
+const Post = ({ post: initialPost, likePost, commentPost, user, navigation }) => {
   const [commentsOpen, setCommentsOpen] = useState(false)
   const [commentText, setCommentText] = useState('')
   const [post, setPost] = useState(initialPost)
@@ -68,14 +68,21 @@ const Post = ({ post: initialPost, likePost, commentPost, user }) => {
   return (
     <View key={post._id} style={styles.postContainer}>
       <View style={styles.headerContainer}>
-        <Image
-          style={styles.profilePicture}
-          source={
-            post.author && post.author._id === user.id
-              ? { uri: user.profilePicture } : post.author && post.author.profilePicture
-                ? { uri: post.author.profilePicture } : defaultProfilePicture
-          }
-        />
+        <Pressable
+          onPress={() => {
+            // Friend's posts have author id, users own posts don't
+            if (post.author._id) navigation.navigate('Friend', { friendId: post.author._id })
+          }}
+        >
+          <Image
+            style={styles.profilePicture}
+            source={
+              post.author && post.author._id === user.id
+                ? { uri: user.profilePicture } : post.author && post.author.profilePicture
+                  ? { uri: post.author.profilePicture } : defaultProfilePicture
+            }
+          />
+        </Pressable>
         <Text style={styles.username}>
           {post.author && post.author._id === user.id ? user.username : post.author.username}
         </Text>
