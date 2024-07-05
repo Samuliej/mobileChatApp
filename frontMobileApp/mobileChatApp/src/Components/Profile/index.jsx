@@ -4,10 +4,13 @@ import { UserContext } from '../../Context/UserContext'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CustomButton from '../SignIn/CustomButton'
 import ErrorBanner from '../Error/index'
+import usePost from '../../hooks/usePost'
+import useUserPosts from '../../hooks/useUserPosts'
 import * as ImagePicker from 'expo-image-picker'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../assets/soldier.png'
+import FriendPost from '../Friends/Friend/FriendPost'
 
 const Profile = () => {
   const { user, updateUserFields, loading } = useContext(UserContext)
@@ -18,6 +21,9 @@ const Profile = () => {
   const [notif, setNotif] = useState('')
   const [image, setImage] = useState(user.profilePicture)
   const [newProfilePicture, setNewProfilePicture] = useState(null)
+  const [currentView, setCurrentView] = useState('info')
+  const { likePost, commentPost } = usePost()
+  const { userPosts } = useUserPosts(user._id)
 
   // Function for selecting an image to upload
   const selectImage = async () => {
@@ -78,6 +84,7 @@ const Profile = () => {
     )
   }
 
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -85,45 +92,101 @@ const Profile = () => {
       keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={styles.container}>
+        <View>
           {notif && (
             <ErrorBanner error={notif} type={'success'} />
           )}
-          <Pressable style={styles.editIcon} onPress={toggleEditMode}>
-            <Ionicons name="settings-outline" size={30} color="#000" />
-          </Pressable>
-          {editMode ? (
-            <Pressable style={styles.imageContainer} onPress={selectImage}>
-              <Image source={image ? { uri: image } : defaultProfilePicture} style={styles.image} />
-              <View style={styles.iconContainer}>
-                <Ionicons name="create-outline" size={24} color="white" />
-              </View>
+          <View style={{ alignItems: 'center' }}>
+            <Pressable style={styles.editIcon} onPress={toggleEditMode}>
+              <Ionicons name="settings-outline" size={30} color="#000" />
             </Pressable>
-          ) : (
-            <View style={styles.imageContainer}>
-              <Image source={user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture} style={styles.image} />
-            </View>
-          )}
-
-          <View style={styles.infoContainer}>
-            <Text style={styles.title}>{user.username}</Text>
             {editMode ? (
-              <View>
-                <Text>Name</Text>
-                <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Name" />
-                <Text>Phone</Text>
-                <TextInput style={styles.input} value={phone} keyboardType='phone-pad' onChangeText={setPhone} placeholder="Phone" />
-                <Text>City</Text>
-                <TextInput style={styles.input} value={city} onChangeText={setCity} placeholder="City" />
-                <CustomButton style={{ marginTop: 10, marginBottom: 20 }} onPress={handleSave} title='Save' />
-              </View>
+              <Pressable style={styles.imageContainer} onPress={selectImage}>
+                <Image source={image ? { uri: image } : defaultProfilePicture} style={styles.image} />
+                <View style={styles.iconContainer}>
+                  <Ionicons name="create-outline" size={24} color="white" />
+                </View>
+              </Pressable>
             ) : (
-              <>
-                <Text style={styles.infoText}>Username: {user.username}</Text>
-                <Text style={styles.infoText}>Name: {user.name}</Text>
-                <Text style={styles.infoText}>Phone: {user.phone}</Text>
-                <Text style={styles.infoText}>City: {user.city}</Text>
-              </>
+              <View style={styles.imageContainer}>
+                <Image source={user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture} style={styles.image} />
+              </View>
+            )}
+          </View>
+
+          <View>
+            <Text style={styles.title}>{user.username}</Text>
+            {editMode && (
+              <View>
+                <View style={{ alignItems: 'center' }}>
+                  <Text>Name</Text>
+                  <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Name" />
+                  <Text>Phone</Text>
+                  <TextInput style={styles.input} value={phone} keyboardType='phone-pad' onChangeText={setPhone} placeholder="Phone" />
+                  <Text>City</Text>
+                  <TextInput style={styles.input} value={city} onChangeText={setCity} placeholder="City" />
+                </View>
+                <CustomButton style={{ marginTop: 10, marginBottom: 20, marginHorizontal: 50 }} onPress={handleSave} title='Save' />
+              </View>
+            )}
+            {!editMode && (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10 }}>
+                <Pressable
+                  onPress={() => setCurrentView('info')}
+                  style={{
+                    flex: 1,
+                    backgroundColor: currentView === 'info' ? '#4CAF50' : '#f8f9fa',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingVertical: 10,
+                    borderRadius: 1,
+                    borderBottomWidth: 1,
+                    borderColor: 'black',
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    elevation: 5,
+                  }}
+                >
+                  <Text style={{ color: currentView === 'info' ? '#ffffff' : '#000000' }}>User Info</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setCurrentView('posts')}
+                  style={{
+                    flex: 1,
+                    backgroundColor: currentView === 'posts' ? '#4CAF50' : '#f8f9fa',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingVertical: 10,
+                    borderRadius: 1,
+                    borderBottomWidth: 1,
+                    borderColor: 'black',
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    elevation: 5,
+                  }}
+                >
+                  <Text style={{ color: currentView === 'posts' ? '#ffffff' : '#000000' }}>Posts</Text>
+                </Pressable>
+              </View>
+            )}
+            {(currentView === 'info' && !editMode) &&(
+              <View>
+                <View style={styles.infoContainer}>
+                  <Text style={styles.infoText}>Username: {user.username}</Text>
+                  <Text style={styles.infoText}>Name: {user.name}</Text>
+                  <Text style={styles.infoText}>Phone: {user.phone}</Text>
+                  <Text style={styles.infoText}>City: {user.city}</Text>
+                </View>
+              </View>
+            )}
+          </View>
+          <View>
+            {(currentView === 'posts' && !editMode) && userPosts.map(post =>
+              <FriendPost key={post._id} post={post} likePost={likePost} commentPost={commentPost} />
             )}
           </View>
         </View>
@@ -133,12 +196,6 @@ const Profile = () => {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f5f5f5',
-  },
   imageContainer: {
     width: 120,
     height: 120,
@@ -160,9 +217,16 @@ const styles = StyleSheet.create({
     borderRadius: 60,
   },
   infoContainer: {
-    width: '100%',
-    alignItems: 'flex-start',
     padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+    marginHorizontal: 20,
+    marginTop: 20,
   },
   title: {
     fontSize: 26,
@@ -173,7 +237,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 18,
-    color: '#666',
+    color: 'black',
     marginBottom: 10,
     textAlign: 'left',
   },
@@ -203,7 +267,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 })
 
 export default Profile

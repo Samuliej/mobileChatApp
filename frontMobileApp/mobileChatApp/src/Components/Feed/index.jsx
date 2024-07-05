@@ -56,7 +56,7 @@ const FeedScreen = ({ navigation }) => {
       >
         <View style={styles.scrollViewContentContainer}>
           {posts.map(post => (
-            <Post key={post._id} post={post} likePost={likePost} commentPost={commentPost} user={user}/>
+            <Post key={post._id} post={post} likePost={likePost} commentPost={commentPost} user={user} navigation={navigation}/>
           ))}
         </View>
       </ScrollView>
