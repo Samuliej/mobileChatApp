@@ -6,6 +6,7 @@ import useConversations from '../../hooks/useConversations.js'
 import { truncate } from '../../utils/utils.js'
 import useDeleteConversation from '../../hooks/useDeleteConversation.js'
 import ErrorBanner from '../Error/index.jsx'
+import theme from '../../theme.js'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
 /*
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     right: 20,
     bottom: 20,
-    backgroundColor: '#4CAF50',
+    backgroundColor: theme.platformStyle.color,
     borderRadius: 35,
     elevation: 8
   },

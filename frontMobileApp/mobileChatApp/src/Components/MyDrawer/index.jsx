@@ -128,41 +128,46 @@ const MyDrawer = () => {
   return (
     <Drawer.Navigator
       drawerContent={(props) => (
-        <DrawerContentScrollView {...props}>
-          <View style={{ alignItems: 'center', margin: 10 }}>
-            <Image
-              source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
-              style={{ width: 80, height: 80, borderRadius: 40 }}
+        <View style={{ flex: 1, justifyContent: 'space-between' }}>
+          <DrawerContentScrollView {...props}>
+            <View style={{ alignItems: 'center', margin: 10, flex: 1 }}>
+              <Image
+                source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
+                style={{ width: 80, height: 80, borderRadius: 30 }}
+              />
+              <Text style={{ marginTop: 10 }}>{user ? user.username : 'Guest'}</Text>
+            </View>
+            <DrawerItem
+              label="Home"
+              onPress={() => props.navigation.navigate('Home')}
             />
-            <Text style={{ marginTop: 10 }}>{user ? user.username : 'Guest'}</Text>
+            <DrawerItem
+              label="Search for a User"
+              onPress={() => props.navigation.navigate('Search for a User')}
+            />
+            <DrawerItem
+              label="Friends"
+              onPress={() => props.navigation.navigate('Friends')}
+            />
+            <CustomDrawerItem
+              label="Friend requests"
+              badgeCount={pendingRequestsCount}
+              onPress={() => props.navigation.navigate('Friend requests')}
+            />
+            <CustomDrawerItem
+              label="Profile"
+              onPress={() => props.navigation.navigate('Profile')}
+            />
+            <DrawerItem
+              label="Sign Out"
+              onPress={handleSignOut}
+              labelStyle={{ color: 'red' }}
+            />
+          </DrawerContentScrollView>
+          <View style={{ padding: 20, backgroundColor: '#D3D3D3', borderTopWidth: 1, borderTopColor: '#808080' }}>
+            <Text style={{ textAlign: 'center', color: '#808080' }}>The Hive</Text>
           </View>
-          <DrawerItem
-            label="Home"
-            onPress={() => props.navigation.navigate('Home')}
-          />
-          <DrawerItem
-            label="Search for a User"
-            onPress={() => props.navigation.navigate('Search for a User')}
-          />
-          <DrawerItem
-            label="Friends"
-            onPress={() => props.navigation.navigate('Friends')}
-          />
-          <CustomDrawerItem
-            label="Friend requests"
-            badgeCount={pendingRequestsCount}
-            onPress={() => props.navigation.navigate('Friend requests')}
-          />
-          <CustomDrawerItem
-            label="Profile"
-            onPress={() => props.navigation.navigate('Profile')}
-          />
-          <DrawerItem
-            label="Sign Out"
-            onPress={handleSignOut}
-            labelStyle={{ color: 'red' }}
-          />
-        </DrawerContentScrollView>
+        </View>
       )}
     >
       <Drawer.Screen
