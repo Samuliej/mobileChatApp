@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, Image, TextInput, StyleSheet, Pressable, ActivityIndicator } from 'react-native'
+import { View, Text, Image, TextInput, StyleSheet, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import { UserContext } from '../../Context/UserContext'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CustomButton from '../SignIn/CustomButton'
@@ -79,48 +79,56 @@ const Profile = () => {
   }
 
   return (
-    <View style={styles.container}>
-      {notif && (
-        <ErrorBanner error={notif} type={'success'} />
-      )}
-      <Pressable style={styles.editIcon} onPress={toggleEditMode}>
-        <Ionicons name="settings-outline" size={30} color="#000" />
-      </Pressable>
-      {editMode ? (
-        <Pressable style={styles.imageContainer} onPress={selectImage}>
-          <Image source={image ? { uri: image } : defaultProfilePicture} style={styles.image} />
-          <View style={styles.iconContainer}>
-            <Ionicons name="create-outline" size={24} color="white" />
-          </View>
-        </Pressable>
-      ) : (
-        <View style={styles.imageContainer}>
-          <Image source={user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture} style={styles.image} />
-        </View>
-      )}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.container}>
+          {notif && (
+            <ErrorBanner error={notif} type={'success'} />
+          )}
+          <Pressable style={styles.editIcon} onPress={toggleEditMode}>
+            <Ionicons name="settings-outline" size={30} color="#000" />
+          </Pressable>
+          {editMode ? (
+            <Pressable style={styles.imageContainer} onPress={selectImage}>
+              <Image source={image ? { uri: image } : defaultProfilePicture} style={styles.image} />
+              <View style={styles.iconContainer}>
+                <Ionicons name="create-outline" size={24} color="white" />
+              </View>
+            </Pressable>
+          ) : (
+            <View style={styles.imageContainer}>
+              <Image source={user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture} style={styles.image} />
+            </View>
+          )}
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.title}>{user.username}</Text>
-        {editMode ? (
-          <View>
-            <Text>Name</Text>
-            <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Name" />
-            <Text>Phone</Text>
-            <TextInput style={styles.input} value={phone} onChangeText={setPhone} placeholder="Phone" />
-            <Text>City</Text>
-            <TextInput style={styles.input} value={city} onChangeText={setCity} placeholder="City" />
-            <CustomButton style={{ marginTop: 10, marginBottom: 20 }} onPress={handleSave} title='Save' />
+          <View style={styles.infoContainer}>
+            <Text style={styles.title}>{user.username}</Text>
+            {editMode ? (
+              <View>
+                <Text>Name</Text>
+                <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Name" />
+                <Text>Phone</Text>
+                <TextInput style={styles.input} value={phone} keyboardType='phone-pad' onChangeText={setPhone} placeholder="Phone" />
+                <Text>City</Text>
+                <TextInput style={styles.input} value={city} onChangeText={setCity} placeholder="City" />
+                <CustomButton style={{ marginTop: 10, marginBottom: 20 }} onPress={handleSave} title='Save' />
+              </View>
+            ) : (
+              <>
+                <Text style={styles.infoText}>Username: {user.username}</Text>
+                <Text style={styles.infoText}>Name: {user.name}</Text>
+                <Text style={styles.infoText}>Phone: {user.phone}</Text>
+                <Text style={styles.infoText}>City: {user.city}</Text>
+              </>
+            )}
           </View>
-        ) : (
-          <>
-            <Text style={styles.infoText}>Username: {user.username}</Text>
-            <Text style={styles.infoText}>Name: {user.name}</Text>
-            <Text style={styles.infoText}>Phone: {user.phone}</Text>
-            <Text style={styles.infoText}>City: {user.city}</Text>
-          </>
-        )}
-      </View>
-    </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   )
 }
 
