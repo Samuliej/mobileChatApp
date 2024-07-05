@@ -131,10 +131,12 @@ const MyDrawer = () => {
         <View style={{ flex: 1, justifyContent: 'space-between' }}>
           <DrawerContentScrollView {...props}>
             <View style={{ alignItems: 'center', margin: 10, flex: 1 }}>
-              <Image
-                source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
-                style={{ width: 80, height: 80, borderRadius: 30 }}
-              />
+              <Pressable onPress={() => navigation.navigate('Profile')}>
+                <Image
+                  source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
+                  style={{ width: 80, height: 80, borderRadius: 30 }}
+                />
+              </Pressable>
               <Text style={{ marginTop: 10 }}>{user ? user.username : 'Guest'}</Text>
             </View>
             <DrawerItem
