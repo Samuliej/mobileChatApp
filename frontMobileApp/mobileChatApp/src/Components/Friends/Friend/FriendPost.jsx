@@ -1,7 +1,8 @@
 import React, { useState, useRef, useContext } from 'react'
-import { View, Text, StyleSheet, Image, Button, Animated, TextInput } from 'react-native'
+import { View, Text, StyleSheet, Image, Animated, TextInput } from 'react-native'
 import { UserContext } from '../../../Context/UserContext.js'
 import { Ionicons } from '@expo/vector-icons'
+import CustomButton from '../../SignIn/CustomButton.jsx'
 
 const FriendPost = ({ post: initialPost, likePost, commentPost }) => {
   const [commentsOpen, setCommentsOpen] = useState(false)
@@ -94,7 +95,7 @@ const FriendPost = ({ post: initialPost, likePost, commentPost }) => {
             value={commentText}
             onChangeText={setCommentText}
           />
-          <Button title="Submit" onPress={handleCommentSubmit} />
+          <CustomButton style={{ marginTop: 10, marginBottom: 5 }} onPress={handleCommentSubmit} title='Submit' />
         </View>
       )}
     </View>
