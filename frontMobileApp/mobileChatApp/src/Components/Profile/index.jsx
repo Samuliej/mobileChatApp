@@ -77,7 +77,6 @@ const Profile = ({ navigation }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log('refreshing posts')
       refreshUserPosts()
     })
 
