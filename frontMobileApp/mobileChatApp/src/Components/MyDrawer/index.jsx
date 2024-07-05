@@ -171,9 +171,9 @@ const MyDrawer = () => {
         options={{
           headerTitle: user ? user.username : 'Home',
           headerStyle: {
-            backgroundColor: '#007BFF',
+            backgroundColor: '#4CAF50',
           },
-          headerTintColor: '#fff',
+          headerTintColor: '#F5F5DC',
           headerTitleStyle: {
             fontWeight: 'bold',
           },

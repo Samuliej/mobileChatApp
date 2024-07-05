@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Button, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
+import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
 import { UserContext } from '../../Context/UserContext.js'
 import api from '../../api.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
+import CustomButton from '../SignIn/CustomButton.jsx'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
 /*
@@ -12,7 +13,6 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
 */
 
-// but just navigate to the existing one
 // TODO: group
 
 const NewConversation = () => {
@@ -48,20 +48,20 @@ const NewConversation = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Create a new group</Text>
-      <Button title="Create Group" onPress={() => {
+      <Text style={{ fontSize: 20, marginBottom: 5, textAlign: 'center', padding: 5 }}>Create a new group</Text>
+      <CustomButton title="Create Group" onPress={() => {
         // navigate to Create Group screen
-        navigation.navigate('Create Group')
+        console.log('Create group')
       }} />
 
-      <Text>Your Friends</Text>
+      <Text style={{ fontSize: 20, marginBottom: 5, marginTop: 10, textAlign: 'center', padding: 5 }}>Your Friends</Text>
       <ScrollView>
         {/* Exclude the friends with whom there is already a started conversation */}
         {friends.filter(friend => !user.conversations.map(convo => convo._id).some(conversationId => friend.conversations.includes(conversationId))).map(friend => (
           <View key={friend._id} style={styles.friendItem}>
             <Image source={friend.profilePicture ? { uri: friend.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
             <Text style={styles.username}>{friend.username}</Text>
-            <Button title="Chat" onPress={async () => {
+            <CustomButton title="Chat" onPress={async () => {
               // start a new conversation with this friend
               const userToken = await AsyncStorage.getItem('userToken')
               const response = await api.post('/api/startConversation', { username: friend.username }, {
