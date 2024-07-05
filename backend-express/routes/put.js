@@ -102,6 +102,32 @@ router.put('/api/likePost/:postId/like', authMiddleware, async (req, res) => {
   }
 })
 
+
+// update user info
+router.put('/api/users/:id', authMiddleware, async (req, res) => {
+  const currentUser = req.currentUser
+  const {name, phone, city} = req.body
+
+  if (!currentUser) {
+    return res.status(400).json({ error: 'Authentication required' })
+  }
+
+  try {
+    const userToModify = await User.findById(currentUser._id)
+    if (name) userToModify.name = name
+    if (phone) userToModify.phone = phone
+    if (city) userToModify.city = city
+
+    console.log(userToModify)
+
+    await userToModify.save()
+    res.status(200).json(userToModify)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ error: 'Error modifying User info' })
+  }
+})
+
 router.use((req, res, next) => {
   console.log('Incoming request:', req.method, req.path)
   next()
