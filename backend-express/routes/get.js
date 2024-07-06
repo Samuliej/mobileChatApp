@@ -91,15 +91,28 @@ router.get('/api/users/search/:query', async (req, res) => {
 // Fetch conversation by ID
 router.get('/api/conversations/:convoId', async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 15
+    const skip = (page - 1) * limit
+
     const convo = await Conversation.findById(req.params.convoId)
       .populate('participants')
       .populate({
         path: 'messages',
+        options: {
+          skip: skip,
+          limit: limit,
+          sort: { timestamp: -1 }
+        }
       })
 
-    res.json(convo)
+
+    res.json({
+      conversation: convo,
+      currentPage: page
+    })
   } catch (error) {
-    console.log('error fetching conversation')
+    console.log('error fetching conversation', error)
     res.status(500).json({ error: 'Error fetching conversation' })
   }
 })

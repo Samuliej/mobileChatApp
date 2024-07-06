@@ -38,6 +38,8 @@ const useChat = (user, conversationId, initialFriend) => {
   const [newMessage, setNewMessage] = useState('')
   const [inputHeight, setInputHeight] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMoreMessages, setHasMoreMessages] = useState(true)
   const socket = useContext(SocketContext)
 
   // Fetch the first page of messages when the component mounts
@@ -80,9 +82,11 @@ const useChat = (user, conversationId, initialFriend) => {
   }, [socket, conversation, user._id])
 
   // Function for fetching a single conversation
-  const fetchConversation = async () => {
-    const response = await api.get(`/api/conversations/${conversationId}`)
-    const fetchedConversation = await response.data
+  const fetchConversation = async (page = 1, limit = 15) => {
+    const response = await api.get(`/api/conversations/${conversationId}?page=${page}&limit=${limit}`)
+    const { conversation: fetchedConversation } = await response.data
+
+    setHasMoreMessages(fetchedConversation.messages.length === limit)
 
     // Sort the messages
     const sortedMessages = fetchedConversation.messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
@@ -111,8 +115,24 @@ const useChat = (user, conversationId, initialFriend) => {
       }
     })
 
-    setConversation({...fetchedConversation, messages: decryptedMessages})
+    if (page > 1) {
+      setConversation(prevConversation => ({
+        ...prevConversation,
+        messages: [...decryptedMessages, ...prevConversation.messages],
+      }))
+    } else {
+      setConversation({ ...fetchedConversation, messages: decryptedMessages })
+    }
+
     setLoading(false)
+  }
+
+  const loadMoreMessages = () => {
+    if (!hasMoreMessages || loading) return
+
+    const nextPage = currentPage + 1
+    setCurrentPage(nextPage)
+    fetchConversation(nextPage)
   }
 
 
@@ -176,7 +196,7 @@ const useChat = (user, conversationId, initialFriend) => {
     setNewMessage('')
   }
 
-  return { friend, conversation, newMessage, setNewMessage, inputHeight, setInputHeight, loading, sendMessage }
+  return { friend, conversation, newMessage, setNewMessage, inputHeight, setInputHeight, loading, sendMessage, loadMoreMessages }
 }
 
 export default useChat
