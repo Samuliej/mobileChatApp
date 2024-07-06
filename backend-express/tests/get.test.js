@@ -174,12 +174,12 @@ test('GET /api/users/search/:query returns the correct users', async () => {
 test('GET /api/conversations/:convoId returns the correct conversation', async () => {
   const response = await api.get(`/api/conversations/${convoId}`).expect(200)
 
-  expect(response.body._id).toBe(convoId)
-  expect(response.body.participants).toHaveLength(2)
-  expect(response.body.participants).toContainEqual(expect.objectContaining({
+  expect(response.body.conversation._id).toBe(convoId)
+  expect(response.body.conversation.participants).toHaveLength(2)
+  expect(response.body.conversation.participants).toContainEqual(expect.objectContaining({
     _id: createdUser1._id.toString()
   }))
-  expect(response.body.participants).toContainEqual(expect.objectContaining({
+  expect(response.body.conversation.participants).toContainEqual(expect.objectContaining({
     _id: createdUser2._id.toString()
   }))
 })

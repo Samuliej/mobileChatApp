@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import {
   View, Text, TextInput,
   Pressable, StyleSheet, FlatList,
@@ -86,12 +86,22 @@ const Chat = ({ route }) => {
   const navigation = useNavigation()
   const { conversationId, friend: initialFriend } = route.params
   const flatListRef = useRef(null)
+  const [isAtBottom, setIsAtBottom] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const {
     friend, conversation, newMessage,
     setNewMessage, inputHeight, setInputHeight,
-    loading, sendMessage
+    loading, sendMessage, loadMoreMessages
   } = useChat(user, conversationId, initialFriend)
 
+  const handleLoadMoreMessages = () => {
+    if (loading || isAtBottom || isLoadingMore) return
+    setIsLoadingMore(true)
+    setTimeout(() => {
+      loadMoreMessages()
+      setIsLoadingMore(false)
+    }, 300)
+  }
 
   if (loading) {
     return (
@@ -112,8 +122,17 @@ const Chat = ({ route }) => {
           key={conversationId}
           data={conversation.messages}
           keyExtractor={item => item && item._id ? item._id : uuid.v4()}
-          onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: false })}
           renderItem={({ item }) => <MessageItem item={item} user={user} />}
+          onScroll={({ nativeEvent }) => {
+            const isCloseToBottom = nativeEvent.layoutMeasurement.height + nativeEvent.contentOffset.y >= nativeEvent.contentSize.height - 50
+            setIsAtBottom(isCloseToBottom)
+            if (nativeEvent.contentOffset.y < 20) {
+              handleLoadMoreMessages()
+            }
+          }}
+          onContentSizeChange={() => {
+            if (isAtBottom) flatListRef.current.scrollToEnd({ animated: false })
+          }}
         />}
         <View style={styles.inputContainer}>
           <TextInput
