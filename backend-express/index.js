@@ -241,6 +241,8 @@ io.on('connection', async (socket) => {
     // Broadcast the messages to the sender and receiver
     io.to(userSocketIds[messageData.sender]).emit('message', newMessage)
     io.to(userSocketIds[messageData.receiver]).emit('message', newMessage)
+    io.to(userSocketIds[messageData.sender]).emit('messageToConvo', newMessage)
+    io.to(userSocketIds[messageData.receiver]).emit('messageToConvo', newMessage)
     if (isNewConvo) {
       // If it's a new conversation, broadcast the conversation to the receiver
       io.to(userSocketIds[messageData.receiver]).emit('newConversation', conversation)

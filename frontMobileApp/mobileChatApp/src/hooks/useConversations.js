@@ -37,7 +37,8 @@ const useConversations = (user) => {
   useEffect(() => {
     // Listens to new messages and updates the conversations
     // Also handles adding the emojies back, since they can't be encrypted
-    socket.on('message', (newMessage) => {
+    socket.on('messageToConvo', (newMessage) => {
+      console.log('ping')
       setConversations((prevConversations) => {
         return prevConversations.map((conversation) => {
           if (conversation._id === newMessage.conversationId) {
@@ -59,7 +60,7 @@ const useConversations = (user) => {
     })
 
     return () => {
-      socket.off('message')
+      socket.off('messageToConvo')
     }
   }, [socket])
 

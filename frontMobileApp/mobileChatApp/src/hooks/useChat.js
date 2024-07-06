@@ -49,23 +49,35 @@ const useChat = (user, conversationId, initialFriend) => {
   useEffect(() => {
     // Listens to new messages, and updates the conversation
     socket.on('message', (newMessage) => {
-      setConversation((prevConversation) => {
-        const messages = prevConversation.messages.map((message) =>
-          message.content === newMessage.content &&
-          message.sender === newMessage.sender &&
-          message.placeHolder
-            ? { ...newMessage, placeHolder: false }
-            : message
-        )
+      if (!conversation || newMessage.sender === user._id) {
+        // If conversation is null or the sender is the current user, don't proceed
+        return
+      }
+      // Decrypt the message content
+      let decryptedContent = decrypt(conversation.encryptionKey, newMessage.content)
 
-        return { ...prevConversation, messages }
-      })
+      // Check if there are emojis to be added back to the decrypted content
+      if (newMessage.emojis && newMessage.emojis.length > 0) {
+        const sortedEmojis = newMessage.emojis.sort((a, b) => b.index - a.index)
+        sortedEmojis.forEach(({ emoji, index }) => {
+          decryptedContent = decryptedContent.slice(0, index) + emoji + decryptedContent.slice(index)
+        })
+      }
+
+      // Update the conversation state with the decrypted message
+      setConversation(prevConversation => ({
+        ...prevConversation,
+        messages: [...prevConversation.messages, {
+          ...newMessage,
+          content: decryptedContent,
+        }],
+      }))
     })
 
     return () => {
       socket.off('message')
     }
-  }, [socket])
+  }, [socket, conversation, user._id])
 
   // Function for fetching a single conversation
   const fetchConversation = async () => {
