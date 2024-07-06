@@ -7,6 +7,7 @@ import ErrorBanner from '../Error/index'
 import usePost from '../../hooks/usePost'
 import useUserPosts from '../../hooks/useUserPosts'
 import * as ImagePicker from 'expo-image-picker'
+import theme from '../../theme'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../assets/soldier.png'
@@ -134,7 +135,7 @@ const Profile = ({ navigation }) => {
                   <Text>City</Text>
                   <TextInput style={styles.input} value={city} onChangeText={setCity} placeholder="City" />
                 </View>
-                <CustomButton style={{ marginTop: 10, marginBottom: 20, marginHorizontal: 50 }} onPress={handleSave} title='Save' />
+                <CustomButton style={[{ marginTop: 10, marginBottom: 20, marginHorizontal: 50 }, {...theme.shadow}]} onPress={handleSave} title='Save' />
               </View>
             )}
             {!editMode && (
@@ -213,11 +214,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     marginTop: 20,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    ...theme.shadow
   },
   image: {
     width: 120,

@@ -10,6 +10,7 @@ import { UserContext } from '../../Context/UserContext.js'
 import Icon from 'react-native-vector-icons/Ionicons'
 import useChat from '../../hooks/useChat.js'
 import uuid from 'react-native-uuid'
+import theme from '../../theme.js'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 const defaultBackgroundPicture = require('../../../assets/rm222-mind-14.jpg')
 
@@ -68,10 +69,12 @@ const MessageItem = ({ item, user }) => {
 
   return (
     <View style={isMyMessage ? styles.myMessageContainer : styles.messageContainer}>
-      <View key={item._id} style={[styles.messageItem, user && item.sender === user._id ? styles.myMessage : styles.friendMessage]}>
+      <View key={item._id} style={[styles.messageItem, isMyMessage ? styles.myMessage : styles.friendMessage]}>
         <Text>{item.content}</Text>
+        <Text style={styles.timestamp}>{formattedDate} {item.status}</Text>
+        {/* Position the tail using absolute positioning */}
+        <View style={isMyMessage ? styles.myMessageTail : styles.friendMessageTail}></View>
       </View>
-      <Text style={styles.timestamp}>{formattedDate} {item.status}</Text>
     </View>
   )
 }
@@ -165,11 +168,31 @@ const styles = StyleSheet.create({
   friendMessage: {
     alignSelf: 'flex-start',
     backgroundColor: '#eee',
+    padding: 10,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   myMessage: {
     alignSelf: 'flex-end',
     backgroundColor: '#0084ff',
     color: 'white',
+    padding: 12,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -182,16 +205,32 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 10,
-    backgroundColor: '#F8F6F0'
+    backgroundColor: '#F8F6F0',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   sendButton: {
     marginLeft: 10,
-    backgroundColor: '#009000',
+    backgroundColor: theme.platformStyle.color,
     borderRadius: 24,
     width: 48,
     height: 48,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   loadingContainer: {
     flex: 1,
@@ -210,19 +249,53 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  timestamp: {
-    fontSize: 10,
-    color: 'gray',
-  },
   messageContainer: {
     flexDirection: 'column',
     alignItems: 'flex-start',
     marginBottom: 10,
+    padding: 10
   },
   myMessageContainer: {
     flexDirection: 'column',
     alignItems: 'flex-end',
     marginBottom: 10,
+    padding: 10,
+  },
+  friendMessageTail: {
+    position: 'absolute',
+    bottom: 0, // Adjust as necessary
+    left: -10, // Adjust to position the tail correctly
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderBottomWidth: 20,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#eee',
+  },
+  myMessageTail: {
+    position: 'absolute',
+    bottom: 0,
+    right: -10,
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderBottomWidth: 20,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#0084ff',
+  },
+  timestamp: {
+    marginTop: 2,
+    fontSize: 8,
+    color: 'black',
+    alignSelf: 'flex-end',
   },
 })
 
