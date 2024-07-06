@@ -249,6 +249,7 @@ io.on('connection', async (socket) => {
     }
   })
 
+  // a
   socket.on('disconnect', () => {
     console.log('A user disconnected')
     delete userSocketIds[userId]
