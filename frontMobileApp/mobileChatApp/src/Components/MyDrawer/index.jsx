@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native'
 import { Image, Pressable, Alert, View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import { SocketContext } from '../../Context/SocketContext.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useQueryClient } from 'react-query'
 // Default user profile picture property of Pixel Perfect:
 // href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../assets/soldier.png'
@@ -73,6 +74,7 @@ const MyDrawer = () => {
   const navigation = useNavigation()
   const [isSigningOut, setIsSigningOut] = useState(false)
   const socket = useContext(SocketContext)
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     setPendingRequestsCount(
@@ -99,6 +101,9 @@ const MyDrawer = () => {
           text: 'Yes',
           onPress: async () => {
             setIsSigningOut(true)
+            // Clear query client when signing out
+            queryClient.invalidateQueries({ predicate: query => query.queryKey[0].startsWith('conversations') })
+            queryClient.clear()
             // Clear the token from the storage
             await AsyncStorage.removeItem('userToken')
             // Update the user context
@@ -108,7 +113,6 @@ const MyDrawer = () => {
               index: 0,
               routes: [{ name: 'Auth', params: { screen: 'The Hive' } }],
             })
-            // No need to set isSigning Out to false because the state will be reset
           }
         },
       ],
