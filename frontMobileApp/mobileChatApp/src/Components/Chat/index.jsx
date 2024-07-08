@@ -3,7 +3,7 @@ import {
   View, Text, TextInput,
   Pressable, StyleSheet, FlatList,
   Image, ImageBackground, StatusBar,
-  ActivityIndicator
+  ActivityIndicator, Animated
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { UserContext } from '../../Context/UserContext.js'
@@ -82,6 +82,7 @@ const MessageItem = ({ item, user }) => {
 
 
 const Chat = ({ route }) => {
+  const scaleValue = useRef(new Animated.Value(1)).current
   const { user } = useContext(UserContext)
   const navigation = useNavigation()
   const { conversationId, friend: initialFriend } = route.params
@@ -101,6 +102,23 @@ const Chat = ({ route }) => {
       loadMoreMessages()
       setIsLoadingMore(false)
     }, 300)
+  }
+
+  const animateSendButton = () => {
+    Animated.sequence([
+      Animated.timing(scaleValue, {
+        toValue: 0.5,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleValue, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      if (newMessage.length !== 0) sendMessage()
+    })
   }
 
   if (loading) {
@@ -145,11 +163,11 @@ const Chat = ({ route }) => {
               setInputHeight(event.nativeEvent.contentSize.height)
             }}
           />
-          <Pressable style={styles.sendButton} onPress={() => {
-            if (newMessage.length !== 0) sendMessage()
-          }}>
-            <Icon name="send" size={24} color="white" />
-          </Pressable>
+          <Animated.View style={[styles.sendButton, { transform: [{ scale: scaleValue }] }]}>
+            <Pressable onPress={animateSendButton}>
+              <Icon name="send" size={24} color="white" />
+            </Pressable>
+          </Animated.View>
         </View>
       </View>
     </ImageBackground>
