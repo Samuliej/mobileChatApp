@@ -82,46 +82,22 @@ const MessageItem = ({ item, user }) => {
 
 
 const Chat = ({ route }) => {
-  const scaleValue = useRef(new Animated.Value(1)).current
   const { user } = useContext(UserContext)
   const navigation = useNavigation()
   const { conversationId, friend: initialFriend } = route.params
   const flatListRef = useRef(null)
-  const [isAtBottom, setIsAtBottom] = useState(true)
-  const [isLoadingMore, setIsLoadingMore] = useState(false)
-  const {
-    friend, conversation, newMessage,
-    setNewMessage, inputHeight, setInputHeight,
-    loading, sendMessage, loadMoreMessages
-  } = useChat(user, conversationId, initialFriend)
+  const [isFetchingMore, setIsFetchingMore] = useState(false)
+  const { messagesData, isLoading, hasNextPage, fetchNextPage, newMessage, setNewMessage, sendMessage, friend } = useChat(user, conversationId, initialFriend)
 
-  const handleLoadMoreMessages = () => {
-    if (loading || isAtBottom || isLoadingMore) return
-    setIsLoadingMore(true)
-    setTimeout(() => {
-      loadMoreMessages()
-      setIsLoadingMore(false)
-    }, 300)
+  const handleEndReached = async () => {
+    if (hasNextPage && !isFetchingMore) {
+      setIsFetchingMore(true)
+      await fetchNextPage()
+      setIsFetchingMore(false)
+    }
   }
 
-  const animateSendButton = () => {
-    Animated.sequence([
-      Animated.timing(scaleValue, {
-        toValue: 0.5,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleValue, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      if (newMessage.length !== 0) sendMessage()
-    })
-  }
-
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -134,44 +110,56 @@ const Chat = ({ route }) => {
       <CustomNavBar navigation={navigation} friend={friend}/>
       <View style={styles.content}>
         <View style={styles.header}>
+          {isFetchingMore && hasNextPage && <ActivityIndicator size="small" color="#0000ff" />}
         </View>
-        {conversation && <FlatList
+        <FlatList
+          inverted
           ref={flatListRef}
-          key={conversationId}
-          data={conversation.messages}
+          data={messagesData.pages.flatMap(page => {
+            return page.conversation.messages
+          })}
           keyExtractor={item => item && item._id ? item._id : uuid.v4()}
           renderItem={({ item }) => <MessageItem item={item} user={user} />}
-          onScroll={({ nativeEvent }) => {
-            const isCloseToBottom = nativeEvent.layoutMeasurement.height + nativeEvent.contentOffset.y >= nativeEvent.contentSize.height - 50
-            setIsAtBottom(isCloseToBottom)
-            if (nativeEvent.contentOffset.y < 20) {
-              handleLoadMoreMessages()
-            }
-          }}
-          onContentSizeChange={() => {
-            if (isAtBottom) flatListRef.current.scrollToEnd({ animated: false })
-          }}
-        />}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, { height: Math.max(35, inputHeight) }]}
-            value={newMessage}
-            onChangeText={text => setNewMessage(text)}
-            placeholder="Type a message..."
-            multiline
-            onContentSizeChange={(event) => {
-              setInputHeight(event.nativeEvent.contentSize.height)
-            }}
-          />
-          <Animated.View style={[styles.sendButton, { transform: [{ scale: scaleValue }] }]}>
-            <Pressable onPress={animateSendButton}>
-              <Icon name="send" size={24} color="white" />
-            </Pressable>
-          </Animated.View>
-        </View>
+          onEndReached={handleEndReached}
+          onEndReachedTreshold={0.5}
+
+        />
+        <MessageInput newMessage={newMessage} setNewMessage={setNewMessage} sendMessage={sendMessage} />
       </View>
     </ImageBackground>
 
+  )
+}
+
+const MessageInput = ({ newMessage, setNewMessage, sendMessage }) => {
+  const [inputHeight, setInputHeight] = useState(35)
+  const scaleValue = useRef(new Animated.Value(1)).current
+
+  const animateSendButton = () => {
+    Animated.sequence([
+      Animated.timing(scaleValue, { toValue: 0.5, duration: 100, useNativeDriver: true }),
+      Animated.timing(scaleValue, { toValue: 1, duration: 100, useNativeDriver: true }),
+    ]).start(() => {
+      if (newMessage.length !== 0) sendMessage()
+    })
+  }
+
+  return (
+    <View style={styles.inputContainer}>
+      <TextInput
+        style={[styles.input, { height: Math.max(35, inputHeight) }]}
+        value={newMessage}
+        onChangeText={setNewMessage}
+        placeholder="Type a message..."
+        multiline
+        onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
+      />
+      <Animated.View style={[styles.sendButton, { transform: [{ scale: scaleValue }] }]}>
+        <Pressable onPress={animateSendButton}>
+          <Icon name="send" size={24} color="white" />
+        </Pressable>
+      </Animated.View>
+    </View>
   )
 }
 
@@ -187,8 +175,10 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight,
   },
   header: {
+    paddingBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   profilePicture: {
     width: 40,
