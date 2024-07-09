@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/User')
 const Conversation = require('../models/Conversation')
+const Message = require('../models/Message')
 const Friendship = require('../models/Friendship')
 const authMiddleware = require('../middlewares/authMiddlewares')
 
@@ -106,10 +107,20 @@ router.get('/api/conversations/:convoId', async (req, res) => {
         }
       })
 
+    const totalMessages = await Message.countDocuments({ conversationId: convo._id })
+    const itemsPerPage = limit
+    const totalPages = Math.ceil(totalMessages / itemsPerPage)
+    const currentPage = page
+
+    // Check if there is a next page
+    const hasNextPage = currentPage < totalPages
 
     res.json({
       conversation: convo,
-      currentPage: page
+      currentPage: page,
+      totalPages: totalPages,
+      hasNextPage: hasNextPage,
+      totalMessages: totalMessages
     })
   } catch (error) {
     console.log('error fetching conversation', error)
