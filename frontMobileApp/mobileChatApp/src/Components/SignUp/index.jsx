@@ -11,7 +11,6 @@ import useSignIn from '../../hooks/useSignIn'
 import { UserContext } from '../../Context/UserContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import useIsUsernameTaken from '../../hooks/useIsUsernameTaken'
-import theme from '../../theme.js'
 
 /*
 
