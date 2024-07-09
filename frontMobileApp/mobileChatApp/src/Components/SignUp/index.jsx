@@ -159,16 +159,6 @@ const SignUp =  () => {
     }
   }
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Fetching posts...</Text>
-      </View>
-    )
-  }
-
-
   return (
     <KeyboardAwareScrollView
       resetScrollToCoords={{ x: 0, y: 0 }}
@@ -328,7 +318,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    paddingLeft: 8,
+    borderRadius: 4,
+    padding: 10,
   },
   imagePicker: {
     width: 100,
