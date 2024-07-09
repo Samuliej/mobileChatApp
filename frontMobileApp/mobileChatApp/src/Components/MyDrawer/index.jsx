@@ -134,7 +134,7 @@ const MyDrawer = () => {
               <Pressable onPress={() => navigation.navigate('Profile')}>
                 <Image
                   source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
-                  style={{ width: 80, height: 80, borderRadius: 30 }}
+                  style={{ width: 80, height: 80, borderRadius: 40 }}
                 />
               </Pressable>
               <Text style={{ marginTop: 10 }}>{user ? user.username : 'Guest'}</Text>

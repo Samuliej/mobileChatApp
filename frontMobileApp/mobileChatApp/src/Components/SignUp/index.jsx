@@ -11,6 +11,7 @@ import useSignIn from '../../hooks/useSignIn'
 import { UserContext } from '../../Context/UserContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import useIsUsernameTaken from '../../hooks/useIsUsernameTaken'
+import theme from '../../theme.js'
 
 /*
 
@@ -158,16 +159,6 @@ const SignUp =  () => {
       }, 5000)
     }
   }
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Fetching posts...</Text>
-      </View>
-    )
-  }
-
 
   return (
     <KeyboardAwareScrollView
@@ -328,7 +319,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    paddingLeft: 8,
+    borderRadius: 4,
+    padding: 10,
   },
   imagePicker: {
     width: 100,
