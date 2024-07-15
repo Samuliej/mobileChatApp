@@ -17,7 +17,7 @@ const RemoveConversation = ({selectedConversation, handleRemoveConversation, han
 
 const styles = StyleSheet.create({
   redBar: {
-    backgroundColor: 'red',
+    backgroundColor: 'rgba(255, 0, 0, 0.7)',
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 10,
