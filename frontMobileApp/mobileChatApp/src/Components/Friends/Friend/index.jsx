@@ -1,49 +1,23 @@
-import React from 'react'
-import { View, Text, Image, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
+import { useState } from 'react'
+import { View, Text, Image, StyleSheet, ScrollView, ActivityIndicator, Pressable } from 'react-native'
 import { useRoute } from '@react-navigation/native'
 import useFriendsPosts from '../../../hooks/useFriendsPosts'
 import useGetUserById from '../../../hooks/useGetUserById'
 import FriendPost from './FriendPost.jsx'
 import usePost from '../../../hooks/usePost.js'
 const defaultProfilePicture = require('../../../../assets/soldier.png')
+import theme from '../../../theme.js'
 
-const DisplayUser = ({ friendId }) => {
-  const { loading, user } = useGetUserById(friendId)
-
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    )
-  }
-
-  return (
-    user && (
-      <View style={styles.userContainer}>
-        <Text style={styles.usernameHeader}>{user.username}</Text>
-        <View style={styles.profileAndInfo}>
-          <View style={styles.imageContainer}>
-            <Image source={user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture} style={styles.profileImage} />
-          </View>
-          <View style={styles.userInfo}>
-            <Text>Name: {user.name}</Text>
-            <Text>City: {user.city ? user.city : 'City not provided'}</Text>
-            <Text>Phone: {user.phone ? user.phone : 'Phone not provided'}</Text>
-          </View>
-        </View>
-      </View>
-    )
-  )
-}
-
+// Component for displaying a friend's info and the posts that he has made.
 const Friend = () => {
   const route = useRoute()
   const { friendId } = route.params
   const { loading, friendPosts } = useFriendsPosts(friendId)
+  const { loading: loadingFriend, user } = useGetUserById(friendId)
   const { likePost, commentPost } = usePost()
+  const [currentView, setCurrentView] = useState('info')
 
-  if (loading) {
+  if (loading || loadingFriend) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -52,92 +26,117 @@ const Friend = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <DisplayUser friendId={friendId} />
-      {friendPosts.length > 0 && (
-        <View style={styles.postsHeaderContainer}>
-          <Text style={styles.postsHeaderText}>Posts</Text>
-          <ScrollView style={styles.postsContainer}>
-            {friendPosts.map((post) => (
-              <FriendPost key={post._id} post={post} likePost={likePost} commentPost={commentPost} />
-            ))}
-          </ScrollView>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View>
+        <View style={{ alignItems: 'center' }}>
+          <View style={styles.imageContainer}>
+            <Image source={user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture} style={styles.image} />
+          </View>
         </View>
-      )}
-    </View>
+        <View>
+          <Text style={styles.title}>{user.username}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10 }}>
+            <Pressable
+              onPress={() => setCurrentView('info')}
+              style={{
+                backgroundColor: currentView === 'info' ? '#4CAF50' : '#f8f9fa',
+                ...styles.buttonStyle
+              }}
+            >
+              <Text style={{ color: currentView === 'info' ? '#ffffff' : '#000000' }}>User Info</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setCurrentView('posts')}
+              style={{
+                backgroundColor: currentView === 'posts' ? '#4CAF50' : '#f8f9fa',
+                ...styles.buttonStyle
+              }}
+            >
+              <Text style={{ color: currentView === 'posts' ? '#ffffff' : '#000000' }}>Posts</Text>
+            </Pressable>
+          </View>
+          {(currentView === 'info') &&(
+            <View>
+              <View style={styles.infoContainer}>
+                <Text style={styles.infoText}>Username: {user.username}</Text>
+                <Text style={styles.infoText}>Name: {user.name}</Text>
+                <Text style={styles.infoText}>Phone: {user.phone}</Text>
+                <Text style={styles.infoText}>City: {user.city}</Text>
+              </View>
+            </View>
+          )}
+        </View>
+        <View>
+          {(currentView === 'posts') && friendPosts.map(post =>
+            <FriendPost key={post._id} post={post} likePost={likePost} commentPost={commentPost} />
+          )}
+        </View>
+      </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  buttonStyle: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-  },
-  userContainer: {
-    backgroundColor: 'white',
-    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 1,
+    borderBottomWidth: 1,
+    borderColor: 'black',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    padding: 10,
-    paddingBottom: 20,
-    borderRadius: 7
-  },
-  profileAndInfo: {
-    flexDirection: 'row',
   },
   imageContainer: {
-    marginRight: 10,
-    marginLeft: 10
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  userInfo: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#e1e4e8',
     justifyContent: 'center',
-  },
-  postsContainer: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    flexGrow: 1,
-    width: '100%',
-  },
-  usernameHeader: {
-    alignSelf: 'center',
-    fontWeight: 'bold',
-    fontSize: 20,
-    marginBottom: 10,
-  },
-  postsHeaderContainer: {
-    backgroundColor: 'white',
-    padding: 10,
     alignItems: 'center',
-    borderRadius: 7,
-    marginTop: 10,
-    flex: 1,
+    marginBottom: 20,
+    marginTop: 20,
+    ...theme.shadow
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  infoContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+    marginHorizontal: 20,
+    marginTop: 20,
   },
-  postsHeaderText: {
+  title: {
+    fontSize: 26,
     fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+    alignSelf: 'center'
+  },
+  infoText: {
     fontSize: 18,
+    color: 'black',
+    marginBottom: 10,
+    textAlign: 'left',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 })
 
 export default Friend

@@ -22,7 +22,7 @@ import RemoveConversation from './RemoveConversation/index.jsx'
 // Main component for rendering the Conversations view and functionality
 const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)
-  const { conversations, loading, setConversations } = useConversations(user)
+  const { conversations, loading, setConversations, fetchAndUpdate } = useConversations(user)
   const [selectedConversation, setSelectedConversation] = useState(null)
   const [deleteConversation, isLoading] = useDeleteConversation()
   const [sortedConversations, setSortedConversations] = useState([])
@@ -98,6 +98,7 @@ const Conversations = ({ navigation }) => {
           setSelectedConversation={setSelectedConversation}
           navigation={navigation}
           handleLongPress={handleLongPress}
+          fetchAndUpdate={fetchAndUpdate}
         />
       )}
       {/* Icon for entering the view to start new conversations */}
