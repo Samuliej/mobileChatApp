@@ -45,7 +45,6 @@ const FeedScreen = ({ navigation }) => {
     )
   }
 
-  // Add error banner
   return (
     <View style={styles.container}>
       <ScrollView

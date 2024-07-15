@@ -1,17 +1,16 @@
 import React, { useContext, useRef, useState } from 'react'
 import {
-  View, Text, TextInput,
+  View, Text,
   Pressable, StyleSheet, FlatList,
   Image, ImageBackground, StatusBar,
-  ActivityIndicator, Animated
+  ActivityIndicator
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { UserContext } from '../../Context/UserContext.js'
-import { formatTimestamp } from '../../utils/utils.js'
-import Icon from 'react-native-vector-icons/Ionicons'
 import useChat from '../../hooks/useChat.js'
 import uuid from 'react-native-uuid'
-import theme from '../../theme.js'
+import MessageInput from './MessageInput/index.jsx'
+import MessageItem from './MessageItem/index.jsx'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 const defaultBackgroundPicture = require('../../../assets/rm222-mind-14.jpg')
 
@@ -46,34 +45,6 @@ const CustomNavBar = ({ navigation, friend }) => {
     </View>
   )
 }
-
-const MessageItem = ({ item, user }) => {
-  if (!item) {
-    return null
-  }
-  if (!item._id) {
-    // Item doesn't have an ID, generate a temporary one
-    item._id = Math.random().toString(36).substr(2, 9)
-  }
-
-  const formattedDate = formatTimestamp(item.timestamp)
-
-  // Variable for figuring out whether the message is sent by the current user
-  const isMyMessage = user && item.sender === user._id
-
-  return (
-    <View style={isMyMessage ? styles.myMessageContainer : styles.messageContainer}>
-      <View key={item._id} style={[styles.messageItem, isMyMessage ? styles.myMessage : styles.friendMessage]}>
-        <Text>{item.content}</Text>
-        <Text style={styles.timestamp}>{formattedDate} {item.status}</Text>
-        {/* Position the tail using absolute positioning */}
-        <View style={isMyMessage ? styles.myMessageTail : styles.friendMessageTail}></View>
-      </View>
-    </View>
-  )
-}
-
-
 
 const Chat = ({ route }) => {
   const { user } = useContext(UserContext)
@@ -124,38 +95,6 @@ const Chat = ({ route }) => {
   )
 }
 
-const MessageInput = ({ newMessage, setNewMessage, sendMessage }) => {
-  const [inputHeight, setInputHeight] = useState(35)
-  const scaleValue = useRef(new Animated.Value(1)).current
-
-  const animateSendButton = () => {
-    Animated.sequence([
-      Animated.timing(scaleValue, { toValue: 0.5, duration: 100, useNativeDriver: true }),
-      Animated.timing(scaleValue, { toValue: 1, duration: 100, useNativeDriver: true }),
-    ]).start(() => {
-      if (newMessage.length !== 0) sendMessage()
-    })
-  }
-
-  return (
-    <View style={styles.inputContainer}>
-      <TextInput
-        style={[styles.input, { height: Math.max(35, inputHeight) }]}
-        value={newMessage}
-        onChangeText={setNewMessage}
-        placeholder="Type a message..."
-        multiline
-        onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
-      />
-      <Animated.View style={[styles.sendButton, { transform: [{ scale: scaleValue }] }]}>
-        <Pressable onPress={animateSendButton}>
-          <Icon name="send" size={24} color="white" />
-        </Pressable>
-      </Animated.View>
-    </View>
-  )
-}
-
 // Styles
 
 const styles = StyleSheet.create({
@@ -179,78 +118,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
-  messageItem: {
-    flexDirection: 'column',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  friendMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#eee',
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  myMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#0084ff',
-    color: 'white',
-    paddingLeft: 12,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  input: {
-    flex: 1,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    backgroundColor: '#F8F6F0',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  sendButton: {
-    marginLeft: 10,
-    backgroundColor: theme.platformStyle.color,
-    borderRadius: 24,
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -267,52 +134,6 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  messageContainer: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    marginLeft: 12
-  },
-  myMessageContainer: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    paddingRight: 10
-  },
-  friendMessageTail: {
-    position: 'absolute',
-    bottom: 0,
-    left: -10,
-    width: 0,
-    height: 0,
-    backgroundColor: 'transparent',
-    borderStyle: 'solid',
-    borderLeftWidth: 10,
-    borderRightWidth: 10,
-    borderBottomWidth: 20,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: '#eee',
-  },
-  myMessageTail: {
-    position: 'absolute',
-    bottom: 0,
-    right: -10,
-    width: 0,
-    height: 0,
-    backgroundColor: 'transparent',
-    borderStyle: 'solid',
-    borderLeftWidth: 10,
-    borderRightWidth: 10,
-    borderBottomWidth: 20,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: '#0084ff',
-  },
-  timestamp: {
-    marginTop: 2,
-    fontSize: 8,
-    color: 'black',
-    alignSelf: 'flex-end',
   },
 })
 
