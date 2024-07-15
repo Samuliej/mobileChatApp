@@ -18,6 +18,8 @@ import Chat from '../Chat/index.jsx'
 import NewPost from '../Feed/NewPost/index.jsx'
 import Friend from '../Friends/Friend/index.jsx'
 import Profile from '../Profile/index.jsx'
+import CustomHeader from './CustomHeader/index.jsx'
+import CustomDrawerItem from './CustomDrawerItem/index.jsx'
 
 /*
 
@@ -32,40 +34,9 @@ import Profile from '../Profile/index.jsx'
     * Friend requests, component for displaying all the user's pending friend requests
     * Sign Out, for signing out of the app.
 
-
 */
 
 const Drawer = createDrawerNavigator()
-
-const CustomHeader = ({ user }) => {
-  const navigation = useNavigation()
-
-  return (
-    <Pressable onPress={() => navigation.toggleDrawer()}>
-      <Image
-        source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
-        style={{ width: 40, height: 40, borderRadius: 20, marginLeft: 8 }}
-      />
-    </Pressable>
-  )
-}
-
-// Custom drawer item with badge for indicating pending friend requests in the drawer
-const CustomDrawerItem = ({ label, badgeCount, ...props }) => (
-  <DrawerItem
-    label={() => (
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Text style={{ color: '#696969', fontWeight: '500' }}>{label}</Text>
-        {badgeCount > 0 && (
-          <View style={{ backgroundColor: 'red', borderRadius: 10, width: 20, height: 20, justifyContent: 'center', alignItems: 'center', marginLeft: 5 }}>
-            <Text style={{ color: 'white' }}>{badgeCount}</Text>
-          </View>
-        )}
-      </View>
-    )}
-    {...props}
-  />
-)
 
 
 const MyDrawer = () => {
@@ -132,16 +103,16 @@ const MyDrawer = () => {
   return (
     <Drawer.Navigator
       drawerContent={(props) => (
-        <View style={{ flex: 1, justifyContent: 'space-between' }}>
+        <View style={styles.drawerContainer}>
           <DrawerContentScrollView {...props}>
-            <View style={{ alignItems: 'center', margin: 10, flex: 1 }}>
+            <View style={styles.profile}>
               <Pressable onPress={() => navigation.navigate('Profile')}>
                 <Image
                   source={user && user.profilePicture ? { uri: user.profilePicture } : defaultProfilePicture}
-                  style={{ width: 80, height: 80, borderRadius: 40 }}
+                  style={styles.image}
                 />
               </Pressable>
-              <Text style={{ marginTop: 10 }}>{user ? user.username : 'Guest'}</Text>
+              <Text style={styles.username}>{user ? user.username : 'Guest'}</Text>
             </View>
             <DrawerItem
               label="Home"
@@ -170,8 +141,8 @@ const MyDrawer = () => {
               labelStyle={{ color: 'red' }}
             />
           </DrawerContentScrollView>
-          <View style={{ padding: 20, backgroundColor: '#D3D3D3', borderTopWidth: 1, borderTopColor: '#808080' }}>
-            <Text style={{ textAlign: 'center', color: '#808080' }}>The Hive</Text>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>The Hive</Text>
           </View>
         </View>
       )}
@@ -221,6 +192,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  drawerContainer: {
+    flex: 1,
+    justifyContent: 'space-between'
+  },
+  profile: {
+    alignItems: 'center',
+    margin: 10,
+    flex: 1
+  },
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 40
+  },
+  username: {
+    marginTop: 10
+  },
+  footer: {
+    padding: 20,
+    backgroundColor: '#D3D3D3',
+    borderTopWidth: 1,
+    borderTopColor: '#808080'
+  },
+  footerText: {
+    textAlign: 'center',
+    color: '#808080'
+  },
+
 })
 
 
