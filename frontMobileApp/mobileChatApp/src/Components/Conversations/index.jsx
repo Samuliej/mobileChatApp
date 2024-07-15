@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, FlatList, Image, ActivityIndicator }
 import { Ionicons } from '@expo/vector-icons'
 import { UserContext } from '../../Context/UserContext.js'
 import useConversations from '../../hooks/useConversations.js'
-import { truncate } from '../../utils/utils.js'
+import { truncate, formatTimestamp } from '../../utils/utils.js'
 import useDeleteConversation from '../../hooks/useDeleteConversation.js'
 import ErrorBanner from '../Error/index.jsx'
 import theme from '../../theme.js'
@@ -108,9 +108,12 @@ const Conversations = ({ navigation }) => {
               onLongPress={() => handleLongPress(item)}
             >
               <Image source={item.friend && item.friend.profilePicture ? { uri: item.friend.profilePicture } : defaultProfilePicture} style={styles.profilePicture} />
-              <View style={styles.textContainer}>
-                <Text style={styles.conversationText}>{item.friend && item.friend.username}</Text>
-                {item.lastMessage && <Text style={styles.latestMessage}>{truncate(item.lastMessage.content, 25)}</Text>}
+              <View style={styles.containerRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.conversationText}>{item.friend && item.friend.username}</Text>
+                  {item.lastMessage && <Text style={styles.latestMessage}>{truncate(item.lastMessage.content, 25)}</Text>}
+                </View>
+                <Text style={styles.timestamp}>{item.lastMessage && formatTimestamp(item.lastMessage.timestamp)}</Text>
               </View>
             </Pressable>
           )}
@@ -201,6 +204,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  containerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  timestamp: {
+    fontSize: 12,
+    flexShrink: 1,
+    marginRight: 80,
+  }
 })
 
 export default Conversations
