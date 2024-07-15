@@ -1,13 +1,14 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Pressable, FlatList, Image, ActivityIndicator } from 'react-native'
+import { View, StyleSheet, Pressable, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { UserContext } from '../../Context/UserContext.js'
 import useConversations from '../../hooks/useConversations.js'
-import { truncate, formatTimestamp } from '../../utils/utils.js'
 import useDeleteConversation from '../../hooks/useDeleteConversation.js'
 import ErrorBanner from '../Error/index.jsx'
 import theme from '../../theme.js'
-const defaultProfilePicture = require('../../../assets/soldier.png')
+import ConversationsList from './ConversationsList/index.jsx'
+import RemoveConversation from './RemoveConversation/index.jsx'
+
 
 /*
 
@@ -17,6 +18,8 @@ const defaultProfilePicture = require('../../../assets/soldier.png')
 
 */
 
+
+// Main component for rendering the Conversations view and functionality
 const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const { conversations, loading, setConversations } = useConversations(user)
@@ -50,6 +53,7 @@ const Conversations = ({ navigation }) => {
     setSelectedConversation(null)
   }
 
+  // User pressed cancel
   const handleCancelRemoveConversation = () => {
     setSelectedConversation(null)
   }
@@ -80,43 +84,20 @@ const Conversations = ({ navigation }) => {
         </View>
       )}
       {selectedConversation && (
-        <View style={styles.redBar}>
-          <Text style={styles.redBarText}>Remove conversation with {selectedConversation.friend.name}?</Text>
-          <Pressable onPress={handleRemoveConversation}>
-            <Text style={[styles.redBarText, { borderWidth: 1, borderColor: '#000', borderRadius: 5, padding: 3 }]}>Remove</Text>
-          </Pressable>
-          <Pressable onPress={handleCancelRemoveConversation}>
-            <Text style={[styles.redBarText, { borderWidth: 1, borderColor: '#000', borderRadius: 5, padding: 3 }]}>Cancel</Text>
-          </Pressable>
-        </View>
+        <RemoveConversation
+          selectedConversation={selectedConversation}
+          handleRemoveConversation={handleRemoveConversation}
+          handleCancelRemoveConversation={handleCancelRemoveConversation}
+        />
       )}
       {/* Display conversations */}
       {conversations.length > 0 && (
-        <FlatList
-          data={sortedConversations}
-          keyExtractor={item => item && item._id ? item._id : ''}
-          renderItem={({ item }) => item && (
-            <Pressable
-              style={styles.conversationItem}
-              onPress={() => {
-                if (selectedConversation) {
-                  setSelectedConversation(null)
-                } else if (item._id) {
-                  navigation.navigate('Chat', { conversationId: item._id })
-                }
-              }}
-              onLongPress={() => handleLongPress(item)}
-            >
-              <Image source={item.friend && item.friend.profilePicture ? { uri: item.friend.profilePicture } : defaultProfilePicture} style={styles.profilePicture} />
-              <View style={styles.containerRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.conversationText}>{item.friend && item.friend.username}</Text>
-                  {item.lastMessage && <Text style={styles.latestMessage}>{truncate(item.lastMessage.content, 25)}</Text>}
-                </View>
-                <Text style={styles.timestamp}>{item.lastMessage && formatTimestamp(item.lastMessage.timestamp)}</Text>
-              </View>
-            </Pressable>
-          )}
+        <ConversationsList
+          sortedConversations={sortedConversations}
+          selectedConversation={selectedConversation}
+          setSelectedConversation={setSelectedConversation}
+          navigation={navigation}
+          handleLongPress={handleLongPress}
         />
       )}
       {/* Icon for entering the view to start new conversations */}
@@ -139,15 +120,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 5
-  },
-  redBar: {
-    backgroundColor: 'red',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-  },
-  redBarText: {
-    color: '#fff',
   },
   paragraph: {
     fontSize: 16,
@@ -175,45 +147,11 @@ const styles = StyleSheet.create({
     left: 20,
     top: 15
   },
-  conversationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    marginBottom: 10,
-    marginHorizontal: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  profilePicture: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 20,
-  },
-  conversationText: {
-    flex: 1,
-    fontSize: 18,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  containerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  timestamp: {
-    fontSize: 12,
-    flexShrink: 1,
-    marginRight: 80,
-  }
 })
 
 export default Conversations

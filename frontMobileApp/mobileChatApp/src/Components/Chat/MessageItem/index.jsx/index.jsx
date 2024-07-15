@@ -45,8 +45,7 @@ const styles = StyleSheet.create({
   },
   myMessage: {
     alignSelf: 'flex-end',
-    backgroundColor: '#0084ff',
-    color: 'white',
+    backgroundColor: '#77e67c',
     paddingLeft: 12,
     borderRadius: 10,
     shadowColor: "#000",
@@ -90,7 +89,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 20,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderBottomColor: '#0084ff',
+    borderBottomColor: '#77e67c',
   },
   friendMessageTail: {
     position: 'absolute',
