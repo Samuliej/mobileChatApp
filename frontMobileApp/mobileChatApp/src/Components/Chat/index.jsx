@@ -7,6 +7,7 @@ import {
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { UserContext } from '../../Context/UserContext.js'
+import { formatTimestamp } from '../../utils/utils.js'
 import Icon from 'react-native-vector-icons/Ionicons'
 import useChat from '../../hooks/useChat.js'
 import uuid from 'react-native-uuid'
@@ -55,14 +56,7 @@ const MessageItem = ({ item, user }) => {
     item._id = Math.random().toString(36).substr(2, 9)
   }
 
-  const date = new Date(item.timestamp)
-  const formattedDate = date.toLocaleString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  const formattedDate = formatTimestamp(item.timestamp)
 
   // Variable for figuring out whether the message is sent by the current user
   const isMyMessage = user && item.sender === user._id
@@ -122,7 +116,6 @@ const Chat = ({ route }) => {
           renderItem={({ item }) => <MessageItem item={item} user={user} />}
           onEndReached={handleEndReached}
           onEndReachedTreshold={0.5}
-
         />
         <MessageInput newMessage={newMessage} setNewMessage={setNewMessage} sendMessage={sendMessage} />
       </View>
@@ -195,7 +188,6 @@ const styles = StyleSheet.create({
   friendMessage: {
     alignSelf: 'flex-start',
     backgroundColor: '#eee',
-    padding: 10,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
@@ -210,7 +202,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     backgroundColor: '#0084ff',
     color: 'white',
-    padding: 12,
+    paddingLeft: 12,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
@@ -279,19 +271,17 @@ const styles = StyleSheet.create({
   messageContainer: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-    marginBottom: 10,
-    padding: 10
+    marginLeft: 12
   },
   myMessageContainer: {
     flexDirection: 'column',
     alignItems: 'flex-end',
-    marginBottom: 10,
-    padding: 10,
+    paddingRight: 10
   },
   friendMessageTail: {
     position: 'absolute',
-    bottom: 0, // Adjust as necessary
-    left: -10, // Adjust to position the tail correctly
+    bottom: 0,
+    left: -10,
     width: 0,
     height: 0,
     backgroundColor: 'transparent',
