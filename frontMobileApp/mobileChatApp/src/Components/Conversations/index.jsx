@@ -61,12 +61,9 @@ const Conversations = ({ navigation }) => {
   // Sort conversations when the conversations change
   useEffect(() => {
     const sorted = conversations
-      .filter(conversation => conversation !== undefined)
+      .filter(conversation => conversation !== undefined && conversation.lastMessage && conversation.lastMessage.timestamp)
       .sort((a, b) => {
-        if (!a.timestamp || !b.timestamp) {
-          return 0
-        }
-        return new Date(b.timestamp) - new Date(a.timestamp)
+        return new Date(b.lastMessage.timestamp) - new Date(a.lastMessage.timestamp)
       })
 
     setSortedConversations(sorted)
