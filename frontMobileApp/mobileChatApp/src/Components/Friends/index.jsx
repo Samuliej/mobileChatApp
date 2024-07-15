@@ -16,6 +16,8 @@ import useFriends from '../../hooks/useFriends.js'
 const Friends = () => {
   const { friends, loading } = useFriends()
   const navigation = useNavigation()
+  let sortedFriends
+  friends ? sortedFriends = friends.sort((a, b) => a.username.localeCompare(b.username)) : null
 
   if (loading) {
     return (
@@ -38,9 +40,9 @@ const Friends = () => {
           </Pressable>
         </View>
       )}
-      {friends.length > 0 && (
+      {sortedFriends.length > 0 && (
         <ScrollView>
-          {friends.map(friend => (
+          {sortedFriends.map(friend => (
             <FriendItem key={friend._id} friend={friend} navigation={navigation} />
           ))}
         </ScrollView>
