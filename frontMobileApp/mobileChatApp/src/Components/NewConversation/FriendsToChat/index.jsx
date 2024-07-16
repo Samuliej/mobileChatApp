@@ -45,7 +45,6 @@ const FriendsToChat = ({friends, user, updateUser, navigation, setCreatingConvo}
               }
             })
             const conversation = response.data.conversation
-            console.log('created conversation', conversation)
             updateUser(userToken)
             // navigate to Chat screen with this conversation
             navigation.navigate('Chat', { conversationId: conversation._id, friend: friend })
