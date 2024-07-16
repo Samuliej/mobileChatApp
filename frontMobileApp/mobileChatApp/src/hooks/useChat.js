@@ -12,7 +12,7 @@ import { useInfiniteQuery, useQueryClient } from 'react-query'
  * @returns {object} An object containing the cleaned message without emojis and an array of extracted emojis with their indices.
  */
 const extractEmojis = (message) => {
-  const emojiRegex = /([\uD800-\uDBFF][\uDC00-\uDFFF])/g // Basic regex for matching surrogate pairs (common for emojis)
+  const emojiRegex = /([\uD800-\uDBFF][\uDC00-\uDFFF])/g
   let match
   const emojis = []
   let cleanedMessage = message
@@ -21,8 +21,11 @@ const extractEmojis = (message) => {
     const emoji = match[0]
     const index = match.index
     emojis.push({ emoji, index })
-    cleanedMessage = cleanedMessage.replace(emoji, "") // Remove emoji from the message
+    cleanedMessage = cleanedMessage.replace(emoji, "")
   }
+
+  // Sort the emojis based on their indices
+  emojis.sort((a, b) => a.index - b.index)
 
   return { cleanedMessage, emojis }
 }
@@ -35,7 +38,7 @@ const extractEmojis = (message) => {
  */
 const isMessageOnlyEmojis = (message) => {
   const { cleanedMessage } = extractEmojis(message)
-  return cleanedMessage.length === 0
+  return cleanedMessage.trim().length === 0
 }
 
 
@@ -74,11 +77,16 @@ const useChat = (user, conversationId, initialFriend) => {
         return
       }
       // Decrypt the message content
-      let decryptedContent = decrypt(conversation.encryptionKey, newMessage.content)
+      let decryptedContent
 
+      if (newMessage.justEmojis) {
+        decryptedContent = newMessage.content
+      } else {
+        decryptedContent = decrypt(conversation.encryptionKey, newMessage.content)
+      }
       // Check if there are emojis to be added back to the decrypted content
       if (newMessage.emojis && newMessage.emojis.length > 0) {
-        const sortedEmojis = newMessage.emojis.sort((a, b) => b.index - a.index)
+        const sortedEmojis = newMessage.emojis.sort((a, b) => a.index - b.index)
         sortedEmojis.forEach(({ emoji, index }) => {
           decryptedContent = decryptedContent.slice(0, index) + emoji + decryptedContent.slice(index)
         })
@@ -138,7 +146,7 @@ const useChat = (user, conversationId, initialFriend) => {
     let decryptedMessages = data.conversation.messages.map((m) => {
       let content = m.justEmojis ? m.content : decrypt(conversation.encryptionKey, m.content)
       if (m.emojis && m.emojis.length > 0) {
-        const sortedEmojis = m.emojis.sort((a, b) => b.index - a.index)
+        const sortedEmojis = m.emojis.sort((a, b) => a.index - b.index)
         sortedEmojis.forEach(({ emoji, index }) => {
           content = content.slice(0, index) + emoji + content.slice(index)
         })

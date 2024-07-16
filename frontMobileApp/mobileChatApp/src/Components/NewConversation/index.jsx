@@ -37,6 +37,7 @@ const NewConversation = () => {
   const { user, updateUser } = useContext(UserContext)
   const [friends, setFriends] = useState([])
   const [loading, setLoading] = useState(true)
+  const [creatingConvo, setCreatingConvo] = useState(false)
   const navigation = useNavigation()
 
   useEffect(() => {
@@ -61,7 +62,7 @@ const NewConversation = () => {
     fetchFriends()
   }, [user ? user.friends : null])
 
-  if (loading) {
+  if (loading || creatingConvo) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -83,6 +84,7 @@ const NewConversation = () => {
         user={user}
         updateUser={updateUser}
         navigation={navigation}
+        setCreatingConvo={setCreatingConvo}
       />
     </View>
   )
