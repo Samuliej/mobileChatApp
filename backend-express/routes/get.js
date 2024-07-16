@@ -13,7 +13,11 @@ const authMiddleware = require('../middlewares/authMiddlewares')
 */
 
 // Fetch all users
-router.get('/api/users', async (req, res) => {
+router.get('/api/users', authMiddleware, async (req, res) => {
+  if (!req.currentUser) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+
   try {
     const users = await User.find({}).select('-password')
     res.json(users)
@@ -24,7 +28,11 @@ router.get('/api/users', async (req, res) => {
 
 
 // Fetch all conversations
-router.get('/api/conversations', async (req, res) => {
+router.get('/api/conversations', authMiddleware, async (req, res) => {
+  if (!req.currentUser) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+
   try {
     const convos = await Conversation.find({})
     res.json(convos)
@@ -35,7 +43,11 @@ router.get('/api/conversations', async (req, res) => {
 
 
 // Fetch user by username
-router.get('/api/users/:username', async (req, res) => {
+router.get('/api/users/:username', authMiddleware, async (req, res) => {
+  if (!req.currentUser) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+
   try {
     const user = await User.findOne({ username: req.params.username })
       .select('-password')
@@ -47,7 +59,11 @@ router.get('/api/users/:username', async (req, res) => {
 })
 
 // Fetch user by id
-router.get('/api/users/id/:userId', async (req, res) => {
+router.get('/api/users/id/:userId', authMiddleware, async (req, res) => {
+  if (!req.currentUser) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+
   try {
     const user = await User.findById(req.params.userId)
       .select('-password')
@@ -70,7 +86,11 @@ router.get('/api/username/:username', async (req, res) => {
 })
 
 // Fetch users by username query pagination added
-router.get('/api/users/search/:query', async (req, res) => {
+router.get('/api/users/search/:query', authMiddleware, async (req, res) => {
+  if (!req.currentUser) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+
   try {
     const page = parseInt(req.query.page) || 1
     const limit = 5 // results / page
@@ -90,7 +110,11 @@ router.get('/api/users/search/:query', async (req, res) => {
 
 
 // Fetch conversation by ID
-router.get('/api/conversations/:convoId', async (req, res) => {
+router.get('/api/conversations/:convoId', authMiddleware, async (req, res) => {
+  if (!req.currentUser) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+
   try {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 15
@@ -130,7 +154,11 @@ router.get('/api/conversations/:convoId', async (req, res) => {
 
 
 // Fetch messages in a conversation
-router.get('/api/conversations/:convoId/messages', async (req, res) => {
+router.get('/api/conversations/:convoId/messages', authMiddleware, async (req, res) => {
+  if (!req.currentUser) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+
   try {
     const convo = await Conversation.findById(req.params.convoId)
       .populate({

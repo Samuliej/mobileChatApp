@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { View, TextInput, Text, FlatList, StyleSheet, Image } from 'react-native'
-import { useSearchUser } from '../../hooks/useSearchUser'
+import useSearchUser from '../../hooks/useSearchUser'
 import theme from '../../theme.js'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import defaultProfilePicture from '../../../assets/soldier.png'

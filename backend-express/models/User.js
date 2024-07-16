@@ -1,17 +1,24 @@
 const mongoose = require('mongoose')
 
-/*
 
-  Mongoose Schema for a single User.
-  The user contains mandatory fields, username, password an name.
-  There are also non-mandatory fields: profile picture, phone and city.
-
-  Inside the user are also fields for
-  pending friend requests, friends, converastions that the user is a part of and
-  the posts that the user has made.
-
-*/
-
+/**
+ * Mongoose schema for users.
+ * Defines the structure of a user document within the database, including username, password, personal information (name, profile picture, phone, city),
+ * and relationships with other entities in the system (pending friend requests, friends, conversations, and posts).
+ *
+ * @module User
+ * @typedef {Object} User
+ * @property {string} username - The user's username. Must be unique and at least 3 characters long.
+ * @property {string} password - The user's password. Required and must be at least 5 characters long.
+ * @property {string} name - The user's full name. Required and must be at least 3 characters long.
+ * @property {string} profilePicture - The URL to the user's profile picture. Optional.
+ * @property {string} phone - The user's phone number. Optional.
+ * @property {string} city - The city the user resides in. Optional.
+ * @property {Array<mongoose.Schema.Types.ObjectId>} pendingFriendRequests - An array of IDs representing friend requests the user has received but not yet responded to.
+ * @property {Array<mongoose.Schema.Types.ObjectId>} friends - An array of IDs representing the user's friends.
+ * @property {Array<mongoose.Schema.Types.ObjectId>} conversations - An array of IDs representing conversations the user is part of.
+ * @property {Array<mongoose.Schema.Types.ObjectId>} posts - An array of IDs representing posts created by the user.
+ */
 const schema = new mongoose.Schema({
   username: {
     type: String,

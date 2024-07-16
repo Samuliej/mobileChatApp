@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../api'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 /**
@@ -21,19 +22,26 @@ const useGetUserById = (userId) => {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (userId) {
-      setLoading(true)
-      api.get(`/api/users/id/${userId}`)
-        .then(response => {
+    const fetchUser = async () => {
+      if (userId) {
+        setLoading(true)
+        try {
+          const token = await AsyncStorage.getItem('userToken')
+          const response = await api.get(`/api/users/id/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
           setUser(response.data)
-          setLoading(false)
-          return response.data
-        })
-        .catch(error => {
+        } catch (error) {
           setError(error)
+        } finally {
           setLoading(false)
-        })
+        }
+      }
     }
+
+    fetchUser()
   }, [userId])
 
   return { loading, user, error }

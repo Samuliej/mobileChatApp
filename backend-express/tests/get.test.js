@@ -87,7 +87,9 @@ beforeAll(async () => {
 })
 
 test('GET /api/users returns all users without passwords', async () => {
-  const response = await api.get('/api/users').expect(200)
+  const response = await api.get('/api/users')
+    .set('Authorization', `Bearer ${user1Token}`)
+    .expect(200)
 
   expect(response.body).toHaveLength(3)
 
@@ -99,7 +101,9 @@ test('GET /api/users returns all users without passwords', async () => {
 })
 
 test('GET /api/conversations returns all conversations', async () => {
-  const response = await api.get('/api/conversations').expect(200)
+  const response = await api.get('/api/conversations')
+    .set('Authorization', `Bearer ${user1Token}`)
+    .expect(200)
 
   expect(response.body).toHaveLength(1)
 
@@ -110,14 +114,18 @@ test('GET /api/conversations returns all conversations', async () => {
 })
 
 test('GET /api/users/:username returns the correct user', async () => {
-  const response = await api.get(`/api/users/${user1.username}`).expect(200)
+  const response = await api.get(`/api/users/${user1.username}`)
+    .set('Authorization', `Bearer ${user1Token}`)
+    .expect(200)
 
   expect(response.body.username).toBe(user1.username)
   expect(response.body.name).toBe(user1.name)
 })
 
 test('GET /api/users/id/:userId returns the correct user', async () => {
-  const response = await api.get(`/api/users/id/${createdUser1._id}`).expect(200)
+  const response = await api.get(`/api/users/id/${createdUser1._id}`)
+    .set('Authorization', `Bearer ${user1Token}`)
+    .expect(200)
 
   expect(response.body._id).toBe(createdUser1._id.toString())
   expect(response.body.username).toBe(user1.username)
@@ -139,7 +147,9 @@ test('GET /api/username/:username correctly identifies a not taken username', as
 
 test('GET /api/users/search/:query returns the correct users', async () => {
   // Users created in beforeAll
-  const firstResponse = await api.get('/api/users/search/user?page=1').expect(200)
+  const firstResponse = await api.get('/api/users/search/user?page=1')
+    .set('Authorization', `Bearer ${user1Token}`)
+    .expect(200)
   expect(firstResponse.body).toHaveLength(3)
 
   // Create more users for testing pagination
@@ -153,7 +163,9 @@ test('GET /api/users/search/:query returns the correct users', async () => {
   }
 
   // Search for users with username starting with 'user'
-  const response = await api.get('/api/users/search/user?page=1').expect(200)
+  const response = await api.get('/api/users/search/user?page=1')
+    .set('Authorization', `Bearer ${user1Token}`)
+    .expect(200)
 
   expect(response.body).toHaveLength(5)
   response.body.forEach(user => {
@@ -162,7 +174,9 @@ test('GET /api/users/search/:query returns the correct users', async () => {
   })
 
   // Check second page
-  const response2 = await api.get('/api/users/search/user?page=2').expect(200)
+  const response2 = await api.get('/api/users/search/user?page=2')
+    .set('Authorization', `Bearer ${user1Token}`)
+    .expect(200)
 
   expect(response2.body).toHaveLength(5) // Now it should receive 5 users
   response2.body.forEach(user => {
@@ -172,7 +186,9 @@ test('GET /api/users/search/:query returns the correct users', async () => {
 })
 
 test('GET /api/conversations/:convoId returns the correct conversation', async () => {
-  const response = await api.get(`/api/conversations/${convoId}`).expect(200)
+  const response = await api.get(`/api/conversations/${convoId}`)
+    .set('Authorization', `Bearer ${user1Token}`)
+    .expect(200)
 
   expect(response.body.conversation._id).toBe(convoId)
   expect(response.body.conversation.participants).toHaveLength(2)

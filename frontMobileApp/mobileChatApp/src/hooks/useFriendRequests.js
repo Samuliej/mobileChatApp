@@ -36,9 +36,14 @@ const useFriendRequests = (setNotification) => {
   const fetchRequests = async () => {
     if (user) {
       const pendingRequests = user.pendingFriendRequests.filter(request => request.receiver === user._id)
+      const token = await AsyncStorage.getItem('userToken')
       // Fetch all requests
       const fetchedRequests = await Promise.all(pendingRequests.map(async (request) => {
-        const response = await api.get(`/api/users/id/${request.sender}`)
+        const response = await api.get(`/api/users/id/${request.sender}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         const senderUser = await response.data
         return {
           ...request,

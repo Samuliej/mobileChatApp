@@ -19,13 +19,27 @@ const initialUsers = [
     'username': 'user2',
     'password': 'password2',
     'name': 'User Two'
+  },
+  {
+    'username': 'tokenUser',
+    'password': 'salis',
+    'name': 'token user'
   }
 ]
 
+const tokenUser = initialUsers[2]
+
 let postId = null
 let user1, user2
+let token
 
 beforeAll(async () => {
+  let result = await api.post('/api/users').send(tokenUser).expect(201)
+
+  result = await api.post('/api/login').send({ username: tokenUser.username, password: tokenUser.password }).expect(200)
+  token = result.body.token
+
+
   user1 = new User(initialUsers[0])
   user2 = new User(initialUsers[1])
 
@@ -73,7 +87,7 @@ test('user with missing mandatory field(s) is not added', async () => {
 
   assert.strictEqual(result.body.error, 'Something went wrong creating the user')
 
-  let response = await api.get('/api/users')
+  let response = await api.get('/api/users').set('Authorization', `Bearer ${token}`)
 
   assert.strictEqual(response.body.length, initialUsers.length)
 
@@ -92,7 +106,7 @@ test('user with missing mandatory field(s) is not added', async () => {
 
   assert.strictEqual(result.body.error, 'Something went wrong creating the user')
 
-  response = await api.get('/api/users')
+  response = await api.get('/api/users').set('Authorization', `Bearer ${token}`)
 
   assert.strictEqual(response.body.length, initialUsers.length)
 
@@ -111,7 +125,7 @@ test('user with missing mandatory field(s) is not added', async () => {
 
   assert.strictEqual(result.body.error, 'Something went wrong creating the user')
 
-  response = await api.get('/api/users')
+  response = await api.get('/api/users').set('Authorization', `Bearer ${token}`)
 
   assert.strictEqual(response.body.length, initialUsers.length)
 })
@@ -131,7 +145,7 @@ test('a valid user can be added', async () => {
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  const response = await api.get('/api/users')
+  const response = await api.get('/api/users').set('Authorization', `Bearer ${token}`)
 
   const usernames = response.body.map(r => r.username)
 

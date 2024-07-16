@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import { UserContext } from '../Context/UserContext'
 import { SocketContext } from '../Context/SocketContext'
 import api from '../api'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 /**
@@ -25,8 +26,13 @@ const useFriends = () => {
   useEffect(() => {
     const fetchFriends = async () => {
       if (user) {
+        const token = await AsyncStorage.getItem('userToken')
         const fetchedFriends = await Promise.all(user.friends.map(async (friendId) => {
-          const response = await api.get(`/api/users/id/${friendId}`)
+          const response = await api.get(`/api/users/id/${friendId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
           const friendUser = await response.data
           return friendUser
         }))
@@ -42,9 +48,14 @@ const useFriends = () => {
     socket.on('friendRequestAccepted', async (friendship) => {
       // Check if the current user is involved in the friendship
       if (friendship.user1._id === user._id || friendship.user2._id === user._id) {
+        const token = await AsyncStorage.getItem('userToken')
         // Get the new friend's user object
         const newFriendId = friendship.user1._id === user._id ? friendship.user2._id : friendship.user1._id
-        const response = await api.get(`/api/users/id/${newFriendId}`)
+        const response = await api.get(`/api/users/id/${newFriendId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         const newFriend = await response.data
 
         // Update the friends state to include the new friend
