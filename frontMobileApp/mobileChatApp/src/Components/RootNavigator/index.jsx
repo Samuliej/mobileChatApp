@@ -7,14 +7,15 @@ import { SocketContext } from '../../Context/SocketContext.js'
 import { UserContext } from '../../Context/UserContext.js'
 import { FriendRequestContext } from '../../Context/FriendRequestContext.js'
 
-/*
-
-  Component for the main Stack navigator
-
-*/
 
 const RootStack = createStackNavigator()
 
+/**
+ * RootNavigator component is responsible for managing the navigation flow of the application.
+ * It listens for socket events related to friend requests and updates the user accordingly.
+ *
+ * @return {JSX.Element} The JSX element representing the root navigator.
+ */
 const RootNavigator = () => {
   const socket = useContext(SocketContext)
   const { user, updateUser } = useContext(UserContext)

@@ -1,12 +1,16 @@
 import React, { useRef } from 'react'
 import { Animated, TouchableOpacity, Text, StyleSheet } from 'react-native'
 
-/*
 
- Custom button component that has built-in animation
-
-*/
-
+/**
+ * Renders a custom button component with built-in animation.
+ *
+ * @param {Object} props - The properties for the custom button.
+ * @param {Function} props.onPress - The function to be called when the button is pressed.
+ * @param {string} props.title - The title of the button.
+ * @param {Object} [props.style] - The style object for the button.
+ * @return {JSX.Element} The custom button component.
+ */
 const CustomButton = ({ onPress, title, style }) => {
   const scaleValue = useRef(new Animated.Value(1)).current
 

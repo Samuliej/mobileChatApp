@@ -22,6 +22,7 @@ const validationSchema = yup.object().shape({
     .required('Password is required'),
 })
 
+
 /**
  * This is the Sign In component of the application.
  *
@@ -33,9 +34,13 @@ const validationSchema = yup.object().shape({
  *
  * The component contains a form with two fields: username and password. Both fields have validation schemas using `yup`.
  *
- * When the user submits the form, the `handleSignIn` function is called. This function calls the `signIn` function from the `useSignIn` hook with the username and password. If the sign in is successful, it stores the user token in `AsyncStorage`, updates the user context, and navigates the user to the main page.
+ * When the user submits the form, the `handleSignIn` function is called. This function calls the `signIn` function from the
+ * `useSignIn` hook with the username and password. If the sign in is successful, it stores the user token
+ * in `AsyncStorage`, updates the user context, and navigates the user to the main page.
  *
  * The component also includes an `ErrorBanner` component to display any error that might occur while signing in.
+ *
+ * @return {JSX.Element} The SignIn component.
  */
 const SignIn = () => {
   const { updateUser } = useContext(UserContext)
@@ -105,7 +110,22 @@ const SignIn = () => {
 }
 
 
-// Sign in view component
+/**
+ * Renders the sign-in view component.
+ *
+ * @param {Object} props - The component props.
+ * @param {string} props.username - The username value.
+ * @param {function} props.setUsername - The function to update the username value.
+ * @param {function} props.setUsernameError - The function to set the username error message.
+ * @param {string} props.password - The password value.
+ * @param {function} props.setPassword - The function to update the password value.
+ * @param {function} props.setPasswordError - The function to set the password error message.
+ * @param {function} props.handleSignIn - The function to handle the sign-in action.
+ * @param {string} props.usernameError - The username error message.
+ * @param {string} props.passwordError - The password error message.
+ * @param {function} props.validateField - The function to validate a field.
+ * @return {JSX.Element} The rendered sign-in view component.
+ */
 const SignInView = ({ username, setUsername, password, setUsernameError, setPasswordError,
   setPassword, handleSignIn, usernameError, passwordError, validateField }) => {
   const navigation = useNavigation()

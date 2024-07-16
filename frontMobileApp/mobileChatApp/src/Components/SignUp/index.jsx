@@ -39,6 +39,146 @@ const validationSchema = yup.object().shape({
 })
 
 
+const SignUpFields = ({
+  errorMessage, selectImage, image, deleteImage, username, setUsername,
+  validateField, setUsernameError, check, isTaken, isLoading, usernameError,
+  password, setPassword, setPasswordError, passwordError, confirmPassword,
+  setConfirmPassword, validateConfirmPassword, setPasswordsMatch, passwordsMatch,
+  name, setName, setNameError, nameError, phone, setPhone, city, setCity,
+  handleSignUp
+}) => {
+
+  return (
+    <View>
+      {errorMessage && <ErrorBanner error={errorMessage} />}
+      <Pressable style={styles.imagePicker} onPress={selectImage}>
+        {image ? (
+          <>
+            <Image source={{ uri: image }} style={styles.image} />
+            <Pressable style={styles.deleteButton} onPress={deleteImage}>
+              <Text style={styles.deleteButtonText}>X</Text>
+            </Pressable>
+          </>
+        ) : (
+          <Text style={styles.imagePickerText}>+</Text>
+        )}
+      </Pressable>
+      <Text style={styles.title}>Choose your username</Text>
+      <Text style={{ marginBottom: 24 }}>Starred(*) fields are required</Text>
+      <Text>Username:*</Text>
+      <TextInput
+        style={styles.input}
+        value={username}
+        onChangeText={setUsername}
+        onBlur={async () => {
+          const trimmedUsername = username.trim()
+          setUsername(trimmedUsername)
+          const errorMessage = validateField('username', { username })
+          if (errorMessage) {
+            setUsernameError(errorMessage)
+            setTimeout(() => {
+              setUsernameError('')
+            }, 3500)
+          }
+          await check(trimmedUsername)
+        }}
+        placeholder='Username (min. 3 characters)'
+      />
+      {isTaken ? <Text style={{ color: 'red' }}>Username is taken</Text> : null}
+      {!isTaken && !isLoading ? <Text style={{ color: 'green' }}>Username is available</Text> : null}
+      {usernameError ? <Text style={{ color: 'red' }}>{usernameError}</Text> : null}
+      <Text style={{ marginTop: 16 }}>Password:*</Text>
+      <TextInput
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+        onBlur={() => {
+          const trimmedPassword = password.trim()
+          setPassword(trimmedPassword)
+          const errorMessage = validateField('password', { password })
+          if (errorMessage) {
+            setPasswordError(errorMessage)
+            setTimeout(() => {
+              setPasswordError('')
+            }, 3500)
+          }
+        }}
+        secureTextEntry
+        placeholder='Password (min. 5 characters)'
+      />
+      {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
+      <Text style={{ marginTop: 16 }}>Confirm Password:*</Text>
+      <TextInput
+        style={styles.input}
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        onBlur={() => {
+          const trimmedConfirmPassword = confirmPassword.trim()
+          setConfirmPassword(trimmedConfirmPassword)
+          const errorMessage = validateConfirmPassword(password, trimmedConfirmPassword)
+          if (errorMessage) {
+            setPasswordsMatch(false)
+          } else {
+            setPasswordsMatch(true)
+          }
+        }}
+        secureTextEntry
+        placeholder='Confirm Password'
+      />
+      {passwordsMatch !== null && !passwordsMatch ? <Text style={{ color: 'red' }}>{'Passwords must match'}</Text> : null}
+      {passwordsMatch ? <Text style={{ color: 'green' }}>{'Passwords match!'}</Text> : null}
+      <Text style={{ marginBottom: 10 }} />
+      <Text style={styles.title}>Additional information</Text>
+      <Text>Name:*</Text>
+      <TextInput
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+        onBlur={() => {
+          const trimmedName = name.trim()
+          setName(trimmedName)
+          const errorMessage = validateField('name', { name })
+          if (errorMessage) {
+            setNameError(errorMessage)
+            setTimeout(() => {
+              setNameError('')
+            }, 3500)
+          } else {
+            setNameError('')
+          }
+        }}
+        placeholder='Name (min. 3 characters)'
+      />
+      {nameError? <Text style={{ color: 'red' }}>{nameError}</Text> : null}
+      <Text style={{ marginTop: 16 }}>Phone:</Text>
+      <TextInput
+        style={styles.input}
+        value={phone}
+        onChangeText={setPhone}
+        placeholder='Phone'
+        keyboardType='phone-pad'
+        onBlur={() => {
+          const trimmedPhone = phone.trim()
+          setPhone(trimmedPhone)
+        }}
+      />
+      <Text style={{ marginTop: 16 }}>City:</Text>
+      <TextInput
+        style={styles.input}
+        value={city}
+        onChangeText={setCity}
+        placeholder='City'
+        onBlur={() => {
+          const trimmedCity = city.trim()
+          setCity(trimmedCity)
+        }}
+      />
+      <CustomButton style={{ marginTop: 10, marginBottom: 20 }} onPress={handleSignUp} title='Register' />
+    </View>
+  )
+}
+
+
 //
 const SignUp =  () => {
   const { signUp, error: signUpError, loading } = useSignUp()
@@ -173,132 +313,19 @@ const SignUp =  () => {
           </View>
         </>
       ) : (
-        <View>
-          {errorMessage && <ErrorBanner error={errorMessage} />}
-          <Pressable style={styles.imagePicker} onPress={selectImage}>
-            {image ? (
-              <>
-                <Image source={{ uri: image }} style={styles.image} />
-                <Pressable style={styles.deleteButton} onPress={deleteImage}>
-                  <Text style={styles.deleteButtonText}>X</Text>
-                </Pressable>
-              </>
-            ) : (
-              <Text style={styles.imagePickerText}>+</Text>
-            )}
-          </Pressable>
-          <Text style={styles.title}>Choose your username</Text>
-          <Text style={{ marginBottom: 24 }}>Starred(*) fields are required</Text>
-          <Text>Username:*</Text>
-          <TextInput
-            style={styles.input}
-            value={username}
-            onChangeText={setUsername}
-            onBlur={async () => {
-              const trimmedUsername = username.trim()
-              setUsername(trimmedUsername)
-              const errorMessage = validateField('username', { username })
-              if (errorMessage) {
-                setUsernameError(errorMessage)
-                setTimeout(() => {
-                  setUsernameError('')
-                }, 3500)
-              }
-              await check(trimmedUsername)
-            }}
-            placeholder='Username (min. 3 characters)'
-          />
-          {isTaken ? <Text style={{ color: 'red' }}>Username is taken</Text> : null}
-          {!isTaken && !isLoading ? <Text style={{ color: 'green' }}>Username is available</Text> : null}
-          {usernameError ? <Text style={{ color: 'red' }}>{usernameError}</Text> : null}
-          <Text style={{ marginTop: 16 }}>Password:*</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            onBlur={() => {
-              const trimmedPassword = password.trim()
-              setPassword(trimmedPassword)
-              const errorMessage = validateField('password', { password })
-              if (errorMessage) {
-                setPasswordError(errorMessage)
-                setTimeout(() => {
-                  setPasswordError('')
-                }, 3500)
-              }
-            }}
-            secureTextEntry
-            placeholder='Password (min. 5 characters)'
-          />
-          {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
-          <Text style={{ marginTop: 16 }}>Confirm Password:*</Text>
-          <TextInput
-            style={styles.input}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            onBlur={() => {
-              const trimmedConfirmPassword = confirmPassword.trim()
-              setConfirmPassword(trimmedConfirmPassword)
-              const errorMessage = validateConfirmPassword(password, trimmedConfirmPassword)
-              if (errorMessage) {
-                setPasswordsMatch(false)
-              } else {
-                setPasswordsMatch(true)
-              }
-            }}
-            secureTextEntry
-            placeholder='Confirm Password'
-          />
-          {passwordsMatch !== null && !passwordsMatch ? <Text style={{ color: 'red' }}>{'Passwords must match'}</Text> : null}
-          {passwordsMatch ? <Text style={{ color: 'green' }}>{'Passwords match!'}</Text> : null}
-          <Text style={{ marginBottom: 10 }} />
-          <Text style={styles.title}>Additional information</Text>
-          <Text>Name:*</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            onBlur={() => {
-              const trimmedName = name.trim()
-              setName(trimmedName)
-              const errorMessage = validateField('name', { name })
-              if (errorMessage) {
-                setNameError(errorMessage)
-                setTimeout(() => {
-                  setNameError('')
-                }, 3500)
-              } else {
-                setNameError('')
-              }
-            }}
-            placeholder='Name (min. 3 characters)'
-          />
-          {nameError? <Text style={{ color: 'red' }}>{nameError}</Text> : null}
-          <Text style={{ marginTop: 16 }}>Phone:</Text>
-          <TextInput
-            style={styles.input}
-            value={phone}
-            onChangeText={setPhone}
-            placeholder='Phone'
-            keyboardType='phone-pad'
-            onBlur={() => {
-              const trimmedPhone = phone.trim()
-              setPhone(trimmedPhone)
-            }}
-          />
-          <Text style={{ marginTop: 16 }}>City:</Text>
-          <TextInput
-            style={styles.input}
-            value={city}
-            onChangeText={setCity}
-            placeholder='City'
-            onBlur={() => {
-              const trimmedCity = city.trim()
-              setCity(trimmedCity)
-            }}
-          />
-          <CustomButton style={{ marginTop: 10, marginBottom: 20 }} onPress={handleSignUp} title='Register' />
-        </View>
+        <SignUpFields
+          errorMessage={errorMessage} selectImage={selectImage} image={image}
+          deleteImage={deleteImage} username={username} setUsername={setUsername}
+          validateField={validateField} setUsernameError={setUsernameError} check={check}
+          isTaken={isTaken} isLoading={isLoading} usernameError={usernameError}
+          password={password} setPassword={setPassword} setPasswordError={setPasswordError}
+          passwordError={passwordError} confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword} validateConfirmPassword={validateConfirmPassword}
+          setPasswordsMatch={setPasswordsMatch} passwordsMatch={passwordsMatch}
+          name={name} setName={setName} setNameError={setNameError} nameError={nameError}
+          phone={phone} setPhone={setPhone} city={city} setCity={setCity}
+          handleSignUp={handleSignUp}
+        />
       )}
     </KeyboardAwareScrollView>
   )
