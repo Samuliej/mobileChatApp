@@ -144,10 +144,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5
   },
-  paragraph: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   fab: {
     position: 'absolute',
     width: 64,

@@ -1,3 +1,28 @@
+/**
+ * @fileoverview This file contains the source code for an old backend system that is no longer in use.
+ * It was designed to handle user authentication, messaging, and friendship management through a
+ * GraphQL API. The system connects to a MongoDB database for data storage and uses Apollo Server
+ * for handling GraphQL requests. It includes models for users, messages, friendships, and conversations,
+ * and defines GraphQL type definitions and resolvers for various operations such as user creation,
+ * login, sending friend requests, and messaging. Note that this backend system has been
+ * deprecated and should not be used in production environments.
+ *
+ * @requires @apollo/server:ApolloServer - Apollo Server for creating the GraphQL server.
+ * @requires @apollo/server/standalone:startStandaloneServer - Function from Apollo Server to start the server in a standalone mode.
+ * @requires bcrypt - Library for hashing and comparing passwords.
+ * @requires jsonwebtoken - Library for generating and verifying JSON Web Tokens (JWT) for authentication.
+ * @requires mongoose - MongoDB object modeling tool designed to work in an asynchronous environment.
+ * @requires dotenv - Module that loads environment variables from a .env file into process.env.
+ * @requires graphql:GraphQLError - Error handling in GraphQL queries and mutations.
+ * @requires ./models/User - Mongoose model for users.
+ * @requires ./models/Message - Mongoose model for messages.
+ * @requires ./models/Friendship - Mongoose model for friendships.
+ * @requires ./models/Conversation - Mongoose model for conversations.
+ *
+ * @deprecated This backend system is deprecated and no longer maintained. It was originally designed for handling user interactions and data management in a social networking context using GraphQL. Consider using or migrating to a more current and supported backend solution.
+ */
+
+
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 const bcrypt = require('bcrypt')
