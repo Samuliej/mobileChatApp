@@ -75,6 +75,7 @@ const validateToken = (token) => {
 const userSocketIds = {}
 
 // handle websocket activity with socket.io
+// asd
 io.on('connection', async (socket) => {
   console.log('a user connected')
   const socketId = socket.id
