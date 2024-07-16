@@ -1,7 +1,19 @@
 import { DrawerItem  } from '@react-navigation/drawer'
 import { View, Text, StyleSheet } from 'react-native'
 
-// Custom drawer item with badge for indicating pending friend requests in the drawer
+/**
+ * CustomDrawerItem is a component that renders a custom drawer item for use in a navigation drawer.
+ * It extends the DrawerItem component from @react-navigation/drawer by adding a badge feature.
+ *
+ * Props:
+ * - label: String. The text label for the drawer item.
+ * - badgeCount: Number. The number to display in the badge. If greater than 0, the badge is displayed.
+ * - ...props: Any additional props are passed down to the DrawerItem component.
+ *
+ * Returns:
+ * - A DrawerItem component with a custom label that includes a badge if badgeCount is greater than 0.
+ *
+ */
 const CustomDrawerItem = ({ label, badgeCount, ...props }) => (
   <DrawerItem
     label={() => (

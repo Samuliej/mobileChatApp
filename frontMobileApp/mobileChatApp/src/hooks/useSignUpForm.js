@@ -19,6 +19,25 @@ const validationSchema = yup.object().shape({
 })
 
 
+/**
+ * Custom hook for managing the sign-up form state and interactions.
+ * It integrates form validation, image selection for profile pictures, and sign-up/sign-in functionalities.
+ *
+ * @returns {object} An object containing state management functions and values for:
+ *                  - username, password, confirmPassword, name, phone, city, profilePicture, image: Form fields.
+ *                  - usernameError, passwordError, nameError: Error messages for the respective form fields.
+ *                  - passwordsMatch: A boolean indicating if the password and confirmPassword match.
+ *                  - setUsername, setPassword, setConfirmPassword, setName, setPhone, setCity, setProfilePicture, setImage: Functions to update form fields.
+ *                  - setUsernameError, setPasswordError, setNameError, setPasswordsMatch: Functions to update error messages and password match status.
+ *                  - validateField: Function to validate a single form field.
+ *                  - validateConfirmPassword: Function to check if password and confirmPassword match.
+ *                  - selectImage: Async function to select an image from the device's library for the profile picture.
+ *                  - deleteImage: Function to remove the selected profile picture.
+ *                  - signUp, signIn: Functions imported from useSignUp and useSignIn hooks for user registration and login.
+ *                  - loading: Boolean indicating if a sign-up or sign-in operation is in progress.
+ *                  - signUpError, signInError: Error messages from sign-up or sign-in operations.
+ *
+ */
 const useSignUpForm = () => {
   const { signUp, error: signUpError, loading } = useSignUp()
   const { signIn, error: signInError } = useSignIn()

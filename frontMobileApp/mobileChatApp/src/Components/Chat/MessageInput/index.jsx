@@ -3,6 +3,27 @@ import { View, TextInput,Pressable, StyleSheet, Animated } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import theme from '../../../theme'
 
+/**
+ * MessageInput is a React component for rendering an input field with an animated send button.
+ * It allows users to type messages, dynamically adjusts its height based on the content, and provides an animated feedback when sending a message.
+ *
+ * Props:
+ * - newMessage: string. The current message text.
+ * - setNewMessage: function. Function to update the state of the message text.
+ * - sendMessage: function. Function to be called when the send button is pressed.
+ *
+ * State:
+ * - inputHeight: number. The dynamic height of the input field based on the content size.
+ *
+ * Refs:
+ * - scaleValue: Animated.Value. Used to control the scale animation of the send button.
+ *
+ * The component consists of a TextInput for the message input and an Animated.View containing a Pressable with an Icon for the send button.
+ * The send button uses an animation to scale down and back up when pressed, providing visual feedback.
+ * The TextInput's height adjusts dynamically to fit the content, improving the user experience by avoiding text overflow.
+ *
+ * Styles are defined for the input container, input field, and send button to ensure a visually appealing layout.
+ */
 const MessageInput = ({ newMessage, setNewMessage, sendMessage }) => {
   const [inputHeight, setInputHeight] = useState(35)
   const scaleValue = useRef(new Animated.Value(1)).current

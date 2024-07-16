@@ -1,10 +1,14 @@
 import { View, Text, StyleSheet } from 'react-native'
 
+
 /**
- * Renders the user's information including username, name, phone, and city.
+ * InfoView is a React component that displays user information in a styled view.
  *
- * @param {Object} user - The user object containing username, name, phone, and city
- * @return {JSX.Element} A React element representing the user's information
+ * Props:
+ * - user: An object containing user information. Expected to have `username`, `name`, `phone`, and `city` properties.
+ *
+ * Behavior:
+ * - Renders a view containing several text elements, each displaying a piece of user information.
  *
  */
 const InfoView = ({user}) => {

@@ -3,14 +3,19 @@ import api from '../api'
 
 
 /**
-   `useSignIn` is a custom hook that provides the functionality to sign in the user.
-    It uses the `api` module to send requests to the server.
-    The hook returns a `signIn` function. This function takes a username and password as parameters, and sends a POST request to '/api/login' with the username and password in the request body.
-    If the sign in is successful, the server responds with a token. The `signIn` function returns this token.
-    If an error occurs while signing in, the `signIn` function throws the error. This allows the component that uses this hook to catch the error and handle it appropriately.
+ * Custom hook for handling user sign-in.
+ * It manages the sign-in process, including loading and error states.
+ *
+ * @returns {object} An object containing:
+ *                  - signIn: A function to sign in a user with a username and password. Returns the user's token if successful.
+ *                  - loading: A boolean indicating if the sign-in process is currently in progress.
+ *                  - error: An error message if an error occurred during sign-in.
+ *                  - setError: A function to manually set the error state.
+ *
+ * @example
+ * const { signIn, loading, error, setError } = useSignIn();
+ * signIn('username', 'password');
  */
-
-
 const useSignIn = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)

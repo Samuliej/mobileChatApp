@@ -5,14 +5,25 @@ const emptyIcon = require('../../../assets/fist-bump.png')
 import FriendItem from './FriendItem.jsx'
 import useFriends from '../../hooks/useFriends.js'
 
-/*
 
-  Component for displaying all the friends of the user.
-  The component is updated in real-time with socket.io
-  You can navigate to a single friend's info and posts displaying component from here also.
-
-*/
-
+/**
+ * Friends is a React component that displays a list of friends or a message indicating no friends are available.
+ * It uses a custom hook, useFriends, to fetch the list of friends and displays them using the FriendItem component.
+ * If the list is empty, it shows a message and a button to navigate to the search page.
+ *
+ * Hooks:
+ * - useFriends: Custom hook to fetch the list of friends and loading state.
+ * - useNavigation: Hook from React Navigation to access the navigation object for navigating between screens.
+ *
+ * Returns:
+ * - A loading indicator if the friends list is being fetched.
+ * - A message and a button to navigate to the search page if the friends list is empty.
+ * - A ScrollView with a list of FriendItem components if there are friends.
+ *
+ * Note:
+ * - The friends list is sorted alphabetically by username before being displayed.
+ * - The component handles loading state and empty state, providing feedback to the user in both cases.
+ */
 const Friends = () => {
   const { friends, loading } = useFriends()
   const navigation = useNavigation()

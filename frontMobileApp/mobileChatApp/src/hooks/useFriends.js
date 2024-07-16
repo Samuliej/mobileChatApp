@@ -3,6 +3,19 @@ import { UserContext } from '../Context/UserContext'
 import { SocketContext } from '../Context/SocketContext'
 import api from '../api'
 
+
+/**
+ * Custom hook for managing and fetching the current user's friends list.
+ * It fetches the user's friends on mount and listens for new friends being added through friend requests.
+ * It uses the UserContext to access the current user's information and the SocketContext for real-time updates.
+ *
+ * @returns {object} An object containing:
+ *                  - friends: An array of friend objects.
+ *                  - loading: A boolean indicating if the friends list is currently being fetched.
+ *
+ * @example
+ * const { friends, loading } = useFriends();
+ */
 const useFriends = () => {
   const { user } = useContext(UserContext)
   const socket = useContext(SocketContext)

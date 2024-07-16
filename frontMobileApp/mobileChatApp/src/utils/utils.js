@@ -1,14 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-
-export const getToken = async () => {
-  try {
-    const token = await AsyncStorage.getItem('userToken')
-    return token
-  } catch (e) {
-    console.error(e)
-  }
-}
-
 // Function that formats the timestamp depending if it's sent on
 // the same day, month or year
 export const formatTimestamp = (timestamp) => {

@@ -2,14 +2,26 @@ import React, { createContext, useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from '../api'
 
-/*
-
-  User Context for easier user management and updating
-
-*/
-
+/**
+ * Provides a React context for user management, including authentication status, user data, and loading state.
+ *
+ * This context facilitates the management of user data throughout the application, including fetching user data,
+ * updating user fields, and handling user authentication state. It uses AsyncStorage for token storage and
+ * an external API for data fetching and updating.
+ *
+ * @module UserContext
+ */
 export const UserContext = createContext()
 
+
+/**
+ * `UserProvider` is a component that uses the `UserContext.Provider` to pass down user data and actions to its children.
+ * It initializes and updates user data based on authentication status and provides functions for updating user data.
+ *
+ * @param {object} props - The props object.
+ * @param {React.ReactNode} props.children - The child components that will have access to the user context.
+ * @returns {React.ReactElement} The Provider component with user data and actions passed down.
+ */
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [isSignedIn, setIsSignedIn] = useState(false)

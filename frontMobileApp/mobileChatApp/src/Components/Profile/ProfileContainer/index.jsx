@@ -11,28 +11,29 @@ import EditView from '../EditView/index'
 import theme from '../../../theme'
 
 /**
- * Renders the profile container with various user details and functionalities based on the edit mode and current view.
+ * ProfileContainer is a React component that renders the profile view of a user, including the user's information, posts, and options to edit the profile.
  *
- * @param {Boolean} notif - Flag indicating if there is a notification to display
- * @param {Function} toggleEditMode - Function to toggle the edit mode
- * @param {Boolean} editMode - Flag indicating if the profile is in edit mode
- * @param {Function} selectImage - Function to select an image
- * @param {String} image - The image URL
- * @param {Object} user - User object containing user details
- * @param {String} name - User's name
- * @param {Function} setName - Function to set the user's name
- * @param {String} phone - User's phone number
- * @param {Function} setPhone - Function to set the user's phone number
- * @param {String} city - User's city
- * @param {Function} setCity - Function to set the user's city
- * @param {Function} handleSave - Function to handle saving changes
- * @param {String} currentView - The current view mode
- * @param {Function} setCurrentView - Function to set the current view
- * @param {Array} userPosts - Array of user posts
- * @param {Function} likePost - Function to like a post
- * @param {Function} commentPost - Function to comment on a post
- * @return {JSX.Element} The profile container component
+ * Props:
+ * - notif: Notification message to display, if any.
+ * - toggleEditMode: Function to toggle the edit mode on and off.
+ * - editMode: Boolean indicating whether the profile is in edit mode.
+ * - selectImage: Function to trigger when the profile image is pressed in edit mode for selecting a new image.
+ * - image: The current profile image URI. If not provided, a default image is used.
+ * - user: Object containing user information (username, profilePicture).
+ * - name, setName, phone, setPhone, city, setCity: State and setters for user's name, phone, and city.
+ * - handleSave: Function to call when saving changes made in edit mode.
+ * - currentView: String indicating the current view ('info' or 'posts').
+ * - setCurrentView: Function to change the current view.
+ * - userPosts: Array of user's posts.
+ * - likePost, commentPost: Functions to like and comment on posts, respectively.
  *
+ * Behavior:
+ * - Displays a notification banner if `notif` is provided.
+ * - Shows the user's profile picture, which can be tapped to change in edit mode.
+ * - Renders a title with the user's username.
+ * - In edit mode, displays an `EditView` for editing user information.
+ * - Otherwise, shows `ContentButtons` to toggle between 'info' and 'posts' views, and displays the corresponding view.
+ * - In 'posts' view, renders a list of `FriendPost` components for each post.
  */
 const ProfileContainer = ({ notif, toggleEditMode, editMode, selectImage,
   image, user, name, setName, phone, setPhone, city, setCity, handleSave, currentView,

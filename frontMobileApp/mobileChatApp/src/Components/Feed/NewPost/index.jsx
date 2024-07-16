@@ -5,13 +5,35 @@ import usePost from '../../../hooks/usePost'
 import * as ImagePicker from 'expo-image-picker'
 import { MaterialIcons, Ionicons } from '@expo/vector-icons'
 
-/*
 
-  Component for creating new posts.
-  The user can pick an image and enter text for the post to upload.
-
-*/
-
+/**
+ * NewPost is a React component for creating a new post with optional image attachment in a social media application.
+ *
+ * Props:
+ * - navigation: Object. The navigation prop provided by React Navigation, used for navigating between screens.
+ *
+ * State:
+ * - content: String. The text content of the new post.
+ * - image: Object|null. The selected image for the post, or null if no image is selected.
+ * - creatingPost: Boolean. Indicates whether a post is currently being created (true) or not (false).
+ *
+ * Hooks:
+ * - useState: To manage component states (content, image, creatingPost).
+ * - useContext: To access the current user's context.
+ * - usePost: A custom hook that provides the createPost function to create a new post.
+ *
+ * Functions:
+ * - selectImage: Asynchronously opens the image library for the user to select an image. Sets the image state with the selected image's URI, type, and name.
+ * - removeImage: Sets the image state to null, effectively removing the selected image.
+ * - handleCreatePost: Asynchronously creates a new post using the createPost function from usePost hook. Resets content and image states and navigates back on success.
+ *
+ * Rendering:
+ * - Displays a loading indicator and message when creatingPost is true.
+ * - Otherwise, renders the UI for creating a new post, including:
+ *   - An optional image preview with a remove button if an image is selected.
+ *   - A TextInput for the post's text content.
+ *   - Buttons for selecting an image and posting.
+ */
 const NewPost = ({ navigation }) => {
   const [content, setContent] = useState('')
   const [image, setImage] = useState(null)

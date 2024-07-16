@@ -14,21 +14,23 @@ import MessageItem from './MessageItem/index.jsx'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 const defaultBackgroundPicture = require('../../../assets/rm222-mind-14.jpg')
 
-/*
 
-Module for the Chat functionality in the app
-
-1. CustomNavBar: This component displays a navigation bar at the top of the chat screen.
-   It includes a back button and displays the friend's profile picture and username.
-2. MessageItem: This component is responsible for rendering individual messages in the chat.
-   It formats the timestamp of the message and determines whether the message was sent by the current user or a friend.
-3. Chat: This is the main component of the module. It uses the UserContext to access the current user's data and the useChat
-   hook to manage the chat state. It renders the CustomNavBar and a FlatList of MessageItem components.
-   It also includes a TextInput for sending new messages and a send button.
-
-*/
-
-
+/**
+ * CustomNavBar is a React component that renders a custom navigation bar for a chat screen.
+ * It displays a back button, the friend's profile picture, and the friend's username or "New Conversation" if no friend is selected.
+ *
+ * Props:
+ * - navigation: Object. The navigation object provided by the navigation library (e.g., React Navigation) to navigate between screens.
+ * - friend: Object. The friend's information including `profilePicture` and `username`. If not provided, defaults to a new conversation setup.
+ *
+ * The component includes:
+ * - A back button that, when pressed, calls the `navigation.goBack` method to return to the previous screen.
+ * - An image component that displays the friend's profile picture if available, or a default profile picture otherwise.
+ * - A text component that displays the friend's username or "New Conversation" if the `friend` prop is not provided.
+ *
+ * Returns:
+ * - A View component containing the custom navigation bar with back button, profile picture, and username or default text.
+ */
 const CustomNavBar = ({ navigation, friend }) => {
   const handleBackButton = () => {
     navigation.goBack()
@@ -46,6 +48,37 @@ const CustomNavBar = ({ navigation, friend }) => {
   )
 }
 
+
+/**
+ * Chat is a React component that renders a chat interface for a specific conversation.
+ * It displays messages from the conversation, allows the user to send new messages, and fetches more messages when the end of the list is reached.
+ *
+ * Props:
+ * - route: Object. Contains parameters passed to this component, including `conversationId` and `initialFriend`.
+ *
+ * State and Context:
+ * - user: Object. The current user's information obtained from UserContext.
+ * - isFetchingMore: boolean. Indicates whether the component is currently fetching more messages.
+ *
+ * Hooks:
+ * - useContext(UserContext) to access the current user's information.
+ * - useNavigation() to navigate between screens.
+ * - useRef(null) to reference the FlatList component.
+ * - useState(false) to manage the fetching state.
+ * - useChat custom hook to manage chat data and actions, including loading messages, sending messages, and fetching more messages.
+ *
+ * The component:
+ * - Displays a loading indicator if messages are being loaded.
+ * - Uses an ImageBackground for styling.
+ * - Includes a custom navigation bar with a back button and the friend's profile picture.
+ * - Renders a list of messages using FlatList, which is inverted to start from the bottom.
+ * - Automatically fetches more messages when the end of the list is reached, if there are more messages to load.
+ * - Provides an input field for sending new messages.
+ *
+ * Returns:
+ * - A loading view if messages are still loading.
+ * - The chat interface, including the navigation bar, messages list, and message input field, once messages have loaded.
+ */
 const Chat = ({ route }) => {
   const { user } = useContext(UserContext)
   const navigation = useNavigation()

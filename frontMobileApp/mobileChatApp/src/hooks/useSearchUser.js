@@ -2,13 +2,23 @@ import { useState, useEffect, useContext } from 'react'
 import api from '../api'
 import { UserContext } from '../Context/UserContext'
 
-/*
 
-  Custom hook for searching for a user by username
-
-*/
-
-export const useSearchUser = (query, page) => {
+/**
+ * Custom hook for searching users based on a query string and pagination.
+ * It leverages the UserContext to exclude the current user from the search results.
+ * The search results are reset when the query changes and are paginated.
+ *
+ * @param {string} query - The search query string.
+ * @param {number} page - The current page number for pagination.
+ * @returns {object} An object containing:
+ *                  - loading: A boolean indicating if the search is in progress.
+ *                  - searchResults: An array of user objects that match the search query, excluding the current user.
+ *                  - error: An error object if an error occurred during the search.
+ *
+ * @example
+ * const { loading, searchResults, error } = useSearchUser('john', 1);
+ */
+const useSearchUser = (query, page) => {
   const [loading, setLoading] = useState(false)
   const [searchResults, setSearchResults] = useState([])
   const [error, setError] = useState(null)
@@ -45,3 +55,5 @@ export const useSearchUser = (query, page) => {
 
   return { loading, searchResults, error }
 }
+
+export default useSearchUser

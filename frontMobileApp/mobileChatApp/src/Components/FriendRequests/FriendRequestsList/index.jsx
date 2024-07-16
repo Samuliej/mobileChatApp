@@ -1,7 +1,19 @@
 import { View, Image, Text, Pressable, StyleSheet } from 'react-native'
 const defaultProfilePicture = require('../../../../assets/soldier.png')
 
-// Component for displaying the received friend requests
+/**
+ * FriendRequestsList is a React component that displays a single friend request item.
+ *
+ * Props:
+ * - request: Object. Contains information about the friend request, including the user object and request ID.
+ * - handleAccept: Function. A callback function that is called when the accept button is pressed. It takes the username and request ID as arguments.
+ * - handleDecline: Function. A callback function that is called when the decline button is pressed. It takes the username and request ID as arguments.
+ *
+ * The component displays the requester's profile picture (or a default picture if none is provided), username, and provides buttons to accept or decline the friend request.
+ *
+ * Returns:
+ * - A View component containing the friend request item, including the profile picture, username, and action buttons.
+ */
 const FriendRequestsList = ({ request, handleAccept, handleDecline }) => {
 
   return (

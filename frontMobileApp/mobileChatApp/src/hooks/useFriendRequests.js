@@ -6,6 +6,23 @@ import { useNavigation } from '@react-navigation/native'
 import { FriendRequestContext } from '../Context/FriendRequestContext.js'
 import { UserContext } from '../Context/UserContext.js'
 
+
+/**
+ * Custom hook for managing friend requests in a React application.
+ * It handles fetching friend requests, accepting, and declining friend requests.
+ * It also integrates with React Navigation for navigation and uses sockets for real-time updates.
+ *
+ * @param {Function} setNotification - Function to set notifications for the user.
+ * @returns {object} An object containing:
+ *                  - fetchRequests: Function to fetch friend requests.
+ *                  - handleAccept: Function to accept a friend request.
+ *                  - handleDecline: Function to decline a friend request.
+ *                  - friendRequests: Array of current friend requests.
+ *                  - setFriendRequests: Function to update the friend requests state.
+ *
+ * @example
+ * const { fetchRequests, handleAccept, handleDecline, friendRequests, setFriendRequests } = useFriendRequests(setNotification);
+ */
 const useFriendRequests = (setNotification) => {
   const socket = useContext(SocketContext)
   const navigation = useNavigation()

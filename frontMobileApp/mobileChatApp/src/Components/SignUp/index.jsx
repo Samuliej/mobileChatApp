@@ -10,17 +10,36 @@ import useIsUsernameTaken from '../../hooks/useIsUsernameTaken'
 import useSignUpForm from '../../hooks/useSignUpForm.js'
 import TextInputField from './TextInputField/index.jsx'
 
-/*
-
-  Component for handling signing up. The user enters his information,
-  username, passwords etc. The user can also upload his own profile picture.
-
-*/
-
 
 const width = Dimensions.get('window').width
 const height = Dimensions.get('window').height
 
+/**
+ * SignUp is a React component that provides a user interface for signing up a new user.
+ * It utilizes various hooks and components to manage form state, input validation, and navigation.
+ *
+ * Features:
+ * - Utilizes `useSignUpForm` custom hook for managing form state and validation.
+ * - Uses `useIsUsernameTaken` custom hook to check if the username is already taken.
+ * - Integrates with `UserContext` for updating user state upon successful sign up.
+ * - Provides visual feedback during the sign-up process with loading indicators and error messages.
+ * - Supports image selection for profile pictures with feedback on selection and option to remove.
+ * - Uses `TextInputField` for input fields with validation feedback.
+ * - Navigates to the main application screen upon successful sign-up and sign-in.
+ *
+ * Behavior:
+ * - Validates input fields onBlur and before attempting to sign up.
+ * - Checks if the username is taken as the user types.
+ * - Displays error messages for individual input fields and general sign-up errors.
+ * - Shows a loading indicator while signing up.
+ * - Resets navigation stack upon successful sign-up to prevent going back to the sign-up screen.
+ *
+ * Usage:
+ * - Should be used within a navigation stack that supports navigation to the 'Main' screen.
+ * - Requires `UserContext` to be available in the component tree for updating user state.
+ *
+ * Props: None
+ */
 const SignUp = () => {
   const form = useSignUpForm()
   const { updateUser } = useContext(UserContext)

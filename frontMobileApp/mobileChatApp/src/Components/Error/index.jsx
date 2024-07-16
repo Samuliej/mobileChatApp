@@ -2,9 +2,17 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
 /**
+ * ErrorBanner is a React component that displays an error or success message banner.
  *
- * Simple component to display an error message.
+ * Props:
+ * - error: String. The message to be displayed in the banner.
+ * - type: String (optional). The type of banner, which can be 'error' or 'success'. Defaults to 'error'.
  *
+ * The component conditionally applies styling based on the `type` prop to differentiate between error and success messages.
+ * The default style displays a red background for errors, while a green background is used for success messages.
+ *
+ * Returns:
+ * - A View component containing the Text component that displays the error or success message.
  */
 const ErrorBanner = ({ error, type = 'error' }) => {
   return (

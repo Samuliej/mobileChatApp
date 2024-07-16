@@ -7,12 +7,35 @@ import * as ImagePicker from 'expo-image-picker'
 import ProfileContainer from './ProfileContainer/index'
 
 
-
 /**
- * Renders the user profile information and handles profile updates.
+ * Profile is a React component that renders the user's profile page, including the profile information and posts.
+ * It allows the user to edit their profile information and select a new profile picture.
  *
- * @param {object} navigation - The navigation object for routing
- * @return {JSX.Element} The JSX component for rendering the user profile
+ * Props:
+ * - navigation: The navigation prop passed from React Navigation, used to listen for navigation events.
+ *
+ * State:
+ * - editMode: Boolean indicating if the profile is in edit mode.
+ * - name, phone, city: Strings representing the user's name, phone number, and city. Initially set from the user context.
+ * - notif: String for displaying notifications like successful profile update.
+ * - image: URI of the current profile picture. Initially set from the user context.
+ * - newProfilePicture: Object representing the new profile picture selected by the user, null if no new picture is selected.
+ * - currentView: String indicating the current view ('info' or 'posts') within the profile.
+ *
+ * Hooks:
+ * - useContext(UserContext): To access and manipulate the user's information.
+ * - useState: To manage local state for edit mode, user information, notification, profile picture, and current view.
+ * - useEffect: To handle side effects like setting a timeout for notifications and refreshing posts when the profile is focused.
+ *
+ * Functions:
+ * - selectImage: Asynchronously opens the image picker for the user to select a new profile picture.
+ * - toggleEditMode: Toggles the edit mode on or off. Resets user information if edit mode is turned off without saving.
+ * - handleSave: Asynchronously updates the user's information with the new values and profile picture.
+ *
+ * Behavior:
+ * - Displays an activity indicator and a message while updating the profile.
+ * - Renders the ProfileContainer component, passing all necessary props and state to it.
+ * - Handles keyboard behavior for iOS and Android differently using KeyboardAvoidingView.
  *
  */
 const Profile = ({ navigation }) => {

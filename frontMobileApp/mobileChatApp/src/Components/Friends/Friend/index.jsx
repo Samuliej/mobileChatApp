@@ -8,7 +8,38 @@ import usePost from '../../../hooks/usePost.js'
 const defaultProfilePicture = require('../../../../assets/soldier.png')
 import theme from '../../../theme.js'
 
-// Component for displaying a friend's info and the posts that he has made.
+
+/**
+ * Friend is a React component that displays the profile and posts of a friend in a social media style application.
+ * It uses navigation to dynamically set the title to the friend's username once loaded.
+ *
+ * Props:
+ * - navigation: Object. The navigation object provided by React Navigation for navigating between screens.
+ *
+ * State:
+ * - currentView: String. Controls which view to display ('info' or 'posts').
+ *
+ * Hooks:
+ * - useRoute: To access the route parameters.
+ * - useState: To manage the currentView state.
+ * - useEffect: To set the navigation title based on the loaded user's username.
+ * - useFriendsPosts: Custom hook to fetch the friend's posts.
+ * - useGetUserById: Custom hook to fetch the friend's user information.
+ * - usePost: Custom hook to provide functions for liking and commenting on posts.
+ *
+ * The component displays a loading indicator while the friend's information or posts are being fetched.
+ * Once the data is loaded, it shows the friend's profile picture, username, and additional user information.
+ * It also provides buttons to toggle between viewing the user's information and their posts.
+ *
+ * The posts view displays a list of FriendPost components, each representing a single post.
+ *
+ * Returns:
+ * - A ScrollView containing the friend's profile information and posts, or a loading indicator if the data is still being fetched.
+ *
+ * Note:
+ * - The component uses several custom hooks for data fetching and actions (likePost, commentPost).
+ * - It dynamically sets the navigation title to the friend's username once it is loaded.
+ */
 const Friend = ({ navigation }) => {
   const route = useRoute()
   const { friendId } = route.params

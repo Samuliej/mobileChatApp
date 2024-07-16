@@ -1,6 +1,29 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { formatTimestamp } from '../../../../utils/utils'
 
+/**
+ * MessageItem is a React component that renders an individual message item in a chat interface.
+ * It displays the message content, a timestamp, and visually differentiates between messages sent by the current user and their friend.
+ *
+ * Props:
+ * - item: Object. The message object containing the content, sender, timestamp, and status.
+ * - user: Object. The current user's information, used to determine if the message was sent by the user.
+ *
+ * The component first checks if the `item` prop is provided. If not, it returns null.
+ * If the item does not have an `_id`, it generates a temporary one.
+ * It uses the `formatTimestamp` utility function to format the message timestamp.
+ * The `isMyMessage` variable is used to determine if the message was sent by the current user, based on the sender ID.
+ *
+ * The message content and formatted timestamp are displayed within a styled View component.
+ * The style of the message bubble changes depending on whether the message is sent by the user or their friend, using conditional styling.
+ *
+ * Styles:
+ * - Different styles are applied to differentiate between the current user's messages and their friend's messages, including background color and alignment.
+ * - A "tail" effect is added to the message bubbles to visually indicate the direction of the message.
+ *
+ * Returns:
+ * - A View component containing the message content, timestamp, and a visual indication of the message sender.
+ */
 const MessageItem = ({ item, user }) => {
   if (!item) {
     return null

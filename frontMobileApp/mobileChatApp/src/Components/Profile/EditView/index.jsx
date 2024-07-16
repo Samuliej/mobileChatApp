@@ -3,16 +3,21 @@ import CustomButton from '../../SignIn/CustomButton'
 import theme from '../../../theme'
 
 /**
- * Renders the EditView component with fields for name, phone, and city, along with a save button.
+ * EditView is a React component for rendering and managing a form where users can edit their name, phone, and city information.
  *
- * @param {string} name - The name value to display and update
- * @param {function} setName - The function to set the name value
- * @param {string} phone - The phone value to display and update
- * @param {function} setPhone - The function to set the phone value
- * @param {string} city - The city value to display and update
- * @param {function} setCity - The function to set the city value
- * @param {function} handleSave - The function to handle the save action
- * @return {JSX.Element} The rendered EditView component
+ * Props:
+ * - name: The current name value.
+ * - setName: Function to set the new name value.
+ * - phone: The current phone value.
+ * - setPhone: Function to set the new phone value.
+ * - city: The current city value.
+ * - setCity: Function to set the new city value.
+ * - handleSave: Function to be called when the save button is pressed.
+ *
+ * Behavior:
+ * - Displays text inputs for the user's name, phone, and city, pre-filled with current values.
+ * - Each input updates its respective state (name, phone, city) on change.
+ * - A "Save" button is provided to submit the changes, which triggers the `handleSave` function.
  *
  */
 const EditView = ({name, setName, phone, setPhone, city, setCity, handleSave}) => {

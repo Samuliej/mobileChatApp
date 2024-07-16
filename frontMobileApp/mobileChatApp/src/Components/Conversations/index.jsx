@@ -10,21 +10,46 @@ import ConversationsList from './ConversationsList/index.jsx'
 import RemoveConversation from './RemoveConversation/index.jsx'
 
 
-/*
-
-  Conversations component. This app displays the ongoing conversations between the current user and
-  his friends. The single conversation component shows the profile picture and the name of the friend,
-  and also it displays the last message in the conversation.
-
-*/
-
-
-// Main component for rendering the Conversations view and functionality
+/**
+ * Conversations is a React component that manages and displays a list of conversations for a messaging application.
+ * It allows users to view, select, and remove conversations. It also provides a button to start new conversations.
+ *
+ * Props:
+ * - navigation: Object. The navigation prop provided by React Navigation, used for navigating between screens.
+ *
+ * State:
+ * - selectedConversation: Object|null. The currently selected conversation for potential removal or null if no conversation is selected.
+ * - sortedConversations: Array. A sorted array of conversations based on the last message timestamp.
+ * - error: String. A string to hold error messages, which is displayed in an ErrorBanner component if not empty.
+ *
+ * Hooks:
+ * - useContext(UserContext): To access the current user's context.
+ * - useState: To manage component states such as selectedConversation, sortedConversations, and error.
+ * - useEffect: To perform side effects such as clearing error messages after a timeout and sorting conversations when they change.
+ * - useConversations: A custom hook to manage fetching and updating conversations.
+ * - useDeleteConversation: A custom hook to handle the deletion of a conversation.
+ *
+ * Component Features:
+ * - Displays an error banner if there is an error message.
+ * - Shows a loading indicator when conversations are being fetched or a conversation is being deleted.
+ * - Renders a RemoveConversation component if a conversation is selected for removal.
+ * - Displays a sorted list of conversations through the ConversationsList component.
+ * - Provides a floating action button (FAB) to navigate to a screen for starting new conversations.
+ *
+ * Handlers:
+ * - handleLongPress: Sets the selectedConversation state when a conversation item is long-pressed.
+ * - handleRemoveConversation: Asynchronously removes a selected conversation and updates the conversations list.
+ * - handleCancelRemoveConversation: Resets the selectedConversation state to null, canceling the remove action.
+ *
+ * Effects:
+ * - Clears the error message after a timeout.
+ * - Sorts conversations based on the last message timestamp whenever the conversations list changes.
+ */
 const Conversations = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const { conversations, loading, setConversations, fetchAndUpdate } = useConversations(user)
   const [selectedConversation, setSelectedConversation] = useState(null)
-  const [deleteConversation, isLoading] = useDeleteConversation()
+  const { deleteConversation, isLoading } = useDeleteConversation()
   const [sortedConversations, setSortedConversations] = useState([])
   const [error, setError] = useState('')
 

@@ -1,12 +1,16 @@
 import { View, Pressable, Text, StyleSheet } from 'react-native'
 
 /**
- * Renders two pressable buttons that toggle between displaying user info and posts.
+ * ContentButtons is a React component that renders two pressable buttons for toggling between user information and posts views.
  *
- * @param {Object} props - The properties for the component.
- * @param {string} props.currentView - The current view being displayed.
- * @param {Function} props.setCurrentView - The function to set the current view.
- * @return {JSX.Element} The rendered component.
+ * Props:
+ * - currentView: A string indicating the current view ('info' or 'posts').
+ * - setCurrentView: A function to update the current view state.
+ *
+ * Behavior:
+ * - Renders two buttons: "User Info" and "Posts".
+ * - The background color of each button changes based on the current view to indicate which view is active.
+ * - Pressing a button updates the current view to the corresponding view ('info' or 'posts').
  *
  */
 const ContentButtons = ({ currentView, setCurrentView }) => {

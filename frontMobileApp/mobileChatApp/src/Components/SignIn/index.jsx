@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { View, StyleSheet, Text, TextInput, Dimensions, Image, ActivityIndicator } from 'react-native'
+import { View, StyleSheet, Text, Dimensions, ActivityIndicator } from 'react-native'
 import * as yup from 'yup'
 import useSignIn from '../../hooks/useSignIn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ErrorBanner from '../Error/index.jsx'
-import theme from '../../theme'
 import { UserContext } from '../../Context/UserContext'
 import { useNavigation } from '@react-navigation/native'
-import CustomButton from './CustomButton.jsx'
+import SignInView from './SignInView/index.jsx'
 const height = Dimensions.get('window').height
-// Sign in icon from:
-// <a href="https://www.flaticon.com/free-icons/honeycomb" title="honeycomb icons">Honeycomb icons created by PIXARTIST - Flaticon</a>
-const icon = require('../../../assets/honeycomb.png')
 
 const validationSchema = yup.object().shape({
   username: yup.string()
@@ -22,25 +18,37 @@ const validationSchema = yup.object().shape({
     .required('Password is required'),
 })
 
-
 /**
- * This is the Sign In component of the application.
+ * SignIn is a React component that provides a sign-in interface for users.
+ * It utilizes a custom hook for sign-in logic, manages form state, and handles navigation upon successful sign-in.
  *
- * It uses several hooks and contexts:
- * - `useSignIn` hook: This custom hook provides the functionality to sign in the user.
- * - `AsyncStorage`: Used to store the user token persistently.
- * - `UserContext`: This context provides the current user state and a function to update it.
- * - `useNavigate`: This hook from 'react-router' is used to programmatically navigate the user.
+ * Features:
+ * - Displays an error banner if sign-in fails.
+ * - Shows a loading indicator while signing in.
+ * - Validates username and password input against predefined rules.
+ * - Navigates to the main screen upon successful sign-in.
  *
- * The component contains a form with two fields: username and password. Both fields have validation schemas using `yup`.
+ * State:
+ * - username: Stores the current value of the username input.
+ * - password: Stores the current value of the password input.
+ * - usernameError: Stores the error message for the username input.
+ * - passwordError: Stores the error message for the password input.
+ * - signingIn: Indicates whether the sign-in process is currently happening.
  *
- * When the user submits the form, the `handleSignIn` function is called. This function calls the `signIn` function from the
- * `useSignIn` hook with the username and password. If the sign in is successful, it stores the user token
- * in `AsyncStorage`, updates the user context, and navigates the user to the main page.
+ * Effects:
+ * - Clears the sign-in error message after a timeout.
  *
- * The component also includes an `ErrorBanner` component to display any error that might occur while signing in.
+ * Validation:
+ * - Uses Yup for schema validation of username and password.
  *
- * @return {JSX.Element} The SignIn component.
+ * Navigation:
+ * - Resets the navigation stack to the main screen upon successful sign-in.
+ *
+ * AsyncStorage:
+ * - Stores the user token in AsyncStorage upon successful sign-in.
+ *
+ * Context:
+ * - Uses UserContext to update the user state globally.
  */
 const SignIn = () => {
   const { updateUser } = useContext(UserContext)
@@ -109,97 +117,11 @@ const SignIn = () => {
 
 }
 
-
-/**
- * Renders the sign-in view component.
- *
- * @param {Object} props - The component props.
- * @param {string} props.username - The username value.
- * @param {function} props.setUsername - The function to update the username value.
- * @param {function} props.setUsernameError - The function to set the username error message.
- * @param {string} props.password - The password value.
- * @param {function} props.setPassword - The function to update the password value.
- * @param {function} props.setPasswordError - The function to set the password error message.
- * @param {function} props.handleSignIn - The function to handle the sign-in action.
- * @param {string} props.usernameError - The username error message.
- * @param {string} props.passwordError - The password error message.
- * @param {function} props.validateField - The function to validate a field.
- * @return {JSX.Element} The rendered sign-in view component.
- */
-const SignInView = ({ username, setUsername, password, setUsernameError, setPasswordError,
-  setPassword, handleSignIn, usernameError, passwordError, validateField }) => {
-  const navigation = useNavigation()
-
-  return (
-    <>
-      <View style={[styles.container, { marginTop: height/7 }]}>
-        <View style={{ alignItems: 'center' }}>
-          <Image
-            source={icon}
-            style={{ width: 90, height: 90 }}
-          />
-        </View>
-        <TextInput
-          style={styles.inputBox}
-          value={username}
-          onChangeText={setUsername}
-          onBlur={() => {
-            const trimmedUsername = username.trim()
-            setUsername(trimmedUsername)
-            const errorMessage = validateField('username', trimmedUsername)
-            if (errorMessage) {
-              setUsernameError(errorMessage)
-              setTimeout(() => {
-                setUsernameError('')
-              }, 3500)
-            } else {
-              setUsernameError('')
-            }
-          }}
-          placeholder='Username'
-        />
-        {usernameError ? <Text style={{ color: 'red' }}>{usernameError}</Text> : null}
-        <TextInput
-          style={styles.inputBox}
-          value={password}
-          onChangeText={setPassword}
-          onBlur={() => {
-            const trimmedPassword = password.trim()
-            setPassword(trimmedPassword)
-            const errorMessage = validateField('password', trimmedPassword)
-            if (errorMessage) {
-              setPasswordError(errorMessage)
-              setTimeout(() => {
-                setPasswordError('')
-              }, 3500)
-            } else {
-              setPasswordError('')
-            }
-          }}
-          placeholder='Password'
-          secureTextEntry={true}
-        />
-        {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
-        <CustomButton style={{ marginTop: 10 }} onPress={handleSignIn} title='Sign in' />
-        <Text style={{ marginBottom: 10, marginTop: 30, textAlign: 'center' }}>{"Don't have an account?"}</Text>
-        <CustomButton title='Register' style={{ backgroundColor: 'black' }}
-          onPress={() => navigation.navigate('SignUp')} />
-      </View>
-    </>
-  )
-}
-
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingTop: 16,
   },
-  button: theme.button,
-  buttonText: theme.buttonText,
-  showPasswordButton: {
-    marginVertical: 10,
-  },
-  inputBox: theme.inputBox,
 })
 
 export default SignIn
