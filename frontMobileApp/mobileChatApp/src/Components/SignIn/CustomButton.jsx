@@ -3,13 +3,20 @@ import { Animated, TouchableOpacity, Text, StyleSheet } from 'react-native'
 
 
 /**
- * Renders a custom button component with built-in animation.
+ * CustomButton is a React component that renders an animated button.
+ * The button scales down when pressed and scales back to its original size after release.
  *
- * @param {Object} props - The properties for the custom button.
- * @param {Function} props.onPress - The function to be called when the button is pressed.
- * @param {string} props.title - The title of the button.
- * @param {Object} [props.style] - The style object for the button.
- * @return {JSX.Element} The custom button component.
+ * Props:
+ * - onPress: Function to be called when the button is pressed.
+ * - title: Text to be displayed inside the button.
+ * - style: Additional styling to be applied to the button.
+ *
+ * Animation:
+ * - Uses a scale animation that changes the button's scale to 0.9 on press and returns it to 1 after release.
+ *
+ * Returns:
+ * - A TouchableOpacity component that wraps an Animated.View, which contains a Text component displaying the button's title.
+ *
  */
 const CustomButton = ({ onPress, title, style }) => {
   const scaleValue = useRef(new Animated.Value(1)).current

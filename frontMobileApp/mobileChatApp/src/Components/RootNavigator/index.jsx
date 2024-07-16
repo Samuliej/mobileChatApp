@@ -11,10 +11,27 @@ import { FriendRequestContext } from '../../Context/FriendRequestContext.js'
 const RootStack = createStackNavigator()
 
 /**
- * RootNavigator component is responsible for managing the navigation flow of the application.
- * It listens for socket events related to friend requests and updates the user accordingly.
+ * RootNavigator is a React component that sets up the navigation for the application.
+ * It uses a stack navigator to manage the authentication flow and the main drawer navigation.
+ * Additionally, it sets up socket listeners to handle friend requests and updates the user's information accordingly.
  *
- * @return {JSX.Element} The JSX element representing the root navigator.
+ * Contexts:
+ * - Uses SocketContext to listen for friend request events.
+ * - Uses UserContext to access and update the user's information.
+ * - Uses FriendRequestContext to manage friend requests.
+ *
+ * Effects:
+ * - On mount, sets up listeners for 'friendRequest', 'friendRequestSent', and 'friendRequestAccepted' events on the socket.
+ * - On these events, it fetches the user token from AsyncStorage and updates the user's information.
+ * - Cleans up the listeners on component unmount or when dependencies change.
+ *
+ * Navigation:
+ * - Uses createStackNavigator to create a stack navigator.
+ * - Defines two screens: 'Auth' for the authentication flow and 'Main' for the main drawer navigation.
+ * - Hides the header for the stack navigator.
+ *
+ * Returns:
+ * - A stack navigator with 'Auth' and 'Main' screens.
  */
 const RootNavigator = () => {
   const socket = useContext(SocketContext)

@@ -21,24 +21,34 @@ import Profile from '../Profile/index.jsx'
 import CustomHeader from './CustomHeader/index.jsx'
 import CustomDrawerItem from './CustomDrawerItem/index.jsx'
 
-/*
-
-  Component for drawer navigation for the app.
-  You press the user's profile picture to open the drawer and choose a component you want to enter
-  or click out of the drawer to exit.
-
-  The user can navigate to:
-    * Home, which is the Tab navigator for switching between Chat and Feed.
-    * Search for a User, component for searching for users to add friends
-    * Friends, component for displaying all the user's friends
-    * Friend requests, component for displaying all the user's pending friend requests
-    * Sign Out, for signing out of the app.
-
-*/
-
 const Drawer = createDrawerNavigator()
 
-
+/**
+ * MyDrawer is a React component that renders a custom navigation drawer using the DrawerNavigator from @react-navigation/drawer.
+ * It integrates various screens and custom drawer items, including a sign-out functionality and displaying the user's profile picture.
+ *
+ * Contexts:
+ * - UserContext: Provides access to the user's information.
+ * - SocketContext: Provides access to the WebSocket connection.
+ *
+ * Hooks:
+ * - useContext: To access UserContext and SocketContext.
+ * - useState: To manage the state of pending friend requests count and sign-out process.
+ * - useEffect: To update the pending friend requests count whenever the user's information changes.
+ * - useNavigation: To navigate between screens.
+ * - useQueryClient: From react-query, to manage query cache.
+ *
+ * Features:
+ * - Displays the user's profile picture and username at the top of the drawer.
+ * - Includes custom drawer items for navigation and functionality, such as signing out.
+ * - Implements a sign-out process that clears user data and navigates to the authentication screen.
+ * - Utilizes a loading indicator during the sign-out process.
+ *
+ * Props: None
+ *
+ * Returns:
+ * - A Drawer.Navigator component with configured screens and a custom drawer content.
+ */
 const MyDrawer = () => {
   const { user, updateUser } = useContext(UserContext)
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0)

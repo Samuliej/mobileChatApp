@@ -4,6 +4,38 @@ import { UserContext } from '../../../Context/UserContext.js'
 import { Ionicons } from '@expo/vector-icons'
 import CustomButton from '../../SignIn/CustomButton.jsx'
 
+/**
+ * FriendPost is a React component that displays a single post in a social media style application.
+ * It allows users to like and comment on the post.
+ *
+ * Props:
+ * - post: Object. The initial post data.
+ * - likePost: Function. A function to handle liking a post.
+ * - commentPost: Function. A function to handle commenting on a post.
+ *
+ * State:
+ * - commentsOpen: Boolean. Determines whether the comments section is open.
+ * - commentText: String. The text of the new comment being written.
+ * - post: Object. The current state of the post, including any new comments or likes.
+ * - justLiked: Boolean. Indicates whether the current user has just liked the post.
+ *
+ * Context:
+ * - UserContext: Provides information about the current user.
+ *
+ * The component displays the post's image (if available), text content, and actions for liking and commenting.
+ * It also shows the number of likes and comments the post has received.
+ * Users can submit new comments through a TextInput field.
+ *
+ * The like button uses an Animated component to provide feedback when a user likes a post.
+ *
+ * Returns:
+ * - A View component containing the post's content, actions for liking and commenting, and the comments section (if open).
+ *
+ * Note:
+ * - The component uses the useContext hook to access the current user's information from UserContext.
+ * - The useState hook is used to manage the component's state.
+ * - The useRef hook is used to manage the like button's animation.
+ */
 const FriendPost = ({ post: initialPost, likePost, commentPost }) => {
   const [commentsOpen, setCommentsOpen] = useState(false)
   const [commentText, setCommentText] = useState('')

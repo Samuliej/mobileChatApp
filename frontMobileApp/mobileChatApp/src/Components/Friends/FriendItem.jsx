@@ -2,10 +2,25 @@ import React from 'react'
 import { Text, Image, Pressable, Animated, StyleSheet } from 'react-native'
 const defaultProfilePicture = require('../../../assets/soldier.png')
 
-/*
-  Component for displaying a single friend container inside Friends list
-*/
-
+/**
+ * FriendItem is a React component that renders a single friend item in a list.
+ * It displays the friend's profile picture and username, and animates on press.
+ *
+ * Props:
+ * - friend: Object. The friend data to display. Should contain `_id`, `profilePicture`, and `username`.
+ * - navigation: Object. The navigation object provided by React Navigation for navigating between screens.
+ *
+ * State:
+ * - None.
+ *
+ * Animation:
+ * - Uses Animated API to scale the friend item when pressed.
+ *
+ * Returns:
+ * - An Animated.View component that scales on press, containing a Pressable component.
+ *   The Pressable component navigates to the 'Friend' screen with the friend's `_id` when pressed.
+ *   It displays the friend's profile picture (or a default picture if none is provided) and username.
+ */
 const FriendItem = ({ friend, navigation }) => {
   const animateScale = new Animated.Value(1)
 

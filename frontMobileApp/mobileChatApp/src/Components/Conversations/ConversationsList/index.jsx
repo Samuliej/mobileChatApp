@@ -1,9 +1,33 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { View, Text, StyleSheet, Pressable, FlatList, Image, RefreshControl, ActivityIndicator } from 'react-native'
 import { truncate, formatTimestamp } from '../../../utils/utils'
 const defaultProfilePicture = require('../../../../assets/soldier.png')
 
-// Component for rendering the Conversation list
+/**
+ * ConversationsList is a React component that renders a list of conversation items for a messaging application.
+ * It supports pull-to-refresh to update the conversations list and navigation to individual chat screens.
+ *
+ * Props:
+ * - sortedConversations: Array. An array of conversation objects to be displayed.
+ * - selectedConversation: Object. The currently selected conversation, if any.
+ * - setSelectedConversation: Function. A function to update the state of the selected conversation.
+ * - navigation: Object. The navigation object provided by React Navigation to navigate between screens.
+ * - handleLongPress: Function. A function to handle long press actions on a conversation item.
+ * - fetchAndUpdate: Function. A function to fetch and update the list of conversations.
+ *
+ * State:
+ * - refreshing: boolean. A state to indicate whether the list is being refreshed.
+ *
+ * The component:
+ * - Displays an activity indicator and a fetching message when the list is being refreshed.
+ * - Renders a FlatList of conversation items. Each item includes the friend's profile picture, username, the last message, and a timestamp.
+ * - Implements pull-to-refresh functionality using the RefreshControl component.
+ * - Navigates to the chat screen with the selected conversation when a conversation item is pressed.
+ * - Calls the handleLongPress function when a conversation item is long-pressed.
+ *
+ * Returns:
+ * - A View component containing either a loading indicator or a FlatList of conversation items.
+ */
 const ConversationsList = ({
   sortedConversations, selectedConversation, setSelectedConversation, navigation, handleLongPress, fetchAndUpdate
 }) => {

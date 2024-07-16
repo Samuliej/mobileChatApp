@@ -1,19 +1,33 @@
 import React, { useState, useRef } from 'react'
 import { TextInput, View, Text, StyleSheet, Image, Animated, Pressable } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-// Default user profile picture property of Pixel Perfect:
-// href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 import defaultProfilePicture from '../../../../assets/soldier.png'
 import CustomButton from '../../SignIn/CustomButton'
 
-/*
-
-  Component for displaying a single uploaded post
-  There are options for liking and commenting the post.
-
-*/
-
-
+/**
+ * Post is a React component that displays a single post in the app.
+ * It includes functionality to like and comment on the post, and to navigate to the author's profile.
+ *
+ * Props:
+ * - post: Object. The initial post data.
+ * - likePost: Function. A function to handle liking the post.
+ * - commentPost: Function. A function to handle submitting a comment on the post.
+ * - user: Object. The current user's information.
+ * - navigation: Object. The navigation prop passed from React Navigation, used for navigating between screens.
+ *
+ * State:
+ * - commentsOpen: Boolean. Indicates whether the comments section is open.
+ * - commentText: String. The text of the new comment being written.
+ * - post: Object. The current state of the post, including any updates.
+ * - justLiked: Boolean. Indicates whether the current user has just liked the post.
+ *
+ * Refs:
+ * - likeScale: Animated.Value. A reference for the scale animation value of the like icon.
+ *
+ * Returns:
+ * - A view component that displays the post, including the author's profile picture, username, post content (text and optional image),
+ *   and actions for liking and commenting. It also includes an animated like icon and a section for displaying and adding comments.
+ */
 const Post = ({ post: initialPost, likePost, commentPost, user, navigation }) => {
   const [commentsOpen, setCommentsOpen] = useState(false)
   const [commentText, setCommentText] = useState('')

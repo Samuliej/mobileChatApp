@@ -7,14 +7,29 @@ import useFriendRequests from '../../hooks/useFriendRequests.js'
 import FriendRequestsList from './FriendRequestsList/index.jsx'
 const emptyIcon = require('../../../assets/fist-bump.png')
 
-/*
-
-  Component for displaying the user's reveived friend requests.
-  The user can either deny or accept the friend request.
-  The component is updated in real-time with socket.io
-
-*/
-
+/**
+ * FriendRequests is a React component that displays the list of friend requests.
+ * It uses the NotificationContext to display notifications and the useFriendRequests hook
+ * to handle friend request logic, including accepting and declining requests.
+ *
+ * The component conditionally renders:
+ * - An error banner if there is a notification.
+ * - A message and a button to navigate to the user search page if there are no friend requests.
+ * - A list of FriendRequestsList components, each representing a friend request, if there are any friend requests.
+ *
+ * useEffect Hook:
+ * - Clears the notification after 3 seconds.
+ *
+ * Props: None
+ *
+ * Returns:
+ * - A ScrollView that contains either a message indicating there are no new friend requests
+ *   with a button to navigate to the search page, or a list of friend requests.
+ *
+ * Note:
+ * - The component uses the useNavigation hook from @react-navigation/native for navigation.
+ * - The styles object at the bottom of the file defines the styling for the component's elements.
+ */
 const FriendRequests = () => {
   const notificationContextValue = useContext(NotificationContext)
   const { notification, setNotification } = notificationContextValue

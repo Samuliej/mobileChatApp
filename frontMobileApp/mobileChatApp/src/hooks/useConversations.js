@@ -5,12 +5,17 @@ import { UserContext } from '../Context/UserContext.js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { decrypt } from 'react-native-simple-encryption'
 
-/*
-
-  Custom hook for fetching conversations and updating them in real-time.
-
-*/
-
+/**
+ * Custom hook for managing conversations in a React application.
+ * It handles fetching conversations, listening for new conversations and messages via websockets,
+ * and decrypting messages.
+ *
+ * @param {object} user - The current user object.
+ * @returns {object} An object containing the conversations array, loading state, and functions to set conversations and fetch/update them.
+ *
+ * @example
+ * const { conversations, loading, setConversations, fetchAndUpdate } = useConversations(user);
+ */
 const useConversations = (user) => {
   const [conversations, setConversations] = useState([])
   const [loading, setLoading] = useState(false)

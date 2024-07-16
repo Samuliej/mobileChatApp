@@ -9,9 +9,31 @@ import { UserContext } from '../../Context/UserContext.js'
 import ErrorBanner from '../Error/index.jsx'
 
 /**
- * Renders a component for searching for new users to add as friends.
+ * SearchForUser is a React component that allows users to search for other users by username.
+ * It displays search results and enables sending friend requests to these users.
  *
- * @return {JSX.Element} The rendered component.
+ * State:
+ * - searchInput: The current value of the search input field.
+ * - page: The current page of search results being displayed.
+ * - sentRequests: An array of usernames to whom the current user has already sent friend requests.
+ * - notification: A message indicating the success or failure of sending a friend request.
+ *
+ * Hooks:
+ * - useState: Manages state for search input, pagination, sent requests, and notifications.
+ * - useContext: Accesses the current user's information from UserContext.
+ * - useSearchUser: A custom hook that returns search results based on the search input.
+ * - useSendFriendRequest: A custom hook that provides a function to send friend requests.
+ * - useEffect: Sets a timeout to clear the notification message after 5 seconds.
+ *
+ * Functions:
+ * - loadMoreResults: Increments the page state to load more search results.
+ * - handleSendFriendRequest: Sends a friend request to the selected user and updates the UI accordingly.
+ *
+ * Behavior:
+ * - Displays a notification banner at the top if there is a notification message.
+ * - Renders a TextInput for the search input.
+ * - Displays a FlatList of search results, each with a profile picture, username, and a button to send a friend request.
+ * - The friend request button's appearance and functionality change based on the current user's relationship with the listed user.
  */
 const SearchForUser = () => {
   const [searchInput, setSearchInput] = useState('')
@@ -61,7 +83,7 @@ const SearchForUser = () => {
         {searchInput && (
           <FlatList
             onEndReached={loadMoreResults}
-            //onEndReachedThreshold={0.5}
+            onEndReachedThreshold={0.5}
             data={searchResults}
             keyExtractor={item => item._id.toString()}
             renderItem={({ item }) => {

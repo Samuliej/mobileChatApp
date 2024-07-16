@@ -5,13 +5,12 @@ import { SocketContext } from '../Context/SocketContext.js'
 import { encrypt, decrypt } from 'react-native-simple-encryption'
 import { useInfiniteQuery, useQueryClient } from 'react-query'
 
-/*
-
-  Custom hook for enabling real-time messaging in the application
-
-*/
-
-// Utility function to extract emojis and their indices from a message
+/**
+ * Extracts emojis and their indices from a given message string.
+ *
+ * @param {string} message - The message string to extract emojis from.
+ * @returns {object} An object containing the cleaned message without emojis and an array of extracted emojis with their indices.
+ */
 const extractEmojis = (message) => {
   const emojiRegex = /([\uD800-\uDBFF][\uDC00-\uDFFF])/g // Basic regex for matching surrogate pairs (common for emojis)
   let match
@@ -28,11 +27,30 @@ const extractEmojis = (message) => {
   return { cleanedMessage, emojis }
 }
 
+/**
+ * Determines if a given message consists only of emojis.
+ *
+ * @param {string} message - The message string to check.
+ * @returns {boolean} True if the message consists only of emojis, false otherwise.
+ */
 const isMessageOnlyEmojis = (message) => {
   const { cleanedMessage } = extractEmojis(message)
   return cleanedMessage.length === 0
 }
 
+
+/**
+ * Custom hook for managing chat functionalities in a React application.
+ * It handles fetching conversations, sending messages, and real-time updates via websockets.
+ *
+ * @param {object} user - The current user object.
+ * @param {string} conversationId - The ID of the current conversation.
+ * @param {object} initialFriend - The initial friend object in the conversation.
+ * @returns {object} An object containing various states and functions for chat management.
+ *
+ * @example
+ * const { messagesData, sendMessage, newMessage, setNewMessage } = useChat(user, conversationId, initialFriend);
+ */
 const useChat = (user, conversationId, initialFriend) => {
   const [friend, setFriend] = useState(initialFriend)
   const [conversation, setConversation] = useState(null)

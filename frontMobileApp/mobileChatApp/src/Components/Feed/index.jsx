@@ -6,13 +6,32 @@ import usePosts from '../../hooks/usePosts'
 import usePost from '../../hooks/usePost'
 import Post from './Post/index'
 
-/*
-
-  Main screen for the feed component that is navigated through the
-  tab navigation. Displays all the posts that the user's friends have posted.
-
-*/
-
+/**
+ * FeedScreen is a React component for displaying a feed of posts in a social media app.
+ * It allows users to view posts, refresh the feed, and navigate to the screen for creating a new post.
+ *
+ * Props:
+ * - navigation: Object. The navigation prop passed from React Navigation, used for navigating between screens.
+ *
+ * State:
+ * - refreshing: Boolean. Indicates whether the feed is being refreshed.
+ *
+ * Context:
+ * - UserContext: Provides access to the current user's information.
+ *
+ * Hooks:
+ * - useContext: To access the current user's information from UserContext.
+ * - useState: To manage the 'refreshing' state.
+ * - useEffect: To perform side effects, including adding an event listener for screen focus and refreshing posts.
+ * - useCallback: To memoize the onRefresh callback function.
+ * - usePosts: Custom hook to fetch posts and manage loading state and post data.
+ * - usePost: Custom hook to perform actions like liking and commenting on posts.
+ *
+ * Returns:
+ * - A view component that displays a loading indicator while posts are being fetched,
+ *   or a scrollable list of posts once the data is loaded. It also includes a floating action button
+ *   to navigate to the screen for creating a new post.
+ */
 const FeedScreen = ({ navigation }) => {
   const { user } = useContext(UserContext)
   const { loading, posts, refreshPosts } = usePosts(user._id)
