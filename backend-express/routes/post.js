@@ -56,7 +56,13 @@ router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
   }
 })
 
-// User login
+
+/**
+ * Handles user login by verifying credentials and generating a JWT token.
+ *
+ * @param {Object} req - The request object containing username and password.
+ * @param {Object} res - The response object used for sending back the JWT token or error messages.
+ */
 router.post('/api/login', async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username })
@@ -89,7 +95,14 @@ router.post('/api/login', async (req, res) => {
   }
 })
 
-// Send friend request
+/**
+ * Endpoint to send a friend request between users.
+ * It checks for existing friendship status and updates or creates a new friendship as needed.
+ * Original implementation, now the friendship request is sent with socket.io
+ *
+ * @param {Object} req - The request object containing the username of the friend to send a request to.
+ * @param {Object} res - The response object used to return the result of the friend request operation.
+ */
 router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
   try {
     const friendUsername = req.body.username
@@ -138,7 +151,14 @@ router.post('/api/sendFriendRequest', authMiddleware, async (req, res) => {
   }
 })
 
-// Start a new conversation
+
+/**
+ * POST /api/startConversation - Starts a new conversation between two users if they are friends.
+ * Checks for existing conversation. If not found, creates a new one with a generated encryption key.
+ *
+ * @param {Object} req - Express request object with currentUser from authMiddleware and target username in body.
+ * @param {Object} res - Express response object for sending back the created conversation or error messages.
+ */
 router.post('/api/startConversation', authMiddleware, async (req, res) => {
   const currentUser = req.currentUser
   let user = await User.findOne({ username: currentUser.username })
@@ -184,7 +204,14 @@ router.post('/api/startConversation', authMiddleware, async (req, res) => {
   }
 })
 
-// Create a new post
+
+/**
+ * Endpoint for creating a new post with optional image upload.
+ * Requires authentication. Saves the post to the database and updates the user's post list.
+ *
+ * @param {Object} req - Express request object, containing post content, author, and optional image file.
+ * @param {Object} res - Express response object for sending back the created post or error messages.
+ */
 router.post('/api/posts', authMiddleware, upload.single('image'), async (req, res) => {
   const content = req.body.content
   const author = req.body.author
@@ -222,7 +249,12 @@ router.post('/api/posts', authMiddleware, upload.single('image'), async (req, re
   }
 })
 
-// Comment a post
+/**
+ * Creates a comment on a specific post.
+ *
+ * @param {Object} req - The request object containing the postId and content of the comment.
+ * @param {Object} res - The response object used for sending back the created comment or error messages.
+ */
 router.post('/api/posts/:postId/comments', authMiddleware, async (req, res) => {
   const { postId, content } = req.body
 
