@@ -17,7 +17,14 @@ const authMiddleware = require('../middlewares/authMiddlewares')
 
 */
 
-// Decline friend request
+
+/**
+ * Endpoint to decline a friend request.
+ * Validates user authentication and ensures the current user is the receiver of the friend request before declining.
+ *
+ * @param {Object} req - Express request object containing the friendshipId as a URL parameter.
+ * @param {Object} res - Express response object for sending back the operation result or error messages.
+ */
 router.put('/api/declineFriendRequest/:friendshipId', authMiddleware, async (req, res) => {
   const friendship = await Friendship.findOne({ _id: req.params.friendshipId })
   const currentUser = req.currentUser
@@ -44,7 +51,13 @@ router.put('/api/declineFriendRequest/:friendshipId', authMiddleware, async (req
   }
 })
 
-// Accept friend request
+/**
+ * Endpoint to accept a friend request.
+ * Validates user authentication and updates the friendship status to 'ACCEPTED' if the current user is the receiver.
+ *
+ * @param {Object} req - Express request object containing the friendshipId in the body.
+ * @param {Object} res - Express response object for sending back the updated friendship or error messages.
+ */
 router.put('/api/acceptFriendRequest', authMiddleware, async (req, res) => {
   const friendship = await Friendship.findOne({ _id: req.body.friendshipId })
   const currentUser = req.currentUser
@@ -80,7 +93,13 @@ router.put('/api/acceptFriendRequest', authMiddleware, async (req, res) => {
   }
 })
 
-// Like a post
+/**
+ * Endpoint to like a post.
+ * Validates user authentication and increments the like count of a post if the user hasn't already liked it.
+ *
+ * @param {Object} req - Express request object containing the postId as a URL parameter.
+ * @param {Object} res - Express response object for sending back the updated post or error messages.
+ */
 router.put('/api/likePost/:postId/like', authMiddleware, async (req, res) => {
   const { postId } = req.params
   const currentUser = req.currentUser
@@ -107,7 +126,13 @@ router.put('/api/likePost/:postId/like', authMiddleware, async (req, res) => {
 })
 
 
-// update user info
+/**
+ * Endpoint to update user information.
+ * Allows authenticated users to update their name, phone, city, and profile picture.
+ *
+ * @param {Object} req - Express request object containing user details and optional profile picture file.
+ * @param {Object} res - Express response object for sending back the updated user information or error messages.
+ */
 router.put('/api/users/:id', upload.single('profilePicture'), authMiddleware, async (req, res) => {
   const currentUser = req.currentUser
   const {name, phone, city} = req.body
