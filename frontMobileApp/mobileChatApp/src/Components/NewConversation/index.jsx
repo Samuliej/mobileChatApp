@@ -5,6 +5,7 @@ import api from '../../api.js'
 import { useNavigation } from '@react-navigation/native'
 import CustomButton from '../SignIn/CustomButton.jsx'
 import FriendsToChat from './FriendsToChat/index.jsx'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 /**
@@ -41,8 +42,13 @@ const NewConversation = () => {
   useEffect(() => {
     const fetchFriends = async () => {
       if (user) {
+        const token = await AsyncStorage.getItem('userToken')
         const fetchedFriends = await Promise.all(user.friends.map(async (friendId) => {
-          const response = await api.get(`/api/users/id/${friendId}`)
+          const response = await api.get(`/api/users/id/${friendId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
           const friendUser = await response.data
           return friendUser
         }))

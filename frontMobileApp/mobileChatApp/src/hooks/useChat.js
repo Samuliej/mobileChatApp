@@ -119,7 +119,12 @@ const useChat = (user, conversationId, initialFriend) => {
 
   // Function for fetching a single conversation
   const fetchConversation = async ({ pageParam = 1 }) => {
-    const response = await api.get(`/api/conversations/${conversationId}?page=${pageParam}&limit=20`)
+    const token = await AsyncStorage.getItem('userToken')
+    const response = await api.get(`/api/conversations/${conversationId}?page=${pageParam}&limit=20`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
     const data = await response.data
 
     const conversation = data.conversation

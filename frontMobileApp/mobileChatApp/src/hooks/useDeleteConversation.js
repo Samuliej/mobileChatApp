@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import api from '../api'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 /**
  * Custom hook for deleting a conversation.
@@ -20,9 +21,14 @@ const useDeleteConversation = () => {
   const deleteConversation = async (id) => {
     setIsLoading(true)
     setError(null)
+    const token = await AsyncStorage.getItem('userToken')
 
     try {
-      const response = await api.delete(`/api/conversations/${id}`)
+      const response = await api.delete(`/api/conversations/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
 
       if (!response.ok) {
         throw new Error('Error deleting conversation')

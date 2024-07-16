@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import api from '../api'
 import { UserContext } from '../Context/UserContext'
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 /**
  * Custom hook for searching users based on a query string and pagination.
@@ -31,10 +31,16 @@ const useSearchUser = (query, page) => {
   }, [query])
 
   useEffect(() => {
-    if (query.length > 0) {
-      setLoading(true)
-      api.get(`/api/users/search/${query}?page=${page}`)
-        .then(response => {
+    const fetchUsers = async () => {
+      if (query.length > 0) {
+        try {
+          setLoading(true)
+          const token = await AsyncStorage.getItem('userToken')
+          const response = await api.get(`/api/users/search/${query}?page=${page}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
           const filteredResults = response.data.filter(user => user._id !== currentUser._id)
           if (page === 1) {
             setSearchResults(filteredResults)
@@ -44,13 +50,15 @@ const useSearchUser = (query, page) => {
               return Array.from(new Set(newResults.map(user => user._id))).map(id => newResults.find(user => user._id === id))
             })
           }
-          setLoading(false)
-        })
-        .catch(error => {
+        } catch (error) {
           setError(error)
+        } finally {
           setLoading(false)
-        })
+        }
+      }
     }
+
+    fetchUsers()
   }, [query, page, currentUser])
 
   return { loading, searchResults, error }

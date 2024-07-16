@@ -80,15 +80,24 @@ const useConversations = (user) => {
 
   // Function for fetching messages and friend's data
   const fetchFriendData = async () => {
+    const token = await AsyncStorage.getItem('userToken')
     const updatedConversations = await Promise.all(user.conversations.map(async (conversation) => {
       const friendId = conversation.participants?.find(id => id !== user._id)
       if (friendId) {
-        const response = await api.get(`/api/users/id/${friendId}`)
+        const response = await api.get(`/api/users/id/${friendId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         const friend = await response.data
 
         // Fetch the messages for the conversation
         // Also handles adding the emojies back, since they can't be encrypted
-        const messagesResponse = await api.get(`/api/conversations/${conversation._id}/messages`)
+        const messagesResponse = await api.get(`/api/conversations/${conversation._id}/messages`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         const messages = await messagesResponse.data
         let lastMessage = messages[messages.length - 1]
         try {
