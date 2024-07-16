@@ -24,7 +24,13 @@ const crypto = require('crypto')
 */
 
 
-// Create a user
+/**
+ * POST /api/users - Creates a new user with optional profile picture upload.
+ * Hashes password for security, optionally uploads profile picture to Cloudinary, and saves the user to the database.
+ * Returns the created user excluding the password.
+ * @param {Object} req - Express request object, containing user details and optional profile picture file.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.post('/api/users', upload.single('profilePicture'), async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
