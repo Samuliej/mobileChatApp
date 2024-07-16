@@ -19,5 +19,5 @@ module.exports = {
   JWT_SECRET,
   NODE_ENV,
   MONGODB_TEST_URI,
-  WS_PORT
+  WS_PORT,
 }

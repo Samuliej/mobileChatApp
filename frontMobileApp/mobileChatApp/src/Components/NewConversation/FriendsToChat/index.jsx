@@ -27,7 +27,7 @@ import api from '../../../api.js'
  * - Navigates to the 'Chat' screen with the newly created conversation ID and friend's details.
  *
  */
-const FriendsToChat = ({friends, user, updateUser, navigation}) => {
+const FriendsToChat = ({friends, user, updateUser, navigation, setCreatingConvo}) => {
   return (
     <ScrollView>
       {/* Exclude the friends with whom there is already a started conversation */}
@@ -37,6 +37,7 @@ const FriendsToChat = ({friends, user, updateUser, navigation}) => {
           <Text style={styles.username}>{friend.username}</Text>
           <CustomButton title="Chat" onPress={async () => {
             // start a new conversation with this friend
+            setCreatingConvo(true)
             const userToken = await AsyncStorage.getItem('userToken')
             const response = await api.post('/api/startConversation', { username: friend.username }, {
               headers: {
@@ -48,6 +49,7 @@ const FriendsToChat = ({friends, user, updateUser, navigation}) => {
             updateUser(userToken)
             // navigate to Chat screen with this conversation
             navigation.navigate('Chat', { conversationId: conversation._id, friend: friend })
+            setCreatingConvo(false)
           }} />
         </View>
       ))}

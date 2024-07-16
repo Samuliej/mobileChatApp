@@ -50,7 +50,7 @@ const useConversations = (user) => {
             let decryptedContent = decrypt(conversation.encryptionKey, newMessage.content)
 
             if (newMessage.emojis && newMessage.emojis.length > 0) {
-              const sortedEmojis = newMessage.emojis.sort((a, b) => b.index - a.index)
+              const sortedEmojis = newMessage.emojis.sort((a, b) => a.index - b.index)
               sortedEmojis.forEach(({ emoji, index }) => {
                 decryptedContent = decryptedContent.slice(0, index) + emoji + decryptedContent.slice(index)
               })
@@ -104,7 +104,7 @@ const useConversations = (user) => {
           if (lastMessage) {
             let decryptedContent = decrypt(conversation.encryptionKey, lastMessage.content)
             if (lastMessage.emojis && lastMessage.emojis.length > 0) {
-              const sortedEmojis = lastMessage.emojis.sort((a, b) => b.index - a.index)
+              const sortedEmojis = lastMessage.emojis.sort((a, b) => a.index - b.index)
               sortedEmojis.forEach(({ emoji, index }) => {
                 decryptedContent = decryptedContent.slice(0, index) + emoji + decryptedContent.slice(index)
               })
