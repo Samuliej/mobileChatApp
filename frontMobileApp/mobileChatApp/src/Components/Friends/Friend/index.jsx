@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Text, Image, StyleSheet, ScrollView, ActivityIndicator, Pressable } from 'react-native'
 import { useRoute } from '@react-navigation/native'
 import useFriendsPosts from '../../../hooks/useFriendsPosts'
@@ -9,13 +9,19 @@ const defaultProfilePicture = require('../../../../assets/soldier.png')
 import theme from '../../../theme.js'
 
 // Component for displaying a friend's info and the posts that he has made.
-const Friend = () => {
+const Friend = ({ navigation }) => {
   const route = useRoute()
   const { friendId } = route.params
   const { loading, friendPosts } = useFriendsPosts(friendId)
   const { loading: loadingFriend, user } = useGetUserById(friendId)
   const { likePost, commentPost } = usePost()
   const [currentView, setCurrentView] = useState('info')
+
+  useEffect(() => {
+    if (user && user.username) {
+      navigation.setOptions({ title: user.username })
+    }
+  }, [user, navigation])
 
   if (loading || loadingFriend) {
     return (
