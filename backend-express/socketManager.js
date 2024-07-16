@@ -104,14 +104,15 @@ module.exports = function (server) {
           const newFriendshipToFront = { ...newFriendship._doc, userObj: user }
 
           const receiverSocketId = userSocketIds[receiver._id]
-
-          io.sockets.sockets.get(receiverSocketId).emit('friendRequest', newFriendshipToFront, (error) => {
-            if (error) {
-              console.error('Error sending friend request:', error)
-            } else {
-              console.log('Friend request sent successfully')
-            }
-          })
+          if (receiverSocketId && io.sockets.sockets.get(receiverSocketId)) {
+            io.sockets.sockets.get(receiverSocketId).emit('friendRequest', newFriendshipToFront, (error) => {
+              if (error) {
+                console.error('Error sending friend request:', error)
+              } else {
+                console.log('Friend request sent successfully')
+              }
+            })
+          }// No need for else, receiver not connected, no need to emit.
         }
       } catch (error) {
         console.log('Error sending friend request:', error)
@@ -166,7 +167,11 @@ module.exports = function (server) {
         await friend.save()
 
         io.to(userSocketIds[user._id]).emit('friendRequestAccepted', friendship)
-        io.to(userSocketIds[friend._id]).emit('friendRequestAccepted', friendship)
+
+        const friendSocketId = userSocketIds[friend._id]
+        if (friendSocketId && io.sockets.sockets.get(friendSocketId)) {
+          io.to(friendSocketId).emit('friendRequestAccepted', friendship)
+        }
 
         socket.emit('friendRequestAccepted', friendship)
       } catch (error) {
@@ -248,10 +253,15 @@ module.exports = function (server) {
       }
 
       // Broadcast the messages to the sender and receiver
+      const receiverSocketId = userSocketIds[messageData.receiver]
+
       io.to(userSocketIds[messageData.sender]).emit('message', newMessage)
-      io.to(userSocketIds[messageData.receiver]).emit('message', newMessage)
       io.to(userSocketIds[messageData.sender]).emit('messageToConvo', newMessage)
-      io.to(userSocketIds[messageData.receiver]).emit('messageToConvo', newMessage)
+
+      if (receiverSocketId && io.sockets.sockets.get(receiverSocketId)) {
+        io.to(userSocketIds[messageData.receiver]).emit('message', newMessage)
+        io.to(userSocketIds[messageData.receiver]).emit('messageToConvo', newMessage)
+      }
       if (isNewConvo) {
         // If it's a new conversation, broadcast the conversation to the receiver
         io.to(userSocketIds[messageData.receiver]).emit('newConversation', conversation)
