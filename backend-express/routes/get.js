@@ -12,7 +12,11 @@ const authMiddleware = require('../middlewares/authMiddlewares')
 
 */
 
-// Fetch all users
+/**
+ * GET /api/users - Fetches all users excluding passwords. Requires authentication.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ */
 router.get('/api/users', authMiddleware, async (req, res) => {
   if (!req.currentUser) {
     return res.status(401).json({ error: 'Authentication required' })
@@ -27,7 +31,11 @@ router.get('/api/users', authMiddleware, async (req, res) => {
 })
 
 
-// Fetch all conversations
+/**
+ * GET /api/conversations - Fetches all conversations. Requires authentication.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ */
 router.get('/api/conversations', authMiddleware, async (req, res) => {
   if (!req.currentUser) {
     return res.status(401).json({ error: 'Authentication required' })
@@ -42,7 +50,11 @@ router.get('/api/conversations', authMiddleware, async (req, res) => {
 })
 
 
-// Fetch user by username
+/**
+ * GET /api/users/:username - Fetches a user by username excluding their password and populates friends' usernames. Requires authentication.
+ * @param {Object} req - Express request object, containing the username parameter.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/users/:username', authMiddleware, async (req, res) => {
   if (!req.currentUser) {
     return res.status(401).json({ error: 'Authentication required' })
@@ -58,7 +70,12 @@ router.get('/api/users/:username', authMiddleware, async (req, res) => {
   }
 })
 
-// Fetch user by id
+
+/**
+ * GET /api/users/id/:userId - Fetches a user by ID, excluding their password, and populates profile picture URL and post titles. Requires authentication.
+ * @param {Object} req - Express request object, containing the userId parameter.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/users/id/:userId', authMiddleware, async (req, res) => {
   if (!req.currentUser) {
     return res.status(401).json({ error: 'Authentication required' })
@@ -75,7 +92,12 @@ router.get('/api/users/id/:userId', authMiddleware, async (req, res) => {
   }
 })
 
-// Check if a username is taken
+
+/**
+ * GET /api/username/:username - Checks if a username is already taken.
+ * @param {Object} req - Express request object, containing the username parameter.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/username/:username', async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username })
@@ -85,7 +107,12 @@ router.get('/api/username/:username', async (req, res) => {
   }
 })
 
-// Fetch users by username query pagination added
+
+/**
+ * GET /api/users/search/:query - Fetches users by username with pagination. Requires authentication.
+ * @param {Object} req - Express request object, containing the username query and pagination parameters.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/users/search/:query', authMiddleware, async (req, res) => {
   if (!req.currentUser) {
     return res.status(401).json({ error: 'Authentication required' })
@@ -109,7 +136,12 @@ router.get('/api/users/search/:query', authMiddleware, async (req, res) => {
 })
 
 
-// Fetch conversation by ID
+/**
+ * GET /api/conversations/:convoId - Fetches a single conversation by ID with pagination for messages.
+ * Requires authentication. Returns conversation details, current page, total pages, if there's a next page, and total messages.
+ * @param {Object} req - Express request object, containing conversation ID and pagination parameters.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/conversations/:convoId', authMiddleware, async (req, res) => {
   if (!req.currentUser) {
     return res.status(401).json({ error: 'Authentication required' })
@@ -153,7 +185,12 @@ router.get('/api/conversations/:convoId', authMiddleware, async (req, res) => {
 })
 
 
-// Fetch messages in a conversation
+/**
+ * GET /api/conversations/:convoId/messages - Fetches all messages within a specific conversation.
+ * Requires authentication. Populates sender and receiver details excluding passwords.
+ * @param {Object} req - Express request object, containing the conversation ID.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/conversations/:convoId/messages', authMiddleware, async (req, res) => {
   if (!req.currentUser) {
     return res.status(401).json({ error: 'Authentication required' })
@@ -176,7 +213,12 @@ router.get('/api/conversations/:convoId/messages', authMiddleware, async (req, r
 })
 
 
-// Fetch current user
+/**
+ * GET /api/me - Fetches the current authenticated user's details excluding their password.
+ * Populates pending friend requests and conversations. Requires authentication.
+ * @param {Object} req - Express request object, containing the current user's authentication information.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/me', authMiddleware, async (req, res) => {
   if (!req.currentUser) {
     return res.status(401).json({ error: 'Authentication required' })
@@ -191,7 +233,13 @@ router.get('/api/me', authMiddleware, async (req, res) => {
   res.json(user)
 })
 
-// Fetch friend requests
+
+/**
+ * GET /api/friendRequests - Fetches pending friend requests for the current user.
+ * Requires authentication. Populates sender's username.
+ * @param {Object} req - Express request object, containing the current user's authentication information.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/friendRequests', authMiddleware, async (req, res) => {
   const currentUser = req.currentUser
   if (!currentUser) {
@@ -210,7 +258,12 @@ router.get('/api/friendRequests', authMiddleware, async (req, res) => {
 })
 
 
-// Fetch user's posts
+/**
+ * GET /api/posts/user/:userId - Fetches all posts made by a specific user.
+ * Requires authentication. Sorts posts by creation date in descending order and populates comments with commenter's username.
+ * @param {Object} req - Express request object, containing the userId parameter and the current user's authentication information.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/posts/user/:userId', authMiddleware, async (req, res) => {
   const currentUser = req.currentUser
   if (!currentUser) {
@@ -241,7 +294,13 @@ router.get('/api/posts/user/:userId', authMiddleware, async (req, res) => {
 })
 
 
-// Fetch friends' posts
+/**
+ * GET /api/posts/friends/:userId - Fetches posts made by friends of a specific user.
+ * Requires authentication. Sorts posts by creation date in descending order, populates comments with commenter's username,
+ * and enriches each post with the author's username and profile picture.
+ * @param {Object} req - Express request object, containing the userId parameter and the current user's authentication information.
+ * @param {Object} res - Express response object used to send the response.
+ */
 router.get('/api/posts/friends/:userId', authMiddleware, async (req, res) => {
   const currentUser = req.currentUser
   if (!currentUser) {
@@ -287,7 +346,6 @@ router.get('/api/posts/friends/:userId', authMiddleware, async (req, res) => {
     console.error(error)
     res.status(500).json({ error: 'Error fetching friends posts' })
   }
-
 })
 
 router.use((req, res, next) => {
