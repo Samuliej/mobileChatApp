@@ -2,12 +2,22 @@ import { useState } from 'react'
 import api from '../api'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-/*
 
-  Custom hook for posting, commenting and liking a post.
-
-*/
-
+/**
+ * Custom hook for creating, commenting on, and liking posts.
+ * It manages the loading state and error handling for each operation.
+ *
+ * @returns {object} An object containing:
+ *                  - loading: A boolean indicating if an operation is in progress.
+ *                  - error: An error message if an error occurred during the last operation.
+ *                  - createPost: A function to create a new post with given content, image, and author.
+ *                  - commentPost: A function to comment on a post with given post ID and content.
+ *                  - likePost: A function to like a post with a given post ID.
+ *
+ * @example
+ * const { loading, error, createPost, commentPost, likePost } = usePost();
+ * createPost('Hello World', imageObject, authorObject);
+ */
 const usePost = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)

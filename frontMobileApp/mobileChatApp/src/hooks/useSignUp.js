@@ -1,12 +1,22 @@
 import { useState } from 'react'
 import api from '../api'
 
-/*
 
-  Custom hook for signing up as a new user.
-
-*/
-
+/**
+ * Custom hook for handling user sign-up.
+ * It manages the sign-up process, including loading and error states, and supports uploading a profile picture.
+ *
+ * @returns {object} An object containing:
+ *                  - signUp: A function to sign up a new user with provided details. It supports uploading a profile picture.
+ *                            The function takes parameters for username, password, name, profilePicture (optional), phone, and city.
+ *                  - loading: A boolean indicating if the sign-up process is currently in progress.
+ *                  - error: An error message if an error occurred during sign-up.
+ *                  - setError: A function to manually set the error state.
+ *
+ * @example
+ * const { signUp, loading, error, setError } = useSignUp();
+ * signUp('username', 'password', 'name', profilePicture, 'phone', 'city');
+ */
 const useSignUp = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
