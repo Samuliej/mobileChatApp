@@ -42,4 +42,9 @@ router.delete('/api/conversations/:id', authMiddleware, async (req, res) => {
   }
 })
 
+router.use((req, res, next) => {
+  console.log('Incoming request:', req.method, req.path)
+  next()
+})
+
 module.exports = router
