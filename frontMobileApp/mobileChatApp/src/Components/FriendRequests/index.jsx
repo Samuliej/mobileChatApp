@@ -100,6 +100,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+  },
 })
 
 export default FriendRequests

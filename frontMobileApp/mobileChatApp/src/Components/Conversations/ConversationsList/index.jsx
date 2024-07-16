@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   timestamp: {
-    fontSize: 12,
+    fontSize: 11,
     flexShrink: 1,
     marginRight: 80,
   },

@@ -7,16 +7,12 @@ import defaultProfilePicture from '../../../assets/soldier.png'
 import useSendFriendRequest from '../../hooks/useSendFriendRequest'
 import { UserContext } from '../../Context/UserContext.js'
 import ErrorBanner from '../Error/index.jsx'
-// Default user profile picture property of Pixel Perfect:
-// href="https://www.flaticon.com/free-icons/soldier" title="soldier icons">Soldier icons created by Pixel perfect - Flaticon
 
-/*
-
-  Component for searching for new users to add as friends.
-  The icon updates according to the friendship status
-
-*/
-
+/**
+ * Renders a component for searching for new users to add as friends.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
 const SearchForUser = () => {
   const [searchInput, setSearchInput] = useState('')
   const [page, setPage] = useState(1)
