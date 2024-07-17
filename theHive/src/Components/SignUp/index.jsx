@@ -47,6 +47,7 @@ const SignUp = () => {
   const navigation = useNavigation()
   const [ signingUp, setSigningUp ] = useState(false)
   const { isLoading, isTaken, check } = useIsUsernameTaken()
+  const [registering, setRegistering] = useState(false)
 
   useEffect(() => {
     if (form.signUpError) {
@@ -81,8 +82,10 @@ const SignUp = () => {
         && (form.username && form.password && form.name && form.confirmPassword)) {
 
       // Sign up the new user
+      setRegistering(true)
       const user = await form.signUp(form.username, form.password, form.name, form.profilePicture, form.phone, form.city)
       if (user) {
+        setRegistering(false)
         // If user created, sign in
         const data = await form.signIn(form.username, form.password)
         if (data) {
@@ -104,20 +107,31 @@ const SignUp = () => {
     }
   }
 
+  if (registering) {
+    return (
+      <View style={[styles.container, { marginTop: height / 3, justifyContent: 'center', alignItems: 'center', } ]}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Registering...</Text>
+      </View>
+    )
+  }
+
+  if (signingUp) {
+    return (
+      <View style={[styles.container, { marginTop: height / 3, justifyContent: 'center', alignItems: 'center', } ]}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Flying to the Hive...</Text>
+      </View>
+    )
+  }
+
   return (
     <KeyboardAwareScrollView
       resetScrollToCoords={{ x: 0, y: 0 }}
       contentContainerStyle={styles.container}
       scrollEnabled={true}
     >
-      {signingUp ? (
-        <>
-          <View style={[styles.container, { marginTop: height / 3, justifyContent: 'center', alignItems: 'center', } ]}>
-            <ActivityIndicator size="large" color="#0000ff" />
-            <Text>Flying to the Hive...</Text>
-          </View>
-        </>
-      ) : (<View>
+      <View>
         {errorMessage && <ErrorBanner error={errorMessage} />}
         <Pressable style={styles.imagePicker} onPress={form.selectImage}>
           {form.image ? (
@@ -246,7 +260,7 @@ const SignUp = () => {
           placeholder={'City'}
         />
         <CustomButton style={{ marginTop: 10, marginBottom: 20 }} onPress={handleSignUp} title='Register' />
-      </View>)}
+      </View>
     </KeyboardAwareScrollView>
   )
 }
