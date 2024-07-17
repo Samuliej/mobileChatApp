@@ -22,12 +22,12 @@ Real-time Communication: Websocket
 
 ## Preview pictures
 
-![Login](https://github.com/user-attachments/assets/36777ecc-d288-4da8-aa22-7c922ed89d35)
-![Register](https://github.com/user-attachments/assets/351e1d32-efa1-4c70-9e3c-046a10ef9be9)
-![Conversations](https://github.com/user-attachments/assets/db57e853-2e07-4e7c-85b7-87a17960b740)
-![Chat](https://github.com/user-attachments/assets/84093d65-3a14-4c00-8bfd-ea58a104ac0a)
-![Feed](https://github.com/user-attachments/assets/ca92de35-ee23-43d0-a4bf-c1b78b2ba658)
-![SearchUser](https://github.com/user-attachments/assets/3d0d2383-f1c7-4f71-9c41-32f3dba9a920)
+![Login](https://github.com/user-attachments/assets/5b335115-7fdd-401e-9405-0dba065b28fa)
+![Register](https://github.com/user-attachments/assets/63a5b2b6-4f73-4b53-8d1a-2a55bbb2ba3d)
+![Conversations](https://github.com/user-attachments/assets/fc8c4bff-df1f-4d54-8559-5373235bf0e1)
+![Chat](https://github.com/user-attachments/assets/f161097a-ce69-4324-bdc0-9a35f7cd8c49)
+![Feed](https://github.com/user-attachments/assets/8a093702-9e57-4657-8184-c394056fc293)
+![SearchUser](https://github.com/user-attachments/assets/5f9ce9c6-45ea-4927-a05f-8aed19a8d87b)
 
 
 
