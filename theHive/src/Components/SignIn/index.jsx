@@ -79,9 +79,9 @@ const SignIn = () => {
 
   // Function for handling signing in
   const handleSignIn = async () => {
+    setSigningIn(true)
     const data = await signIn(username, password)
     if (data) {
-      setSigningIn(true)
       await AsyncStorage.setItem('userToken', data)
       await updateUser(data)
       navigation.reset({
@@ -96,22 +96,22 @@ const SignIn = () => {
     }
   }
 
+  if (signingIn) {
+    return (
+      <View style={[styles.container, { marginTop: height / 3, justifyContent: 'center', alignItems: 'center', } ]}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Flying to the Hive...</Text>
+      </View>
+    )
+  }
+
   return (
     <>
       {error && <ErrorBanner error={error} />}
-      {signingIn ? (
-        <>
-          <View style={[styles.container, { marginTop: height / 3, justifyContent: 'center', alignItems: 'center', } ]}>
-            <ActivityIndicator size="large" color="#0000ff" />
-            <Text>Flying to the Hive...</Text>
-          </View>
-        </>
-      ) : (
-        <SignInView username={username} setUsername={setUsername} setUsernameError={setUsernameError}
-          password={password} setPassword={setPassword} setPasswordError={setPasswordError}
-          handleSignIn={handleSignIn} usernameError={usernameError} passwordError={passwordError}
-          validateField={validateField} />
-      )}
+      <SignInView username={username} setUsername={setUsername} setUsernameError={setUsernameError}
+        password={password} setPassword={setPassword} setPasswordError={setPasswordError}
+        handleSignIn={handleSignIn} usernameError={usernameError} passwordError={passwordError}
+        validateField={validateField} />
     </>
   )
 
