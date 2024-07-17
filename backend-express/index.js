@@ -76,7 +76,11 @@ app.get('/', (req, res) => {
 const port = config.PORT || 3000
 
 // initializes WebSocket communication with socket.io
-setupSockets(server)
+setupSockets(server, {
+  transports: ['websocket'],
+  pingInterval: 1000 * 60 * 5,
+  pingTimeout: 1000 * 60 * 3
+})
 
 /**
  * Starts the server on the configured port if not in test environment.
