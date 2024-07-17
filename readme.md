@@ -2,9 +2,9 @@
 - You can try the app on your mobile device without any setting up by previewing it from my public expo update link.
 - **Important notes:** 
 - The Expo Go mobile app needs to be expo sdk 49.
-- If you use an emulator, make sure it has enough ram and VM heap allocated, as the websocket functionality suffers if the emulated device is slow. (3Gb ram and 1Gb vm heap worked for me on 16Gb ram laptop)
+- If you use an emulator, make sure it has enough ram and VM heap allocated (3Gb ram and 1Gb vm heap worked for me).
 - Link for downloading the mobile app https://expo.dev/go.
-- Link to expo update: https://expo.dev/preview/update?message=%23skip%20Merge%20pull%20request%20%2350%20from%20Samuliej%2Fchanges%0A%0AChanges&updateRuntimeVersion=1.1.0&createdAt=2024-07-17T10%3A40%3A58.210Z&slug=exp&projectId=c65168d9-6015-44c3-8256-ab2b906efa5f&group=8b474d5b-75e9-4f2e-b5c8-f38f1d703014
+- Link to expo update: [https://expo.dev/preview/update?message=%23skip%20Merge%20pull%20request%20%2350%20from%20Samuliej%2Fchanges%0A%0AChanges&updateRuntimeVersion=1.1.0&createdAt=2024-07-17T10%3A40%3A58.210Z&slug=exp&projectId=c65168d9-6015-44c3-8256-ab2b906efa5f&group=8b474d5b-75e9-4f2e-b5c8-f38f1d703014](https://expo.dev/preview/update?message=Merge%20pull%20request%20%2356%20from%20Samuliej%2Fsocket%0A%0AFixes&updateRuntimeVersion=1.1.0&createdAt=2024-07-17T17%3A44%3A12.439Z&slug=exp&projectId=c65168d9-6015-44c3-8256-ab2b906efa5f&group=ade82914-9a83-4889-875b-cc834f909915)
 
 ## Development Diary
 
