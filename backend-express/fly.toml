@@ -24,14 +24,6 @@ primary_region = 'arn'
   cpu_kind = 'shared'
   cpus = 4
 
-[[http_service.checks]]
-  grace_period = "10s"
-  interval = "2m"
-  method = "GET"
-  timeout = "5s"
-  path = "/"
-
-
 # Enable sticky sessions for WebSocket connections
 [experimental]
   auto_https = false

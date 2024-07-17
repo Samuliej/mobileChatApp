@@ -5,7 +5,6 @@ const User = require('./models/User')
 const Friendship = require('./models/Friendship')
 const validateToken = require('./utils/validateToken')
 
-
 /**
  * Initializes and configures the WebSocket server using socket.io.
  *
@@ -33,7 +32,6 @@ module.exports = function (server) {
     const userId = socket.handshake.query.userId
     // Store user id and the socket id as key-value pair
     userSocketIds[userId] = socketId
-
 
     /**
      * Event listener for 'sendFriendRequest'. Handles the logic for sending friend requests between users.
@@ -278,7 +276,7 @@ module.exports = function (server) {
     })
 
     socket.on('disconnect', () => {
-      console.log('A user disconnected')
+      console.log(`'A user disconnected. socketId: ${socketId} userId: ${userId}`)
       delete userSocketIds[userId]
     })
   })

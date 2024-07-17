@@ -93,6 +93,8 @@ const SignIn = () => {
         setPassword('')
         setSigningIn(false)
       }, 2000)
+    } else {
+      setSigningIn(false)
     }
   }
 
