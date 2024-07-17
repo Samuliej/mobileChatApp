@@ -33,7 +33,6 @@ export const SocketProvider = ({ children }) => {
       newSocket = io.connect(HTTP_URL, {
         query: { userId: userContext.user._id }
       })
-      console.log('Connected to socket at context')
       setSocket(newSocket)
     }
 

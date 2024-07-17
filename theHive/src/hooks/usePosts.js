@@ -53,7 +53,6 @@ const usePosts = (userId) => {
   // Feetch the posts in a useEffect hook
   useEffect(() => {
     const fetchPosts = async () => {
-      console.log('fetchPosts')
       setLoading(true)
       try {
         const token = await AsyncStorage.getItem('userToken')
