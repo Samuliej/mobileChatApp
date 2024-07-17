@@ -26,7 +26,7 @@ primary_region = 'arn'
 
 [[http_service.checks]]
   grace_period = "10s"
-  interval = "30s"
+  interval = "2m"
   method = "GET"
   timeout = "5s"
   path = "/"
@@ -35,5 +35,4 @@ primary_region = 'arn'
 # Enable sticky sessions for WebSocket connections
 [experimental]
   auto_https = false
-  private_network = true
   session_affinity = true
