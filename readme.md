@@ -22,9 +22,12 @@ Real-time Communication: Websocket
 
 ## Preview pictures
 
-![sc1](https://github.com/Samuliej/mobileChatApp/assets/103901865/f3178f94-7f24-4c96-8e55-f575ddead3d3)
-![sc2](https://github.com/Samuliej/mobileChatApp/assets/103901865/0edc1bd5-cf89-4077-9f1d-f43cecc594db)
-![sc3](https://github.com/Samuliej/mobileChatApp/assets/103901865/9d8ae022-d7e3-4d2b-a064-b457774fb6a2)
-![sc4](https://github.com/Samuliej/mobileChatApp/assets/103901865/ea82b76b-c99f-4c16-a3ad-f2bb580bd8a3)
-![sc5](https://github.com/Samuliej/mobileChatApp/assets/103901865/035206e0-9743-49cd-a445-7c50b8213818)
-![sc6](https://github.com/Samuliej/mobileChatApp/assets/103901865/144ed880-3734-4e73-b19a-8b05e20433d5)
+![Login](https://github.com/user-attachments/assets/36777ecc-d288-4da8-aa22-7c922ed89d35)
+![Register](https://github.com/user-attachments/assets/351e1d32-efa1-4c70-9e3c-046a10ef9be9)
+![Conversations](https://github.com/user-attachments/assets/db57e853-2e07-4e7c-85b7-87a17960b740)
+![Chat](https://github.com/user-attachments/assets/84093d65-3a14-4c00-8bfd-ea58a104ac0a)
+![Feed](https://github.com/user-attachments/assets/ca92de35-ee23-43d0-a4bf-c1b78b2ba658)
+![SearchUser](https://github.com/user-attachments/assets/3d0d2383-f1c7-4f71-9c41-32f3dba9a920)
+
+
+
