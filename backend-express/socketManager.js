@@ -104,15 +104,14 @@ module.exports = function (server) {
           const newFriendshipToFront = { ...newFriendship._doc, userObj: user }
 
           const receiverSocketId = userSocketIds[receiver._id]
-          if (receiverSocketId && io.sockets.sockets.get(receiverSocketId)) {
-            io.sockets.sockets.get(receiverSocketId).emit('friendRequest', newFriendshipToFront, (error) => {
-              if (error) {
-                console.error('Error sending friend request:', error)
-              } else {
-                console.log('Friend request sent successfully')
-              }
-            })
-          }// No need for else, receiver not connected, no need to emit.
+          io.sockets.sockets.get(receiverSocketId).emit('friendRequest', newFriendshipToFront, (error) => {
+            if (error) {
+              if (!receiverSocketId)
+                console.error('user was not connected to a socket, the request was still sent.')
+            } else {
+              console.log('Friend request sent successfully')
+            }
+          })
         }
       } catch (error) {
         console.log('Error sending friend request:', error)
@@ -139,6 +138,7 @@ module.exports = function (server) {
      * If any errors occur during this process, logs the error and emits an error message to the user.
      */
     socket.on('acceptFriendRequest', async (data) => {
+      let friendSocketId
       try {
         const { friendshipId, token } = data
         const currentUser = validateToken(token)
@@ -168,15 +168,17 @@ module.exports = function (server) {
 
         io.to(userSocketIds[user._id]).emit('friendRequestAccepted', friendship)
 
-        const friendSocketId = userSocketIds[friend._id]
-        if (friendSocketId && io.sockets.sockets.get(friendSocketId)) {
-          io.to(friendSocketId).emit('friendRequestAccepted', friendship)
-        }
+        friendSocketId = userSocketIds[friend._id]
+        io.to(friendSocketId).emit('friendRequestAccepted', friendship)
 
         socket.emit('friendRequestAccepted', friendship)
       } catch (error) {
-        console.log('Error accepting friend request:', error)
-        socket.emit('error', { error: 'Error accepting friend request' })
+        if (!friendSocketId)
+          console.error('user was not connected to a socket, the request was still sent.')
+        else {
+          console.log('Error accepting friend request:', error)
+          socket.emit('error', { error: 'Error accepting friend request' })
+        }
       }
     })
 
@@ -252,19 +254,26 @@ module.exports = function (server) {
         socket.emit('error', { error: 'Something went wrong updating the conversation'})
       }
 
-      // Broadcast the messages to the sender and receiver
-      const receiverSocketId = userSocketIds[messageData.receiver]
+      let receiverSocketId
+      try {
+        // Broadcast the messages to the sender and receiver
+        receiverSocketId = userSocketIds[messageData.receiver]
 
-      io.to(userSocketIds[messageData.sender]).emit('message', newMessage)
-      io.to(userSocketIds[messageData.sender]).emit('messageToConvo', newMessage)
+        io.to(userSocketIds[messageData.sender]).emit('message', newMessage)
+        io.to(userSocketIds[messageData.sender]).emit('messageToConvo', newMessage)
 
-      if (receiverSocketId && io.sockets.sockets.get(receiverSocketId)) {
-        io.to(userSocketIds[messageData.receiver]).emit('message', newMessage)
-        io.to(userSocketIds[messageData.receiver]).emit('messageToConvo', newMessage)
-      }
-      if (isNewConvo) {
-        // If it's a new conversation, broadcast the conversation to the receiver
-        io.to(userSocketIds[messageData.receiver]).emit('newConversation', conversation)
+        io.to(receiverSocketId).emit('message', newMessage)
+        io.to(receiverSocketId).emit('messageToConvo', newMessage)
+        if (isNewConvo) {
+          // If it's a new conversation, broadcast the conversation to the receiver
+          io.to(receiverSocketId).emit('newConversation', conversation)
+        }
+      } catch (error) {
+        if (!receiverSocketId)
+          console.error('Receiver not connected to socket, message still sent.')
+        else {
+          console.error('something went wrong emitting the message: ', error)
+        }
       }
     })
 
