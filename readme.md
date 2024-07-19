@@ -1,10 +1,10 @@
 # How to preview the app
 - You can try the app on your mobile device without any setting up by previewing it from my public expo update link.
-- **Important notes:** 
+- **Important notes:**
 - The Expo Go mobile app needs to be expo sdk 49.
 - If you use an emulator, make sure it has enough ram and VM heap allocated (3Gb ram and 1Gb vm heap worked for me).
 - Link for downloading the mobile app https://expo.dev/go.
-- Link to expo update: [https://expo.dev/preview/update?message=%23skip%20Merge%20pull%20request%20%2350%20from%20Samuliej%2Fchanges%0A%0AChanges&updateRuntimeVersion=1.1.0&createdAt=2024-07-17T10%3A40%3A58.210Z&slug=exp&projectId=c65168d9-6015-44c3-8256-ab2b906efa5f&group=8b474d5b-75e9-4f2e-b5c8-f38f1d703014](https://expo.dev/preview/update?message=Merge%20pull%20request%20%2356%20from%20Samuliej%2Fsocket%0A%0AFixes&updateRuntimeVersion=1.1.0&createdAt=2024-07-17T17%3A44%3A12.439Z&slug=exp&projectId=c65168d9-6015-44c3-8256-ab2b906efa5f&group=ade82914-9a83-4889-875b-cc834f909915)
+- Link to expo update: [https://expo.dev/preview/update?message=%23skip%20Merge%20pull%20request%20%2361%20from%20Samuliej%2Flast-changes%0A%0AChanged%20the%20IOS%20color%20to%20be%20the%20same%20as%20on%20android&updateRuntimeVersion=1.1.0&createdAt=2024-07-19T07%3A23%3A09.685Z&slug=exp&projectId=c65168d9-6015-44c3-8256-ab2b906efa5f&group=09a4cebe-2161-43df-968f-ddb9e4ad847b](https://expo.dev/preview/update?message=%23skip%20Merge%20pull%20request%20%2361%20from%20Samuliej%2Flast-changes%0A%0AChanged%20the%20IOS%20color%20to%20be%20the%20same%20as%20on%20android&updateRuntimeVersion=1.1.0&createdAt=2024-07-19T07%3A23%3A09.685Z&slug=exp&projectId=c65168d9-6015-44c3-8256-ab2b906efa5f&group=09a4cebe-2161-43df-968f-ddb9e4ad847b)
 
 ## Development Diary
 
@@ -12,16 +12,16 @@ For a detailed development diary, see [kehityspaivakirja.md](./kehityspaivakirja
 
 # Welcome to The Hive 🐝
 
-Welcome to The Hive, your go-to social networking app designed to bring people closer 
-together, no matter where they are. In today's fast-paced world, staying connected with 
-friends and loved ones is more important than ever. The Hive makes it easy and fun 
+Welcome to The Hive, your go-to social networking app designed to bring people closer
+together, no matter where they are. In today's fast-paced world, staying connected with
+friends and loved ones is more important than ever. The Hive makes it easy and fun
 to share your life's moments, chat in real-time, and build meaningful connections.
 
 ## Why The Hive?
 
-The Hive stands out with its intuitive design, seamless user experience, and a suite of 
-features tailored to enhance your social interactions. Whether you're looking to catch up 
-with old friends, make new ones, or simply share a glimpse of your day, The Hive provides 
+The Hive stands out with its intuitive design, seamless user experience, and a suite of
+features tailored to enhance your social interactions. Whether you're looking to catch up
+with old friends, make new ones, or simply share a glimpse of your day, The Hive provides
 the perfect platform to do so.
 
 ## Key Features
@@ -50,7 +50,7 @@ the perfect platform to do so.
 - NODE_ENV: set it as ""
 - CLOUDINARY_URL: You need to create a cloudinary account and get the url to use for media storage. After creating an account and setting up a product environment, you can find your url in settings -> Product environment settings -> API keys. At the same location you can find your CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET.
 - CLOUDINARY_NAME: The same as the name of your product environment.
-  
+
 - **Frontend:**
 - HTTP_URL: Use http://ipaddr:3000 where ipaddr is your local IP address. This is necessary as localhost:3000 may not work in some configurations. The IP address should be the same as when starting frontend: "Metro waiting on exp://ipaddr:8081".
 
