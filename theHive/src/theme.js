@@ -122,7 +122,7 @@ const theme = {
   platformStyle: {
     color: Platform.select({
       android: '#4CAF50',
-      ios: '#318CE7',
+      ios: '#4CAF50',
       default: '#4CAF50'
     })
   }
